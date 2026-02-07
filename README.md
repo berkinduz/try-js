@@ -1,0 +1,56 @@
+# JS Park
+
+A lightweight JavaScript & TypeScript playground. Write code, see output instantly.
+
+**Live:** [js.berkinduz.com](https://js.berkinduz.com)
+
+## Features
+
+- **Instant feedback** — auto-run with 500ms debounce, or manual run with `Cmd+Enter`
+- **JavaScript & TypeScript** — switch between JS and TS with one click. TypeScript is transpiled in-browser via Sucrase
+- **REPL-style evaluation** — bare expressions (like `x` or `1 + 2`) display their result in the console, just like Chrome DevTools
+- **Console output** — supports `console.log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
+- **Sandboxed execution** — code runs in a sandboxed iframe with a 5s timeout to catch infinite loops
+- **Dark / Light theme** — toggle with `Cmd+Shift+P`
+- **Resizable panels** — drag the split between editor and console
+- **Code persistence** — your code is saved to localStorage per language
+
+## Tech Stack
+
+| Layer | Choice | Size |
+|-------|--------|------|
+| UI Framework | Preact + Preact Signals | ~6 KB gzip |
+| Editor | CodeMirror 6 | ~166 KB gzip |
+| TS Transpiler | Sucrase | ~48 KB gzip |
+| Build | Vite | — |
+| Hosting | Vercel | — |
+
+Total bundle: **~130 KB gzipped**
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Type-check & build
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd+Enter` | Run code |
+| `Cmd+L` | Clear console |
+| `Cmd+Shift+P` | Toggle theme |
+
+## License
+
+MIT

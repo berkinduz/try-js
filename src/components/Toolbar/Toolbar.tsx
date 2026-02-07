@@ -24,9 +24,9 @@ export function Toolbar({ onRun }: Props) {
           <span class="toolbar__logo">JS</span>
           <span class="toolbar__title">Park</span>
         </div>
+      </div>
 
-        <div class="toolbar__separator" />
-
+      <div class="toolbar__right">
         {!auto && (
           <button
             class="toolbar__run-btn"
@@ -46,11 +46,11 @@ export function Toolbar({ onRun }: Props) {
             checked={auto}
             onChange={(e) => setAutoRun((e.target as HTMLInputElement).checked)}
           />
-          <span class="toolbar__toggle-label">Auto</span>
+          <span class="toolbar__toggle-label">Auto run</span>
         </label>
-      </div>
 
-      <div class="toolbar__right">
+        <div class="toolbar__separator" />
+
         <div class="toolbar__lang-switch">
           <button
             class={`toolbar__lang-btn ${currentLang === "javascript" ? "active" : ""}`}

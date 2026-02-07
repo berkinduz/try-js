@@ -4,7 +4,7 @@ import type { SerializedValue } from "../utils/format";
 export interface ConsoleEntry {
   id: number;
   kind: "console";
-  method: "log" | "warn" | "error" | "info" | "table" | "clear" | "time" | "timeEnd";
+  method: "log" | "warn" | "error" | "info" | "table" | "clear" | "time" | "timeEnd" | "result";
   args: SerializedValue[];
   timestamp: number;
 }

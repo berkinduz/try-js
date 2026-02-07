@@ -12,6 +12,7 @@ const METHOD_ICONS: Record<string, string> = {
   warn: "⚠",
   error: "✕",
   table: "▦",
+  result: "←",
 };
 
 function renderValue(val: SerializedValue, index: number) {

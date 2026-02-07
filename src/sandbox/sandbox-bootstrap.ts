@@ -5,6 +5,9 @@ export const SANDBOX_BOOTSTRAP = `
 (function() {
   var _timers = {};
 
+  // Exposed globally so the result capture code can use it
+  window.__jspark_serialize = serialize;
+
   function serialize(val, depth, seen) {
     if (depth === undefined) depth = 0;
     if (seen === undefined) seen = new WeakSet();

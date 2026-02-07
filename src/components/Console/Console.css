@@ -89,6 +89,15 @@
   color: var(--console-info-fg);
 }
 
+.console-entry--result {
+  opacity: 0.7;
+}
+
+.console-entry--result .console-icon {
+  opacity: 1;
+  color: var(--text-muted);
+}
+
 .console-icon {
   flex-shrink: 0;
   width: 16px;

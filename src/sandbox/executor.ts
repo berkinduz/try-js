@@ -10,6 +10,68 @@ import {
 } from "../state/console";
 import { EXECUTION_TIMEOUT } from "../utils/constants";
 
+/**
+ * REPL-style last expression evaluation.
+ *
+ * Given transpiled JS code, attempts to detect the last expression statement
+ * and return it separately so it can be captured via eval().
+ *
+ * Returns { body, lastExpr } where body is the code without the last expression,
+ * and lastExpr is the expression string (without trailing semicolons), or null
+ * if the last statement is not an expression.
+ *
+ * Declarations (var/let/const/function/class/import/export), control flow
+ * (if/for/while/switch/try), and statements ending with blocks are NOT wrapped.
+ */
+function splitLastExpression(code: string): { body: string; lastExpr: string | null } {
+  const lines = code.split("\n");
+
+  // Find the last non-empty, non-comment line
+  let lastIdx = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const trimmed = lines[i].trim();
+    if (trimmed && !trimmed.startsWith("//") && !trimmed.startsWith("/*")) {
+      lastIdx = i;
+      break;
+    }
+  }
+
+  if (lastIdx === -1) return { body: code, lastExpr: null };
+
+  const lastLine = lines[lastIdx].trim();
+
+  // Skip lines that are clearly not standalone expressions
+  const nonExprPrefixes = [
+    "var ", "let ", "const ", "function ", "function*",
+    "class ", "import ", "export ", "return ", "throw ",
+    "if ", "if(", "else ", "else{",
+    "for ", "for(", "while ", "while(", "do ", "do{",
+    "switch ", "switch(",
+    "try ", "try{",
+    "break", "continue",
+    "debugger",
+  ];
+
+  for (const prefix of nonExprPrefixes) {
+    if (lastLine.startsWith(prefix)) return { body: code, lastExpr: null };
+  }
+
+  // Skip if the line ends with opening brace (block statement)
+  if (lastLine.endsWith("{")) return { body: code, lastExpr: null };
+
+  // Strip trailing semicolons to get the expression
+  const stripped = lastLine.replace(/;+$/, "").trim();
+  if (!stripped) return { body: code, lastExpr: null };
+
+  // Build body = all lines except the last expression line
+  const bodyLines = lines.slice(0, lastIdx);
+  // Include any trailing empty/comment lines after the expression
+  // (but not the expression line itself)
+  const body = bodyLines.join("\n");
+
+  return { body, lastExpr: stripped };
+}
+
 let currentIframe: HTMLIFrameElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
 let runningIndicatorId: ReturnType<typeof setTimeout> | null = null;
@@ -40,6 +102,8 @@ function handleMessage(event: MessageEvent) {
 
   if (data.type === "console") {
     addConsoleEntry(data.method, data.args || []);
+  } else if (data.type === "result") {
+    addConsoleEntry("result", [data.value]);
   } else if (data.type === "error") {
     addErrorEntry(
       data.errorType || "error",
@@ -96,8 +160,27 @@ export function executeCode(source: string, lang: Language) {
   }
 
   const jsCode = result.code;
+  const { body, lastExpr } = splitLastExpression(jsCode);
 
-  // Build the sandbox HTML
+  // Build the sandbox HTML.
+  // If we detected a last expression, run the body first, then eval the expression
+  // to capture its result (REPL-style). Otherwise, just run the full code.
+  const execBlock = lastExpr
+    ? `${body}
+var __jspark_result = eval(${JSON.stringify(lastExpr)});`
+    : jsCode;
+
+  const resultBlock = lastExpr
+    ? `
+if (typeof __jspark_result !== "undefined") {
+  parent.postMessage({
+    source: "jspark",
+    type: "result",
+    value: window.__jspark_serialize(__jspark_result, 0)
+  }, "*");
+}`
+    : "";
+
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -107,7 +190,7 @@ ${SANDBOX_BOOTSTRAP}
 
 var __startTime = performance.now();
 try {
-${jsCode}
+${execBlock}
 } catch(e) {
   parent.postMessage({
     source: "jspark",
@@ -118,6 +201,7 @@ ${jsCode}
   }, "*");
 }
 var __endTime = performance.now();
+${resultBlock}
 parent.postMessage({
   source: "jspark",
   type: "done",
