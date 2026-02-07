@@ -2,7 +2,7 @@
 
 A lightweight JavaScript & TypeScript playground. Write code, see output instantly.
 
-**Live:** [testjs.app](https://testjs.app)
+**Live:** [TryJS](https://testjs.app)
 
 ## Features
 

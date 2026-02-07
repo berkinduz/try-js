@@ -30,7 +30,7 @@ export function StatusBar() {
           rel="noopener noreferrer"
           class="statusbar__brand"
         >
-          TestJS
+          TryJS
         </a>
       </div>
 
