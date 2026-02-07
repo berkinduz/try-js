@@ -33,7 +33,8 @@ import {
 } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 import type { Language } from "../../state/editor";
-import { lightTheme, darkTheme } from "./themes";
+import type { SyntaxThemeId, UiTheme } from "./themes";
+import { getEditorTheme } from "./themes";
 
 export const languageCompartment = new Compartment();
 export const themeCompartment = new Compartment();
@@ -42,20 +43,21 @@ export function getLanguageExtension(lang: Language): Extension {
   return javascript({ typescript: lang === "typescript", jsx: false });
 }
 
-export function getThemeExtension(theme: "light" | "dark"): Extension {
-  return theme === "dark" ? darkTheme : lightTheme;
+export function getThemeExtension(uiTheme: UiTheme, syntaxThemeId: SyntaxThemeId): Extension[] {
+  return getEditorTheme(uiTheme, syntaxThemeId);
 }
 
 export function createExtensions(
   lang: Language,
-  theme: "light" | "dark",
+  uiTheme: UiTheme,
+  syntaxThemeId: SyntaxThemeId,
   onChange: (code: string) => void
 ): Extension[] {
   return [
     // Language
     languageCompartment.of(getLanguageExtension(lang)),
-    // Theme
-    themeCompartment.of(getThemeExtension(theme)),
+    // Theme (UI + syntax)
+    themeCompartment.of(getThemeExtension(uiTheme, syntaxThemeId)),
     // Core
     lineNumbers(),
     highlightActiveLineGutter(),

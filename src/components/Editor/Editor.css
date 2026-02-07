@@ -1,3 +1,38 @@
+.editor-wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.editor-copy {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.editor-copy:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.editor-copy__done {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--success);
+}
+
 .editor-container {
   height: 100%;
   overflow: hidden;

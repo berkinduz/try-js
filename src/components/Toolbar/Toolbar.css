@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 44px;
-  padding: 0 12px;
+  height: 52px;
+  padding: 0 14px;
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--border);
-  gap: 12px;
+  gap: 14px;
   flex-shrink: 0;
   z-index: 10;
 }
@@ -15,10 +15,14 @@
 .toolbar__right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-/* Brand */
+.toolbar__right--links {
+  gap: 2px;
+}
+
+/* Brand: JS/TS toggle + Park */
 .toolbar__brand {
   display: flex;
   align-items: center;
@@ -26,73 +30,81 @@
   user-select: none;
 }
 
-.toolbar__logo {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 800;
-  color: #000;
-  background: var(--accent);
-  padding: 2px 5px;
-  border-radius: 4px;
-  letter-spacing: -0.5px;
-  line-height: 1;
+/* Fused segments: no gap, shared edge; subtle rounding */
+.toolbar__lang-toggle {
+  display: flex;
+  gap: 0;
 }
 
-.toolbar__title {
+.toolbar__logo {
+  font-family: var(--font-mono);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
+  padding: 4px 10px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+/* JS: only left corners slightly rounded */
+.toolbar__logo--js {
+  border-radius: 4px 0 0 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.toolbar__logo--js:hover {
   color: var(--text-primary);
-  letter-spacing: -0.3px;
+}
+
+.toolbar__logo--js.active {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.toolbar__logo--js.active:hover {
+  background: var(--accent-hover);
+}
+
+/* TS: only right corners slightly rounded */
+.toolbar__logo--ts {
+  border-radius: 0 4px 4px 0;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.toolbar__logo--ts:hover {
+  color: var(--text-primary);
+}
+
+.toolbar__logo--ts.active {
+  background: #3178c6;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toolbar__logo--ts.active:hover {
+  background: #235a97;
 }
 
 /* Separator */
 .toolbar__separator {
   width: 1px;
-  height: 18px;
+  height: 20px;
   background: var(--border);
   margin: 0 2px;
-}
-
-/* Language switch */
-.toolbar__lang-switch {
-  display: flex;
-  background: var(--bg-tertiary);
-  border-radius: 6px;
-  padding: 2px;
-  gap: 2px;
-}
-
-.toolbar__lang-btn {
-  padding: 3px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  line-height: 1.3;
-}
-
-.toolbar__lang-btn:hover {
-  color: var(--text-primary);
-}
-
-.toolbar__lang-btn.active {
-  background: var(--accent);
-  color: #000;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 /* Run button */
 .toolbar__run-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 5px 14px;
+  font-size: 13px;
   font-weight: 600;
   border: none;
   border-radius: 6px;
@@ -134,24 +146,96 @@
   to { transform: rotate(360deg); }
 }
 
-/* Icon buttons */
-.toolbar__icon-btn {
+/* Syntax theme select */
+.toolbar__syntax-select {
+  height: 34px;
+  padding: 0 8px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23656d76' d='M5 6.5L1 2.5h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toolbar__syntax-select:hover {
+  background-color: var(--bg-secondary);
+}
+
+.toolbar__syntax-select:focus {
+  outline: none;
+  border-color: var(--border);
+}
+
+/* Icon buttons & links */
+.toolbar__icon-btn,
+.toolbar__link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s;
+  text-decoration: none;
 }
 
-.toolbar__icon-btn:hover {
+.toolbar__icon-btn:hover,
+.toolbar__link:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+}
+
+/* Buy Me a Coffee: icon + text slides open to the left on hover */
+.toolbar__bmc {
+  width: auto;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  gap: 8px;
+  justify-content: flex-end;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.toolbar__bmc-text {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  transition: max-width 0.3s ease-out;
+}
+
+.toolbar__bmc:hover {
+  background: #ffdd00;
+  color: #000;
+  border-color: #e6c700;
+  box-shadow: 0 0 0 1px #e6c700;
+}
+
+.toolbar__bmc:hover .toolbar__bmc-text {
+  max-width: 140px;
+}
+
+.toolbar__bmc-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* Toggle */
@@ -164,14 +248,14 @@
 }
 
 .toolbar__toggle input {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   accent-color: var(--accent);
   cursor: pointer;
 }
 
 .toolbar__toggle-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
 }
@@ -181,10 +265,6 @@
   .toolbar {
     padding: 0 8px;
     gap: 6px;
-  }
-
-  .toolbar__title {
-    display: none;
   }
 
   .toolbar__toggle-label {

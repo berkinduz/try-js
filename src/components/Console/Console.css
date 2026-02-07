@@ -30,19 +30,25 @@
   gap: 6px;
 }
 
-.console-header__count {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
+.console-header__clear {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
   color: var(--text-muted);
-  background: var(--bg-tertiary);
-  padding: 1px 6px;
-  border-radius: 8px;
-  min-width: 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
-.console-header__count:empty {
-  display: none;
+.console-header__clear:hover {
+  background: var(--console-hover);
+  color: var(--text-primary);
 }
 
 .console-list {

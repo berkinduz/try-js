@@ -1,11 +1,15 @@
 import { signal, computed } from "@preact/signals";
 import { DEFAULT_JS_CODE, DEFAULT_TS_CODE } from "../utils/constants";
+import type { SyntaxThemeId } from "../components/Editor/themes";
+import {
+  SYNTAX_THEMES,
+  getUiModeForSyntax,
+  DEFAULT_DARK_SYNTAX,
+  DEFAULT_LIGHT_SYNTAX,
+} from "../components/Editor/themes";
 
 export type Language = "javascript" | "typescript";
 export type Theme = "light" | "dark";
-
-const getInitialTheme = (): Theme =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
 const getStoredCode = (lang: Language): string => {
   const stored = localStorage.getItem(`jspark:code:${lang}`);
@@ -17,15 +21,19 @@ const getStoredLanguage = (): Language => {
   return stored === "typescript" ? "typescript" : "javascript";
 };
 
-const getStoredTheme = (): Theme => {
-  const stored = localStorage.getItem("jspark:theme");
-  if (stored === "light" || stored === "dark") return stored;
-  return getInitialTheme();
+const validSyntaxIds = new Set(SYNTAX_THEMES.map((t) => t.id));
+const getStoredSyntaxTheme = (): SyntaxThemeId => {
+  const stored = localStorage.getItem("jspark:syntaxTheme");
+  if (stored && validSyntaxIds.has(stored as SyntaxThemeId)) return stored as SyntaxThemeId;
+  return "one-dark";
 };
 
 export const language = signal<Language>(getStoredLanguage());
 export const code = signal<string>(getStoredCode(getStoredLanguage()));
-export const theme = signal<Theme>(getStoredTheme());
+export const syntaxTheme = signal<SyntaxThemeId>(getStoredSyntaxTheme());
+
+/** Site UI theme (light/dark) derived from syntax theme so they stay in sync. */
+export const theme = computed<Theme>(() => getUiModeForSyntax(syntaxTheme.value));
 
 export const fileExtension = computed(() =>
   language.value === "typescript" ? ".ts" : ".js"
@@ -45,11 +53,21 @@ export function setCode(newCode: string) {
   code.value = newCode;
 }
 
+/** Toggle between light and dark: switches to default syntax theme for the other mode. */
 export function toggleTheme() {
-  theme.value = theme.value === "dark" ? "light" : "dark";
-  localStorage.setItem("jspark:theme", theme.value);
-  document.documentElement.setAttribute("data-theme", theme.value);
+  const nextSyntax =
+    theme.value === "dark" ? DEFAULT_LIGHT_SYNTAX : DEFAULT_DARK_SYNTAX;
+  setSyntaxTheme(nextSyntax);
 }
 
-// Initialize theme attribute
-document.documentElement.setAttribute("data-theme", getStoredTheme());
+export function setSyntaxTheme(id: SyntaxThemeId) {
+  syntaxTheme.value = id;
+  localStorage.setItem("jspark:syntaxTheme", id);
+  document.documentElement.setAttribute("data-theme", getUiModeForSyntax(id));
+}
+
+// Initialize site theme from stored syntax theme
+document.documentElement.setAttribute(
+  "data-theme",
+  getUiModeForSyntax(getStoredSyntaxTheme())
+);

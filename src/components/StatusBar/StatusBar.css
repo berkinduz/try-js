@@ -16,11 +16,144 @@
 .statusbar__right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.statusbar__lang {
+/* Font & Theme: no labels, content more prominent */
+.statusbar__appearance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
+.statusbar__select {
+  height: 22px;
+  padding: 0 8px 0 6px;
+  font-size: 11px;
   font-weight: 500;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 10 10'%3E%3Cpath fill='%238b949e' d='M5 6.5L1 2.5h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  padding-right: 20px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.statusbar__select:hover {
+  background-color: var(--border-subtle);
+  border-color: var(--text-muted);
+}
+
+.statusbar__select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Shortcut (⌘) button - left of font selector, hover shows tooltip */
+.statusbar__shortcut-wrap {
+  position: relative;
+  margin-right: 4px;
+}
+
+.statusbar__shortcut-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.statusbar__shortcut-btn:hover {
+  background: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.statusbar__shortcut-icon {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.statusbar__shortcut-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.15s, opacity 0.15s;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.statusbar__shortcut-wrap:hover .statusbar__shortcut-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.statusbar__shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.statusbar__shortcut-row:last-child {
+  margin-bottom: 0;
+}
+
+.statusbar__shortcut-tooltip kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.statusbar__brand {
+  font-weight: 600;
+}
+
+.statusbar__copyright {
+  color: var(--text-muted);
+}
+
+.statusbar__copyright-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.statusbar__copyright-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
 }
 
 .statusbar__item {

@@ -2,35 +2,7 @@
    JS Park - Design System & Global Styles
    ============================================ */
 
-/* Fonts - Geist Mono & Geist Sans from Vercel */
-@font-face {
-  font-family: "Geist Mono";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist_Mono/GeistMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist_Mono/GeistMono-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist_Mono/GeistMono-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist_Mono/GeistMono-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* Geist Mono via Google Fonts (see index.html link); Geist Sans from Vercel */
 @font-face {
   font-family: "Geist";
   src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Regular.woff2") format("woff2");
@@ -64,11 +36,13 @@
   --font-mono: "Geist Mono", "SF Mono", "Fira Code", "Cascadia Code", monospace;
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-size: 14px;
+  --editor-font: "Geist Mono", monospace;
 
   /* Spacing */
   --radius: 8px;
   --radius-sm: 4px;
 }
+
 
 /* ============================================
    LIGHT THEME
@@ -234,6 +208,7 @@ html, body, #app {
 body {
   font-family: var(--font-sans);
   font-size: var(--font-size);
+  font-optical-sizing: auto;
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;

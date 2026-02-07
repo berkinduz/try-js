@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "preact/hooks";
+import { useState, useRef, useEffect } from "preact/hooks";
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import {
@@ -8,12 +8,21 @@ import {
   getLanguageExtension,
   getThemeExtension,
 } from "./extensions";
-import { code, language, theme, setCode } from "../../state/editor";
+import { code, language, theme, syntaxTheme, setCode } from "../../state/editor";
 import "./Editor.css";
 
 export function Editor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code.value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (_) {}
+  };
 
   // Create editor on mount
   useEffect(() => {
@@ -22,9 +31,12 @@ export function Editor() {
     const view = new EditorView({
       state: EditorState.create({
         doc: code.value,
-        extensions: createExtensions(language.value, theme.value, (newCode) => {
-          setCode(newCode);
-        }),
+        extensions: createExtensions(
+          language.value,
+          theme.value,
+          syntaxTheme.value,
+          (newCode) => setCode(newCode)
+        ),
       }),
       parent: containerRef.current,
     });
@@ -48,16 +60,17 @@ export function Editor() {
     });
   }, [language.value]);
 
-  // Sync theme compartment
+  // Sync theme compartment (UI theme + syntax theme)
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
 
-    const t = theme.value;
     view.dispatch({
-      effects: themeCompartment.reconfigure(getThemeExtension(t)),
+      effects: themeCompartment.reconfigure(
+        getThemeExtension(theme.value, syntaxTheme.value)
+      ),
     });
-  }, [theme.value]);
+  }, [theme.value, syntaxTheme.value]);
 
   // Sync external code changes (e.g. language switch restoring saved code)
   useEffect(() => {
@@ -76,5 +89,25 @@ export function Editor() {
     }
   }, [code.value]);
 
-  return <div ref={containerRef} class="editor-container" />;
+  return (
+    <div class="editor-wrapper">
+      <button
+        type="button"
+        class="editor-copy"
+        onClick={copyCode}
+        title="Copy code"
+        aria-label="Copy code"
+      >
+        {copied ? (
+          <span class="editor-copy__done">Copied!</span>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+          </svg>
+        )}
+      </button>
+      <div ref={containerRef} class="editor-container" />
+    </div>
+  );
 }

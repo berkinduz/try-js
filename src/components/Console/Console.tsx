@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "preact/hooks";
-import { consoleOutput } from "../../state/console";
+import { consoleOutput, clearConsole } from "../../state/console";
 import { ConsoleEntry } from "./ConsoleEntry";
 import "./Console.css";
 
@@ -34,9 +34,18 @@ export function Console() {
           </svg>
           Console
         </span>
-        <span class="console-header__count">
-          {entries.length > 0 && `${entries.length}`}
-        </span>
+        <button
+          type="button"
+          class="console-header__clear"
+          onClick={clearConsole}
+          title="Clear console (Ctrl+L / ⌘+L)"
+          aria-label="Clear console"
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="6" />
+            <line x1="5" y1="5" x2="11" y2="11" />
+          </svg>
+        </button>
       </div>
       <div class="console-list" ref={listRef} onScroll={onScroll}>
         {entries.length === 0 ? (

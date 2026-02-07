@@ -4,9 +4,9 @@ import { Console } from "./components/Console/Console";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { StatusBar } from "./components/StatusBar/StatusBar";
 import { SplitPane } from "./components/SplitPane/SplitPane";
-import { code, language, toggleTheme } from "./state/editor";
+import { code, language } from "./state/editor";
 import { clearConsole, consoleOutput } from "./state/console";
-import { autoRun, autoRunDelay } from "./state/settings";
+import { autoRunDelay } from "./state/settings";
 import { executeCode } from "./sandbox/executor";
 import { useKeyboard } from "./hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
@@ -27,10 +27,8 @@ export function App() {
     executeCode(code.value, language.value);
   }, []);
 
-  // Auto-run on code change
+  // Auto-run on code change (always on)
   useEffect(() => {
-    if (!autoRun.value) return;
-
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       executeCode(code.value, language.value);
@@ -58,7 +56,6 @@ export function App() {
       },
     },
     { key: "l", mod: true, handler: clearConsole },
-    { key: "p", mod: true, shift: true, handler: toggleTheme },
   ]);
 
   // Error count for mobile badge
@@ -69,7 +66,7 @@ export function App() {
   if (isMobile) {
     return (
       <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <Toolbar onRun={run} />
+        <Toolbar />
         <div class="mobile-tabs">
           <button
             class={`mobile-tab ${mobileTab === "editor" ? "active" : ""}`}
@@ -102,7 +99,7 @@ export function App() {
 
   return (
     <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Toolbar onRun={run} />
+      <Toolbar />
       <SplitPane
         left={<Editor />}
         right={<Console />}
