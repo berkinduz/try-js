@@ -1,5 +1,5 @@
 import { language, theme, setLanguage, toggleTheme } from "../../state/editor";
-import { clearConsole, isRunning } from "../../state/console";
+import { clearConsole } from "../../state/console";
 import { autoRun, setAutoRun } from "../../state/settings";
 import type { Language } from "../../state/editor";
 import "./Toolbar.css";
@@ -11,7 +11,6 @@ interface Props {
 export function Toolbar({ onRun }: Props) {
   const currentLang = language.value;
   const currentTheme = theme.value;
-  const running = isRunning.value;
   const auto = autoRun.value;
 
   const handleLangSwitch = (lang: Language) => {
@@ -28,21 +27,18 @@ export function Toolbar({ onRun }: Props) {
 
         <div class="toolbar__separator" />
 
-        <button
-          class={`toolbar__run-btn ${running ? "running" : ""}`}
-          onClick={onRun}
-          disabled={running}
-          title="Run (Ctrl+Enter / ⌘+Enter)"
-        >
-          {running ? (
-            <span class="toolbar__spinner" />
-          ) : (
+        {!auto && (
+          <button
+            class="toolbar__run-btn"
+            onClick={onRun}
+            title="Run (Ctrl+Enter / ⌘+Enter)"
+          >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
               <path d="M4 2l10 6-10 6V2z" />
             </svg>
-          )}
-          <span>{running ? "Running..." : "Run"}</span>
-        </button>
+            <span>Run</span>
+          </button>
+        )}
 
         <label class="toolbar__toggle" title="Auto-run on code change">
           <input
