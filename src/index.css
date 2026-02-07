@@ -1,0 +1,254 @@
+/* ============================================
+   JS Park - Design System & Global Styles
+   ============================================ */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-size: 14px;
+
+  /* Spacing */
+  --radius: 8px;
+  --radius-sm: 4px;
+}
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #e8ecf0;
+
+  /* Text */
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
+  --text-muted: #8b949e;
+
+  /* Accent */
+  --accent: #f0d000;
+  --accent-hover: #e0c200;
+
+  /* Borders */
+  --border: #d1d9e0;
+  --border-subtle: #e8ecf0;
+
+  /* Semantic */
+  --error: #cf222e;
+  --warning: #bf8700;
+  --info: #0969da;
+  --success: #1a7f37;
+
+  /* Toolbar */
+  --toolbar-bg: #ffffff;
+
+  /* Status bar */
+  --statusbar-bg: #f6f8fa;
+
+  /* Divider */
+  --divider-bg: #e8ecf0;
+  --divider-hover: #d1d9e0;
+  --divider-handle: #656d76;
+
+  /* Editor */
+  --editor-bg: #ffffff;
+  --editor-fg: #1f2328;
+  --editor-gutter-bg: #f6f8fa;
+  --editor-gutter-fg: #8b949e;
+  --editor-active-line: #f6f8fa;
+  --editor-selection: #0969da22;
+  --editor-bracket-match: #0969da18;
+
+  /* Console */
+  --console-bg: #f6f8fa;
+  --console-hover: #e8ecf0;
+  --console-warn-bg: #fff8c5;
+  --console-warn-fg: #7a5e00;
+  --console-warn-border: #f0d000aa;
+  --console-error-bg: #ffebe9;
+  --console-error-fg: #cf222e;
+  --console-error-border: #cf222e44;
+  --console-info-fg: #0969da;
+  --console-stack-bg: #e8ecf0;
+
+  /* Syntax (for console values) */
+  --syntax-string: #0a3069;
+  --syntax-number: #0550ae;
+  --syntax-keyword: #cf222e;
+  --syntax-function: #8250df;
+  --syntax-comment: #6e7781;
+
+  /* Run button */
+  --run-btn-bg: #1f883d;
+  --run-btn-fg: #ffffff;
+  --run-btn-hover: #1a7f37;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+
+  /* Text */
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #656d76;
+
+  /* Accent */
+  --accent: #f0d000;
+  --accent-hover: #f5da30;
+
+  /* Borders */
+  --border: #30363d;
+  --border-subtle: #21262d;
+
+  /* Semantic */
+  --error: #f85149;
+  --warning: #d29922;
+  --info: #58a6ff;
+  --success: #3fb950;
+
+  /* Toolbar */
+  --toolbar-bg: #161b22;
+
+  /* Status bar */
+  --statusbar-bg: #0d1117;
+
+  /* Divider */
+  --divider-bg: #21262d;
+  --divider-hover: #30363d;
+  --divider-handle: #8b949e;
+
+  /* Editor */
+  --editor-bg: #0d1117;
+  --editor-fg: #e6edf3;
+  --editor-gutter-bg: #0d1117;
+  --editor-gutter-fg: #484f58;
+  --editor-active-line: #161b2266;
+  --editor-selection: #58a6ff33;
+  --editor-bracket-match: #58a6ff22;
+
+  /* Console */
+  --console-bg: #0d1117;
+  --console-hover: #161b22;
+  --console-warn-bg: #d299220f;
+  --console-warn-fg: #d29922;
+  --console-warn-border: #d2992233;
+  --console-error-bg: #f851490f;
+  --console-error-fg: #f85149;
+  --console-error-border: #f8514933;
+  --console-info-fg: #58a6ff;
+  --console-stack-bg: #161b22;
+
+  /* Syntax (for console values) */
+  --syntax-string: #a5d6ff;
+  --syntax-number: #79c0ff;
+  --syntax-keyword: #ff7b72;
+  --syntax-function: #d2a8ff;
+  --syntax-comment: #8b949e;
+
+  /* Run button */
+  --run-btn-bg: #238636;
+  --run-btn-fg: #ffffff;
+  --run-btn-hover: #2ea043;
+}
+
+/* ============================================
+   GLOBAL RESETS & BASE
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection */
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* Mobile: tab system */
+@media (max-width: 767px) {
+  .mobile-tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-tab {
+    flex: 1;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .mobile-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .mobile-tab__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    margin-left: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--error);
+    color: #fff;
+    border-radius: 8px;
+  }
+}

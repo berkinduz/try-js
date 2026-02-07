@@ -1,0 +1,196 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.toolbar__left,
+.toolbar__center,
+.toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar__left {
+  flex: 1;
+}
+
+.toolbar__right {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Brand */
+.toolbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.toolbar__logo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: #000;
+  background: var(--accent);
+  padding: 2px 5px;
+  border-radius: 4px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.toolbar__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+/* Language switch */
+.toolbar__lang-switch {
+  display: flex;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.toolbar__lang-btn {
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.3;
+}
+
+.toolbar__lang-btn:hover {
+  color: var(--text-primary);
+}
+
+.toolbar__lang-btn.active {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Run button */
+.toolbar__run-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  background: var(--run-btn-bg);
+  color: var(--run-btn-fg);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.toolbar__run-btn:hover:not(:disabled) {
+  background: var(--run-btn-hover);
+  transform: translateY(-1px);
+}
+
+.toolbar__run-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.toolbar__run-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.toolbar__run-btn.running {
+  background: var(--warning);
+}
+
+/* Spinner */
+.toolbar__spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Icon buttons */
+.toolbar__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.toolbar__icon-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Toggle */
+.toolbar__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar__toggle input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.toolbar__toggle-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .toolbar {
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .toolbar__title {
+    display: none;
+  }
+
+  .toolbar__toggle-label {
+    display: none;
+  }
+}
