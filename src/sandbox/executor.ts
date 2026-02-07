@@ -12,11 +12,21 @@ import { EXECUTION_TIMEOUT } from "../utils/constants";
 
 let currentIframe: HTMLIFrameElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
+let runningIndicatorId: ReturnType<typeof setTimeout> | null = null;
+let executionDone = false;
+
+// Delay before showing the "Running..." indicator.
+// Most executions finish in <50ms, so this prevents flicker.
+const RUNNING_INDICATOR_DELAY = 150;
 
 function cleanup() {
   if (timeoutId) {
     clearTimeout(timeoutId);
     timeoutId = null;
+  }
+  if (runningIndicatorId) {
+    clearTimeout(runningIndicatorId);
+    runningIndicatorId = null;
   }
   if (currentIframe) {
     currentIframe.remove();
@@ -39,6 +49,12 @@ function handleMessage(event: MessageEvent) {
       data.colno
     );
   } else if (data.type === "done") {
+    executionDone = true;
+    // Cancel the running indicator if it hasn't fired yet
+    if (runningIndicatorId) {
+      clearTimeout(runningIndicatorId);
+      runningIndicatorId = null;
+    }
     isRunning.value = false;
     if (typeof data.executionTime === "number") {
       executionTime.value = data.executionTime;
@@ -52,14 +68,29 @@ window.addEventListener("message", handleMessage);
 export function executeCode(source: string, lang: Language) {
   cleanup();
   clearConsole();
-  isRunning.value = true;
+  executionDone = false;
   executionTime.value = null;
+
+  // Don't set isRunning = true immediately.
+  // Instead, wait RUNNING_INDICATOR_DELAY ms. If execution finishes
+  // before then, we never show "Running..." → no flicker.
+  runningIndicatorId = setTimeout(() => {
+    if (!executionDone) {
+      isRunning.value = true;
+    }
+    runningIndicatorId = null;
+  }, RUNNING_INDICATOR_DELAY);
 
   // Transpile if needed
   const result = transpile(source, lang);
 
   if (result.error !== null) {
     addErrorEntry("error", `Transpilation Error: ${result.error}`);
+    executionDone = true;
+    if (runningIndicatorId) {
+      clearTimeout(runningIndicatorId);
+      runningIndicatorId = null;
+    }
     isRunning.value = false;
     return;
   }
@@ -111,6 +142,7 @@ parent.postMessage({
       "error",
       `Execution timed out after ${EXECUTION_TIMEOUT / 1000}s. Possible infinite loop?`
     );
+    executionDone = true;
     isRunning.value = false;
   }, EXECUTION_TIMEOUT);
 
@@ -129,5 +161,6 @@ parent.postMessage({
 
 export function stopExecution() {
   cleanup();
+  executionDone = true;
   isRunning.value = false;
 }
