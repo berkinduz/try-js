@@ -1,4 +1,4 @@
-# JS Park
+# Test JS
 
 A lightweight JavaScript & TypeScript playground. Write code, see output instantly.
 
