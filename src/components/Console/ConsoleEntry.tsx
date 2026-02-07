@@ -89,11 +89,15 @@ function renderTable(args: SerializedValue[]) {
 
 export function ConsoleEntry({ entry }: Props) {
   if (entry.kind === "error") {
+    const location =
+      entry.lineno != null || entry.colno != null
+        ? ` (line ${entry.lineno ?? "?"}, column ${entry.colno ?? "?"})`
+        : "";
     return (
       <div class="console-entry console-entry--error">
         <span class="console-icon">✕</span>
         <div class="console-content">
-          <span class="console-message">{entry.message}</span>
+          <span class="console-message">{entry.message}{location}</span>
           {entry.stack && (
             <pre class="console-stack">{entry.stack}</pre>
           )}

@@ -107,6 +107,14 @@ export const SANDBOX_BOOTSTRAP = `
     };
   });
 
+  function sendDone(executionTime) {
+    parent.postMessage({
+      source: "jspark",
+      type: "done",
+      executionTime: typeof executionTime === "number" ? executionTime : 0
+    }, "*");
+  }
+
   window.onerror = function(message, source, lineno, colno, error) {
     parent.postMessage({
       source: "jspark",
@@ -117,6 +125,8 @@ export const SANDBOX_BOOTSTRAP = `
       lineno: lineno,
       colno: colno
     }, "*");
+    sendDone(0);
+    return true;
   };
 
   window.addEventListener("unhandledrejection", function(event) {
@@ -127,6 +137,29 @@ export const SANDBOX_BOOTSTRAP = `
       message: event.reason ? String(event.reason) : "Unhandled Promise Rejection",
       stack: event.reason && event.reason.stack ? event.reason.stack : undefined
     }, "*");
+    sendDone(0);
   });
+
+  window.addEventListener("message", function(e) {
+    if (!e.data || e.data.source !== "jspark" || e.data.type !== "run") return;
+    var code = e.data.code;
+    try {
+      eval(code);
+    } catch (err) {
+      parent.postMessage({
+        source: "jspark",
+        type: "error",
+        errorType: "error",
+        message: err.message || String(err),
+        stack: err.stack,
+        lineno: err.lineno,
+        colno: err.colno
+      }, "*");
+    }
+    var execTime = (typeof __endTime !== "undefined" && typeof __startTime !== "undefined") ? (__endTime - __startTime) : 0;
+    parent.postMessage({ source: "jspark", type: "done", executionTime: execTime }, "*");
+  });
+
+  parent.postMessage({ source: "jspark", type: "ready" }, "*");
 })();
 `;

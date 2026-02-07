@@ -63,6 +63,9 @@ function splitLastExpression(code: string): { body: string; lastExpr: string | n
   const stripped = lastLine.replace(/;+$/, "").trim();
   if (!stripped) return { body: code, lastExpr: null };
 
+  // "}" or "};" alone is a block closer, not an expression – don't treat as last expr
+  if (stripped === "}") return { body: code, lastExpr: null };
+
   // Build body = all lines except the last expression line
   const bodyLines = lines.slice(0, lastIdx);
   // Include any trailing empty/comment lines after the expression
@@ -76,6 +79,14 @@ let currentIframe: HTMLIFrameElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
 let runningIndicatorId: ReturnType<typeof setTimeout> | null = null;
 let executionDone = false;
+
+// Line number mapping: iframe reports line numbers in the generated HTML.
+let userCodeStartLine = 0;
+let userCodeLineCount = 0;
+// Code to run when iframe sends "ready" (avoids srcdoc/onload race).
+let pendingCode: string | null = null;
+// Clear console on first output of this run (avoids empty-console flicker between runs).
+let clearOnNextOutput = false;
 
 // Delay before showing the "Running..." indicator.
 // Most executions finish in <50ms, so this prevents flicker.
@@ -94,6 +105,7 @@ function cleanup() {
     currentIframe.remove();
     currentIframe = null;
   }
+  pendingCode = null;
 }
 
 function handleMessage(event: MessageEvent) {
@@ -101,18 +113,58 @@ function handleMessage(event: MessageEvent) {
   if (!data || data.source !== "jspark") return;
 
   if (data.type === "console") {
+    if (clearOnNextOutput) {
+      clearConsole();
+      clearOnNextOutput = false;
+    }
     addConsoleEntry(data.method, data.args || []);
   } else if (data.type === "result") {
+    if (clearOnNextOutput) {
+      clearConsole();
+      clearOnNextOutput = false;
+    }
     addConsoleEntry("result", [data.value]);
   } else if (data.type === "error") {
-    addErrorEntry(
-      data.errorType || "error",
-      data.message,
-      data.stack,
-      data.lineno,
-      data.colno
-    );
+    if (clearOnNextOutput) {
+      clearConsole();
+      clearOnNextOutput = false;
+    }
+    let lineno = data.lineno;
+    let colno = data.colno;
+    const message = data.message;
+    let stack = data.stack;
+    // Map iframe line to editor line; hide our internals from stack
+    if (
+      typeof lineno === "number" &&
+      userCodeStartLine > 0 &&
+      userCodeLineCount > 0
+    ) {
+      const userLine = lineno - userCodeStartLine + 1;
+      if (userLine >= 1 && userLine <= userCodeLineCount) {
+        lineno = userLine;
+      }
+    }
+    if (stack && /__jspark|postMessage|at about:srcdoc/.test(stack)) {
+      stack = undefined;
+    }
+    addErrorEntry(data.errorType || "error", message, stack, lineno, colno);
+  } else if (data.type === "ready") {
+    if (
+      pendingCode !== null &&
+      currentIframe?.contentWindow &&
+      event.source === currentIframe.contentWindow
+    ) {
+      currentIframe.contentWindow.postMessage(
+        { source: "jspark", type: "run", code: pendingCode },
+        "*"
+      );
+      pendingCode = null;
+    }
   } else if (data.type === "done") {
+    if (clearOnNextOutput) {
+      clearConsole();
+      clearOnNextOutput = false;
+    }
     executionDone = true;
     // Cancel the running indicator if it hasn't fired yet
     if (runningIndicatorId) {
@@ -131,7 +183,7 @@ window.addEventListener("message", handleMessage);
 
 export function executeCode(source: string, lang: Language) {
   cleanup();
-  clearConsole();
+  clearOnNextOutput = true; // clear on first output (avoids empty-console flicker)
   executionDone = false;
   executionTime.value = null;
 
@@ -181,43 +233,32 @@ if (typeof __jspark_result !== "undefined") {
 }`
     : "";
 
-  const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body>
-<script>
-${SANDBOX_BOOTSTRAP}
+  // Line numbers: code starts with __startTime then user code, so user line 1 = line 2 of code.
+  userCodeStartLine = 2;
+  userCodeLineCount = execBlock.split("\n").length;
 
-var __startTime = performance.now();
-try {
-${execBlock}
-} catch(e) {
-  parent.postMessage({
-    source: "jspark",
-    type: "error",
-    errorType: "error",
-    message: e.message || String(e),
-    stack: e.stack
-  }, "*");
-}
-var __endTime = performance.now();
-${resultBlock}
-parent.postMessage({
-  source: "jspark",
-  type: "done",
-  executionTime: __endTime - __startTime
-}, "*");
-</script>
-</body>
-</html>`;
+  // Code to run in iframe. No postMessage(done) – bootstrap sends done after eval().
+  const codeToRun =
+    "var __startTime = performance.now();\n" +
+    execBlock +
+    "\nvar __endTime = performance.now();\n" +
+    resultBlock;
 
-  // Create sandboxed iframe
+  pendingCode = codeToRun;
+
+  // srcdoc = only bootstrap. It sends "ready"; we then postMessage the code (no HTML injection).
+  const bootstrapForHtml = SANDBOX_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
+  const srcdoc =
+    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body><script>" +
+    bootstrapForHtml +
+    "</script></body></html>";
+
   const iframe = document.createElement("iframe");
   iframe.sandbox.add("allow-scripts");
   iframe.style.display = "none";
-  iframe.srcdoc = html;
-  document.body.appendChild(iframe);
   currentIframe = iframe;
+  iframe.srcdoc = srcdoc;
+  document.body.appendChild(iframe);
 
   // Execution timeout
   timeoutId = setTimeout(() => {
