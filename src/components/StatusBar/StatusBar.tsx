@@ -24,18 +24,14 @@ export function StatusBar() {
   return (
     <div class="statusbar">
       <div class="statusbar__left">
-        <span class="statusbar__brand">TestJS</span>
-        <span class="statusbar__copyright">
-          ©{" "}
-          <a
-            href="https://berkinduz.com/en/about"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="statusbar__copyright-link"
-          >
-            Berkin Düz
-          </a>
-        </span>
+        <a
+          href="https://berkinduz.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="statusbar__brand"
+        >
+          TestJS
+        </a>
       </div>
 
       <div class="statusbar__right">

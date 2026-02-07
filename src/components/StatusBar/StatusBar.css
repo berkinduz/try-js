@@ -139,21 +139,13 @@
 
 .statusbar__brand {
   font-weight: 600;
-}
-
-.statusbar__copyright {
-  color: var(--text-muted);
-}
-
-.statusbar__copyright-link {
   color: inherit;
   text-decoration: none;
   transition: color 0.15s;
 }
 
-.statusbar__copyright-link:hover {
+.statusbar__brand:hover {
   color: var(--text-primary);
-  text-decoration: underline;
 }
 
 .statusbar__item {
