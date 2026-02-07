@@ -26,6 +26,35 @@ export function Toolbar({ onRun }: Props) {
           <span class="toolbar__title">Park</span>
         </div>
 
+        <div class="toolbar__separator" />
+
+        <button
+          class={`toolbar__run-btn ${running ? "running" : ""}`}
+          onClick={onRun}
+          disabled={running}
+          title="Run (Ctrl+Enter / ⌘+Enter)"
+        >
+          {running ? (
+            <span class="toolbar__spinner" />
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4 2l10 6-10 6V2z" />
+            </svg>
+          )}
+          <span>{running ? "Running..." : "Run"}</span>
+        </button>
+
+        <label class="toolbar__toggle" title="Auto-run on code change">
+          <input
+            type="checkbox"
+            checked={auto}
+            onChange={(e) => setAutoRun((e.target as HTMLInputElement).checked)}
+          />
+          <span class="toolbar__toggle-label">Auto</span>
+        </label>
+      </div>
+
+      <div class="toolbar__right">
         <div class="toolbar__lang-switch">
           <button
             class={`toolbar__lang-btn ${currentLang === "javascript" ? "active" : ""}`}
@@ -42,35 +71,6 @@ export function Toolbar({ onRun }: Props) {
             TS
           </button>
         </div>
-      </div>
-
-      <div class="toolbar__center">
-        <button
-          class={`toolbar__run-btn ${running ? "running" : ""}`}
-          onClick={onRun}
-          disabled={running}
-          title="Run (Ctrl+Enter / ⌘+Enter)"
-        >
-          {running ? (
-            <span class="toolbar__spinner" />
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M4 2l10 6-10 6V2z" />
-            </svg>
-          )}
-          <span>{running ? "Running..." : "Run"}</span>
-        </button>
-      </div>
-
-      <div class="toolbar__right">
-        <label class="toolbar__toggle" title="Auto-run on code change">
-          <input
-            type="checkbox"
-            checked={auto}
-            onChange={(e) => setAutoRun((e.target as HTMLInputElement).checked)}
-          />
-          <span class="toolbar__toggle-label">Auto</span>
-        </label>
 
         <button
           class="toolbar__icon-btn"

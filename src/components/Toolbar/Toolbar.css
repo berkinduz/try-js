@@ -12,20 +12,10 @@
 }
 
 .toolbar__left,
-.toolbar__center,
 .toolbar__right {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.toolbar__left {
-  flex: 1;
-}
-
-.toolbar__right {
-  flex: 1;
-  justify-content: flex-end;
 }
 
 /* Brand */
@@ -53,6 +43,14 @@
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.3px;
+}
+
+/* Separator */
+.toolbar__separator {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 2px;
 }
 
 /* Language switch */
@@ -92,9 +90,9 @@
 .toolbar__run-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  font-size: 13px;
+  gap: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
   font-weight: 600;
   border: none;
   border-radius: 6px;
@@ -107,11 +105,10 @@
 
 .toolbar__run-btn:hover:not(:disabled) {
   background: var(--run-btn-hover);
-  transform: translateY(-1px);
 }
 
 .toolbar__run-btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.97);
 }
 
 .toolbar__run-btn:disabled {
@@ -125,9 +122,9 @@
 
 /* Spinner */
 .toolbar__spinner {
-  width: 12px;
-  height: 12px;
-  border: 2px solid currentColor;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid currentColor;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -161,22 +158,22 @@
 .toolbar__toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   user-select: none;
 }
 
 .toolbar__toggle input {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   accent-color: var(--accent);
   cursor: pointer;
 }
 
 .toolbar__toggle-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 /* Mobile */
@@ -191,6 +188,10 @@
   }
 
   .toolbar__toggle-label {
+    display: none;
+  }
+
+  .toolbar__separator {
     display: none;
   }
 }
