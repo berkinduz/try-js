@@ -4,17 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>TryJS - Free Online JavaScript & TypeScript Playground</title>
-    <meta name="description" content="Run JavaScript and TypeScript in your browser. Free online playground with instant feedback, console, syntax themes. No signup. Perfect for learning and quick tests." />
+    <meta name="description" content="TryJS: free JavaScript and TypeScript playground. Run code in the browser with instant feedback, console, and themes. No signup." />
     <meta name="keywords" content="javascript playground, typescript playground, online js editor, run javascript online, typescript online, code playground, js sandbox" />
     <meta name="author" content="TryJS" />
     <meta name="robots" content="index, follow" />
+    <!-- Use your production domain; canonical must match the URL users see -->
     <link rel="canonical" href="https://testjs.app/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://testjs.app/" />
     <meta property="og:title" content="TryJS - Free Online JavaScript & TypeScript Playground" />
-    <meta property="og:description" content="Run JavaScript and TypeScript in your browser. Free online playground with instant feedback, console, syntax themes. No signup required." />
+    <meta property="og:description" content="TryJS: free JavaScript and TypeScript playground. Run code in the browser with instant feedback. No signup." />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="TryJS" />
     <!-- Add when you have a 1200×630 image: <meta property="og:image" content="https://testjs.app/og.png" /> -->
@@ -22,9 +23,10 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="TryJS - Free Online JavaScript & TypeScript Playground" />
-    <meta name="twitter:description" content="Run JavaScript and TypeScript in your browser. Free online playground with instant feedback. No signup." />
+    <meta name="twitter:description" content="TryJS: free JavaScript and TypeScript playground. Run code in the browser. No signup." />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -44,11 +46,34 @@
     </script>
 
     <style>
-      body { margin: 0; overflow: hidden; }
+      body { margin: 0; overflow: auto; }
+      .app-wrap { height: 100vh; min-height: 100vh; }
+      .seo-content {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 3rem;
+        font: 1rem/1.6 system-ui, sans-serif;
+        color: #374151;
+      }
+      .seo-content h1 { font-size: 1.5rem; margin: 0 0 1rem; color: #111; }
+      .seo-content h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; color: #222; }
+      .seo-content p { margin: 0 0 0.75rem; }
+      .seo-content a { color: #2563eb; text-decoration: none; }
+      .seo-content a:hover { text-decoration: underline; }
     </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="app-wrap"><div id="app"></div></div>
+    <section class="seo-content" id="about" aria-label="About TryJS">
+      <h1>TryJS – Free Online JavaScript & TypeScript Playground</h1>
+      <p>TryJS is a free JavaScript and TypeScript playground that runs in your browser. Write code and see the result instantly, with no signup or installation. Use it to learn JavaScript and TypeScript, test snippets, or try ideas on the fly.</p>
+      <h2>What you can do</h2>
+      <p>Switch between JavaScript and TypeScript with one click; TypeScript is compiled in the browser. The editor runs your code automatically as you type (with a short delay), and you can use <kbd>Cmd</kbd>+<kbd>Enter</kbd> to run immediately. The console shows <code>console.log</code>, errors, and REPL-style results for expressions.</p>
+      <p>You get syntax highlighting and several themes (e.g. One Dark, Dracula, GitHub Light). Your code is saved in the browser per language, and execution runs in a sandbox with a timeout to avoid infinite loops.</p>
+      <h2>Why use this playground</h2>
+      <p>This online JS and TypeScript playground is built for quick experiments and learning. There is no backend: everything runs in your browser. It works on desktop and mobile. For the full experience, use a modern browser like Chrome, Firefox, or Safari.</p>
+      <p>TryJS is open source. You can find the project on <a href="https://github.com/berkinduz/js-park" rel="noopener noreferrer">GitHub</a> and the live app at <a href="https://testjs.app/">testjs.app</a>. Bookmark the page to get a quick JavaScript or TypeScript playground whenever you need it.</p>
+    </section>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
