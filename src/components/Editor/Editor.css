@@ -53,3 +53,19 @@
 .editor-container .cm-focused {
   outline: none;
 }
+
+/* Placeholder overlay: disappears on focus/click so user doesn't try to delete it */
+.editor-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 0 0 3rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  line-height: 1.6;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}

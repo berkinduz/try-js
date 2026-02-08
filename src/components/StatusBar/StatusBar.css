@@ -58,10 +58,16 @@
   border-color: var(--accent);
 }
 
-/* Shortcut (⌘) button - left of font selector, hover shows tooltip */
+/* Shortcut (⌘) button - left of font selector, hover shows tooltip; hidden on mobile */
 .statusbar__shortcut-wrap {
   position: relative;
   margin-right: 4px;
+}
+
+@media (max-width: 768px) {
+  .statusbar__shortcut-wrap {
+    display: none;
+  }
 }
 
 .statusbar__shortcut-btn {

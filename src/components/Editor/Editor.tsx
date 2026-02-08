@@ -15,6 +15,7 @@ export function Editor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const [copied, setCopied] = useState(false);
+  const [editorFocused, setEditorFocused] = useState(false);
 
   const copyCode = async () => {
     try {
@@ -43,7 +44,14 @@ export function Editor() {
 
     viewRef.current = view;
 
+    const onFocus = () => setEditorFocused(true);
+    const onBlur = () => setEditorFocused(false);
+    view.contentDOM.addEventListener("focus", onFocus);
+    view.contentDOM.addEventListener("blur", onBlur);
+
     return () => {
+      view.contentDOM.removeEventListener("focus", onFocus);
+      view.contentDOM.removeEventListener("blur", onBlur);
       view.destroy();
       viewRef.current = null;
     };
@@ -89,8 +97,20 @@ export function Editor() {
     }
   }, [code.value]);
 
+  const showPlaceholder = code.value === "" && !editorFocused;
+
   return (
     <div class="editor-wrapper">
+      {showPlaceholder && (
+        <div
+          class="editor-placeholder"
+          aria-hidden="true"
+        >
+          // Welcome to TryJS
+          <br />
+          // Write or paste your code below
+        </div>
+      )}
       <button
         type="button"
         class="editor-copy"
