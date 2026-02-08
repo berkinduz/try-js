@@ -1,4 +1,4 @@
-# Test JS
+# TryJS
 
 A lightweight JavaScript & TypeScript playground. Write code, see output instantly.
 
