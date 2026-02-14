@@ -5,28 +5,32 @@
 /* Geist Mono via Google Fonts (see index.html link); Geist Sans from Vercel */
 @font-face {
   font-family: "Geist";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Regular.woff2") format("woff2");
+  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Regular.woff2")
+    format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Geist";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Medium.woff2") format("woff2");
+  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Medium.woff2")
+    format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Geist";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-SemiBold.woff2") format("woff2");
+  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-SemiBold.woff2")
+    format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Geist";
-  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Bold.woff2") format("woff2");
+  src: url("https://assets.vercel.com/raw/upload/v1710191091/geist/Geist/Geist-Bold.woff2")
+    format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -34,7 +38,9 @@
 
 :root {
   --font-mono: "Geist Mono", "SF Mono", "Fira Code", "Cascadia Code", monospace;
-  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-sans:
+    "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    sans-serif;
   --font-size: 14px;
   --editor-font: "Geist Mono", monospace;
 
@@ -42,7 +48,6 @@
   --radius: 8px;
   --radius-sm: 4px;
 }
-
 
 /* ============================================
    LIGHT THEME
@@ -90,7 +95,7 @@
   --editor-gutter-fg: #8b949e;
   --editor-active-line: #f3f1e8;
   --editor-selection: #0969da22;
-  --editor-bracket-match: #0969da18;
+  --editor-bracket-match: #0969da30;
 
   /* Console */
   --console-bg: #f3f1e8;
@@ -163,7 +168,7 @@
   --editor-gutter-fg: #5a5a56;
   --editor-active-line: #2c2c2a66;
   --editor-selection: #58a6ff33;
-  --editor-bracket-match: #58a6ff22;
+  --editor-bracket-match: #58a6ff38;
 
   /* Console */
   --console-bg: #252524;
@@ -193,13 +198,17 @@
 /* ============================================
    GLOBAL RESETS & BASE
    ============================================ */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   width: 100%;
   overflow: hidden;
