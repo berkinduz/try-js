@@ -14,7 +14,11 @@ export type SyntaxThemeId =
 
 export type UiTheme = "light" | "dark";
 
-export const SYNTAX_THEMES: { id: SyntaxThemeId; label: string; mode: UiTheme }[] = [
+export const SYNTAX_THEMES: {
+  id: SyntaxThemeId;
+  label: string;
+  mode: UiTheme;
+}[] = [
   { id: "one-dark", label: "One Dark", mode: "dark" },
   { id: "one-light", label: "One Light", mode: "light" },
   { id: "dracula", label: "Dracula", mode: "dark" },
@@ -23,7 +27,9 @@ export const SYNTAX_THEMES: { id: SyntaxThemeId; label: string; mode: UiTheme }[
   { id: "solarized-dark", label: "Solarized Dark", mode: "dark" },
 ];
 
-const syntaxThemeById = Object.fromEntries(SYNTAX_THEMES.map((t) => [t.id, t])) as Record<SyntaxThemeId, (typeof SYNTAX_THEMES)[number]>;
+const syntaxThemeById = Object.fromEntries(
+  SYNTAX_THEMES.map((t) => [t.id, t]),
+) as Record<SyntaxThemeId, (typeof SYNTAX_THEMES)[number]>;
 
 /** UI theme (light/dark) that matches the syntax theme so site and editor look consistent. */
 export function getUiModeForSyntax(id: SyntaxThemeId): UiTheme {
@@ -76,7 +82,8 @@ function baseEditorTheme(isDark: boolean) {
       },
       ".cm-matchingBracket": {
         backgroundColor: "var(--editor-bracket-match)",
-        outline: "1px solid var(--accent)",
+        outline: "1px solid color-mix(in srgb, var(--accent) 50%, transparent)",
+        borderRadius: "2px",
       },
       ".cm-tooltip": {
         backgroundColor: "var(--bg-secondary)",
@@ -110,7 +117,7 @@ function baseEditorTheme(isDark: boolean) {
         color: "var(--text-muted)",
       },
     },
-    { dark: isDark }
+    { dark: isDark },
   );
 }
 
@@ -258,7 +265,10 @@ const solarizedDarkHighlight = HighlightStyle.define([
   { tag: tags.self, color: "#cb4b16" },
 ]);
 
-const syntaxHighlightById: Record<SyntaxThemeId, ReturnType<typeof HighlightStyle.define>> = {
+const syntaxHighlightById: Record<
+  SyntaxThemeId,
+  ReturnType<typeof HighlightStyle.define>
+> = {
   "one-dark": oneDarkHighlight,
   "one-light": oneLightHighlight,
   dracula: draculaHighlight,
@@ -268,7 +278,10 @@ const syntaxHighlightById: Record<SyntaxThemeId, ReturnType<typeof HighlightStyl
 };
 
 /** Full editor theme: UI (light/dark) + syntax highlighting. */
-export function getEditorTheme(uiTheme: UiTheme, syntaxThemeId: SyntaxThemeId): Extension[] {
+export function getEditorTheme(
+  uiTheme: UiTheme,
+  syntaxThemeId: SyntaxThemeId,
+): Extension[] {
   const isDark = uiTheme === "dark";
   const highlight = syntaxHighlightById[syntaxThemeId];
   return [baseEditorTheme(isDark), syntaxHighlighting(highlight)];
