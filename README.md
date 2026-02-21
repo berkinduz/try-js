@@ -80,6 +80,17 @@ src/
   utils/               # Share encoding, screenshot renderer, constants
 ```
 
+## Roadmap
+
+What's coming next — features we're actively exploring:
+
+- **🔍 Console Object Inspector** — expand and collapse objects, arrays, Maps, and Sets inline, just like Chrome DevTools
+- **📁 Multi-file Tabs** — create multiple files, import between them, and build real modules in the browser
+- **⚡ Live HTML/CSS Preview** — render HTML & CSS output in a live preview panel alongside the console
+- **💾 GitHub Gist Sync** — save your playground to a Gist and load any Gist as a playground with one click
+
+Have an idea? [Open an issue](https://github.com/aspect-apps/tryjs/issues) — we'd love to hear it.
+
 ## License
 
 MIT
