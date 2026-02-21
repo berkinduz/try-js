@@ -309,7 +309,7 @@ function executeModuleCode(jsCode: string) {
   const { body, lastExpr } = splitLastExpression(rewritten);
 
   // Build module code with timing and result capture.
-  // In module mode we can use top-level await natively.
+  // In module mode, static imports must stay at top level (cannot be inside try/catch).
   const execBlock = lastExpr
     ? `${body}\nvar __jspark_result = ${lastExpr};`
     : rewritten;
@@ -325,31 +325,31 @@ if (typeof __jspark_result !== "undefined") {
 }`
     : "";
 
-  // Line mapping: bootstrap is in a separate <script>, module code starts at line 1
-  userCodeStartLine = 3; // account for try { and timing var
+  // module code layout:
+  // 1: var __startTime ...
+  // 2+: user code
+  // N: timing/result/done postMessage
+  // So user line 1 starts at module line 2.
+  const preUserLinesInModule = 1;
   userCodeLineCount = execBlock.split("\n").length;
 
   const moduleCode = `
 var __startTime = performance.now();
-try {
 ${execBlock}
 var __endTime = performance.now();
 ${resultBlock}
 parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - __startTime }, "*");
-} catch (err) {
-parent.postMessage({
-  source: "jspark",
-  type: "error",
-  errorType: "error",
-  message: err.message || String(err),
-  stack: err.stack
-}, "*");
-parent.postMessage({ source: "jspark", type: "done", executionTime: 0 }, "*");
-}
 `;
 
   const bootstrapForHtml = SANDBOX_BOOTSTRAP_MODULE.replace(/<\/script/gi, "<\\/script");
   const moduleForHtml = moduleCode.replace(/<\/script/gi, "<\\/script");
+
+  const htmlBeforeModuleScript =
+    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" +
+    "<script>" + bootstrapForHtml + "</script>" +
+    "<script type=\"module\">";
+  const moduleScriptStartLine = htmlBeforeModuleScript.split("\n").length;
+  userCodeStartLine = moduleScriptStartLine + preUserLinesInModule;
 
   const srcdoc =
     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" +

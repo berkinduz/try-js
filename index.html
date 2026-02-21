@@ -1,11 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>TryJS - Online JavaScript & TypeScript Playground</title>
-    <meta name="description" content="TryJS is a free online JavaScript and TypeScript playground with npm imports, snippets, share links, embeddable output, and code-to-image export." />
-    <meta name="keywords" content="javascript playground, typescript playground, online js editor, run javascript online, typescript online, npm import playground, code snippet gallery, code image export, js sandbox" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>TryJS — Free Online JavaScript & TypeScript Playground</title>
+    <meta
+      name="description"
+      content="TryJS is a free online JavaScript and TypeScript playground. Run code instantly with npm imports, ready-to-run snippets, shareable links, embeddable output, and code-to-image export — no install needed."
+    />
+    <meta
+      name="keywords"
+      content="javascript playground, typescript playground, online js editor, run javascript online, typescript online, npm import playground, code snippet gallery, code image export, js sandbox"
+    />
     <meta name="author" content="TryJS" />
     <meta name="robots" content="index, follow" />
     <!-- Use your production domain; canonical must match the URL users see -->
@@ -14,88 +23,163 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://tryjs.app/" />
-    <meta property="og:title" content="TryJS - Online JavaScript & TypeScript Playground" />
-    <meta property="og:description" content="Run JavaScript and TypeScript in your browser with npm imports, snippets, sharing, and image export." />
+    <meta
+      property="og:title"
+      content="TryJS — Free Online JavaScript & TypeScript Playground"
+    />
+    <meta
+      property="og:description"
+      content="Run JavaScript and TypeScript in your browser with npm imports, ready-to-run snippets, shareable links, and code-to-image export. No setup required."
+    />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="TryJS" />
-    <meta property="og:image" content="https://tryjs.app/tryjs.png" />
-    <meta property="og:image:alt" content="TryJS JavaScript and TypeScript playground preview" />
+    <meta property="og:image" content="https://tryjs.app/og-tryjs.png" />
+    <meta
+      property="og:image:alt"
+      content="TryJS — Free online JavaScript and TypeScript playground with live console, npm imports, and code sharing"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TryJS - Online JavaScript & TypeScript Playground" />
-    <meta name="twitter:description" content="JavaScript and TypeScript playground with npm imports, snippets, sharing, and image export." />
-    <meta name="twitter:image" content="https://tryjs.app/tryjs.png" />
-    <meta name="twitter:image:alt" content="TryJS JavaScript and TypeScript playground preview" />
+    <meta
+      name="twitter:title"
+      content="TryJS — Free Online JavaScript & TypeScript Playground"
+    />
+    <meta
+      name="twitter:description"
+      content="Run JavaScript and TypeScript in your browser with npm imports, ready-to-run snippets, shareable links, and code-to-image export. No setup required."
+    />
+    <meta name="twitter:image" content="https://tryjs.app/og-tryjs.png" />
+    <meta
+      name="twitter:image:alt"
+      content="TryJS — Free online JavaScript and TypeScript playground with live console, npm imports, and code sharing"
+    />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Structured data for search engines -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "TryJS",
-      "description": "Free online JavaScript and TypeScript playground with instant execution, console output, snippets, sharing, and image export.",
-      "url": "https://tryjs.app/",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "featureList": [
-        "JavaScript and TypeScript toggle",
-        "In-browser TypeScript transpilation",
-        "NPM imports via esm.sh",
-        "Snippet gallery",
-        "Shareable URL and embeddable iframe",
-        "Code to image export with gradient backgrounds",
-        "Sandboxed execution with timeout"
-      ],
-      "sameAs": [
-        "https://github.com/berkinduz/js-park"
-      ]
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "TryJS",
+        "description": "Free online JavaScript and TypeScript playground with instant execution, console output, snippets, sharing, and image export.",
+        "url": "https://tryjs.app/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "JavaScript and TypeScript toggle",
+          "In-browser TypeScript transpilation",
+          "NPM imports via esm.sh",
+          "Snippet gallery",
+          "Shareable URL and embeddable iframe",
+          "Code to image export with gradient backgrounds",
+          "Sandboxed execution with timeout"
+        ],
+        "sameAs": ["https://github.com/berkinduz/js-park"]
+      }
     </script>
 
     <!-- Set embed attribute early to prevent layout flash -->
     <script>
-      if (new URLSearchParams(location.search).get('embed') === '1')
-        document.documentElement.setAttribute('data-embed', '');
+      if (new URLSearchParams(location.search).get("embed") === "1")
+        document.documentElement.setAttribute("data-embed", "");
     </script>
 
     <style>
-      body { margin: 0; overflow: auto; }
-      .app-wrap { height: 100vh; min-height: 100vh; }
-      [data-embed] .seo-content { display: none; }
+      body {
+        margin: 0;
+        overflow: auto;
+      }
+      .app-wrap {
+        height: 100vh;
+        min-height: 100vh;
+      }
+      [data-embed] .seo-content {
+        display: none;
+      }
       .seo-content {
         max-width: 720px;
         margin: 0 auto;
         padding: 2rem 1.5rem 3rem;
-        font: 1rem/1.6 system-ui, sans-serif;
+        font:
+          1rem/1.6 system-ui,
+          sans-serif;
         color: #374151;
       }
-      .seo-content h1 { font-size: 1.5rem; margin: 0 0 1rem; color: #111; }
-      .seo-content h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; color: #222; }
-      .seo-content p { margin: 0 0 0.75rem; }
-      .seo-content a { color: #2563eb; text-decoration: none; }
-      .seo-content a:hover { text-decoration: underline; }
+      .seo-content h1 {
+        font-size: 1.5rem;
+        margin: 0 0 1rem;
+        color: #111;
+      }
+      .seo-content h2 {
+        font-size: 1.1rem;
+        margin: 1.5rem 0 0.5rem;
+        color: #222;
+      }
+      .seo-content p {
+        margin: 0 0 0.75rem;
+      }
+      .seo-content a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .seo-content a:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <div class="app-wrap"><div id="app"></div></div>
     <section class="seo-content" id="about" aria-label="About TryJS">
       <h1>TryJS – Free Online JavaScript & TypeScript Playground</h1>
-      <p>TryJS is a free JavaScript and TypeScript playground that runs in your browser. Write code and see results instantly, with no signup or installation. Use it to learn JS/TS, test ideas quickly, and share runnable examples.</p>
+      <p>
+        TryJS is a free JavaScript and TypeScript playground that runs in your
+        browser. Write code and see results instantly, with no signup or
+        installation. Use it to learn JS/TS, test ideas quickly, and share
+        runnable examples.
+      </p>
       <h2>What you can do</h2>
-      <p>Switch between JavaScript and TypeScript with one click; TypeScript is compiled in-browser. The editor auto-runs as you type, and you can run instantly with <kbd>Cmd</kbd>+<kbd>Enter</kbd>. The console shows logs, warnings, errors, timing output, and REPL-style expression results.</p>
-      <p>Import npm packages directly, browse ready-to-run snippets, and share code as a URL or embeddable iframe. You can also export your code as an image with multiple frames, themes, paddings, and gradient backgrounds.</p>
-      <p>Choose from multiple syntax themes and editor fonts. Your code is saved locally per language, and execution runs in a sandbox with timeouts to prevent runaway scripts.</p>
+      <p>
+        Switch between JavaScript and TypeScript with one click; TypeScript is
+        compiled in-browser. The editor auto-runs as you type, and you can run
+        instantly with <kbd>Cmd</kbd>+<kbd>Enter</kbd>. The console shows logs,
+        warnings, errors, timing output, and REPL-style expression results.
+      </p>
+      <p>
+        Import npm packages directly, browse ready-to-run snippets, and share
+        code as a URL or embeddable iframe. You can also export your code as an
+        image with multiple frames, themes, paddings, and gradient backgrounds.
+      </p>
+      <p>
+        Choose from multiple syntax themes and editor fonts. Your code is saved
+        locally per language, and execution runs in a sandbox with timeouts to
+        prevent runaway scripts.
+      </p>
       <h2>Why use this playground</h2>
-      <p>This online JS/TS playground is built for fast experiments, learning, and sharing. There is no backend for your code execution: everything runs locally in your browser. It works on both desktop and mobile with a streamlined interface.</p>
-      <p>TryJS is open source. You can find the project on <a href="https://github.com/berkinduz/js-park" rel="noopener noreferrer">GitHub</a> and the live app at <a href="https://tryjs.app/">tryjs.app</a>. Bookmark the page to get a quick JavaScript or TypeScript playground whenever you need it.</p>
+      <p>
+        This online JS/TS playground is built for fast experiments, learning,
+        and sharing. There is no backend for your code execution: everything
+        runs locally in your browser. It works on both desktop and mobile with a
+        streamlined interface.
+      </p>
+      <p>
+        TryJS is open source. You can find the project on
+        <a href="https://github.com/berkinduz/js-park" rel="noopener noreferrer"
+          >GitHub</a
+        >, browse a concise <a href="/features">features page</a>, and use the
+        live app at <a href="https://tryjs.app/">tryjs.app</a>.
+      </p>
     </section>
     <script type="module" src="/src/main.tsx"></script>
   </body>

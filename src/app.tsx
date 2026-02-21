@@ -15,6 +15,7 @@ import { ScreenshotModal } from "./components/Screenshot/ScreenshotModal";
 import { embedMode } from "./state/ui";
 import { encodeToHash } from "./utils/share";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
+import { FeaturesPage } from "./components/Features/FeaturesPage";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -32,6 +33,13 @@ function EmbedOpenLink() {
 }
 
 export function App() {
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  const isFeaturesPage = path === "/features";
+
+  if (isFeaturesPage) {
+    return <FeaturesPage />;
+  }
+
   const isEmbed = embedMode.value;
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
