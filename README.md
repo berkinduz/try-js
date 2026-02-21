@@ -26,13 +26,13 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 ## Tech Stack
 
-| Layer | Choice |
-|-------|--------|
-| UI | Preact + Preact Signals |
-| Editor | CodeMirror 6 |
-| TS Transpiler | Sucrase |
-| Build | Vite |
-| Hosting | Vercel |
+| Layer         | Choice                  |
+| ------------- | ----------------------- |
+| UI            | Preact + Preact Signals |
+| Editor        | CodeMirror 6            |
+| TS Transpiler | Sucrase                 |
+| Build         | Vite                    |
+| Hosting       | Vercel                  |
 
 ## Development
 
@@ -52,11 +52,11 @@ npm run preview
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd+Enter` | Run code |
-| `Cmd+S` | Save to localStorage |
-| `Cmd+L` | Clear console |
+| Shortcut    | Action               |
+| ----------- | -------------------- |
+| `Cmd+Enter` | Run code             |
+| `Cmd+S`     | Save to localStorage |
+| `Cmd+L`     | Clear console        |
 
 ## Project Structure
 
