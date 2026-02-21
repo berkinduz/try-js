@@ -9,7 +9,7 @@
     <title>TryJS — Free Online JavaScript & TypeScript Playground</title>
     <meta
       name="description"
-      content="TryJS is a free online JavaScript and TypeScript playground. Run code instantly with npm imports, ready-to-run snippets, shareable links, embeddable output, and code-to-image export — no install needed."
+      content="Write and run JavaScript & TypeScript in your browser — instantly. TryJS is a free playground with npm imports, a snippet gallery, shareable URLs, embeddable iframes, and code-to-image export. No signup or install needed."
     />
     <meta
       name="keywords"
@@ -150,41 +150,72 @@
     <section class="seo-content" id="about" aria-label="About TryJS">
       <h1>TryJS – Free Online JavaScript & TypeScript Playground</h1>
       <p>
-        TryJS is a free JavaScript and TypeScript playground that runs in your
-        browser. Write code and see results instantly, with no signup or
-        installation. Use it to learn JS/TS, test ideas quickly, and share
-        runnable examples.
+        TryJS is a free JavaScript and TypeScript playground that runs entirely
+        in your browser. Write code and see results instantly — no signup, no
+        backend, no installation required. Whether you want to learn JavaScript,
+        experiment with TypeScript, test a quick idea, or share a runnable code
+        example, TryJS gives you a fast and distraction-free environment to do
+        it.
       </p>
-      <h2>What you can do</h2>
+
+      <h2>Write and Run Code Instantly</h2>
       <p>
-        Switch between JavaScript and TypeScript with one click; TypeScript is
-        compiled in-browser. The editor auto-runs as you type, and you can run
-        instantly with <kbd>Cmd</kbd>+<kbd>Enter</kbd>. The console shows logs,
-        warnings, errors, timing output, and REPL-style expression results.
+        Switch between
+        <a href="https://tryjs.app/">JavaScript and TypeScript</a>
+        with one click. TypeScript is transpiled in-browser using Sucrase, so
+        there is zero server round-trip. The editor auto-runs your code as you
+        type with a smart debounce, and you can trigger immediate execution with
+        <kbd>Cmd</kbd>+<kbd>Enter</kbd>. The built-in console displays logs,
+        warnings, errors, tables, timing output, and REPL-style expression
+        results — just like Chrome DevTools.
+      </p>
+
+      <h2>NPM Imports in the Browser</h2>
+      <p>
+        Import any npm package by writing a standard import statement such as
+        <code>import confetti from "canvas-confetti"</code>. TryJS rewrites bare
+        specifiers to
+        <a href="https://esm.sh" rel="noopener noreferrer">esm.sh</a> and loads
+        modules on the fly. No <code>node_modules</code>, no bundler
+        configuration — just import and use. See it in action on the
+        <a href="/features">features page</a>.
+      </p>
+
+      <h2>Snippets, Sharing & Export</h2>
+      <p>
+        Browse a curated
+        <a href="https://tryjs.app/">snippet gallery</a> covering JS
+        fundamentals, async patterns, and TypeScript essentials. Share your code
+        as a compact URL that preserves editor state, or embed the playground as
+        an iframe in blog posts and documentation. You can also
+        <a href="/features">export your code as a styled PNG image</a>
+        with syntax-highlighted themes, window frames, adjustable padding, and
+        gradient backgrounds — perfect for social media and presentations.
+      </p>
+
+      <h2>Customization & Themes</h2>
+      <p>
+        Choose from six syntax themes including One Dark, Dracula, GitHub Light,
+        Monokai, and Solarized Dark. Pick your preferred editor font from Geist
+        Mono, Fira Code, or JetBrains Mono. The resizable split pane lets you
+        control how much space the editor and console each occupy. Code is saved
+        to localStorage per language so you never lose your work.
+      </p>
+
+      <h2>Safe, Private & Open Source</h2>
+      <p>
+        All code execution happens inside a sandboxed iframe with a five-second
+        timeout to prevent runaway scripts. No code is ever sent to a server.
+        TryJS works on desktop and mobile with a responsive, streamlined
+        interface optimized for speed.
       </p>
       <p>
-        Import npm packages directly, browse ready-to-run snippets, and share
-        code as a URL or embeddable iframe. You can also export your code as an
-        image with multiple frames, themes, paddings, and gradient backgrounds.
-      </p>
-      <p>
-        Choose from multiple syntax themes and editor fonts. Your code is saved
-        locally per language, and execution runs in a sandbox with timeouts to
-        prevent runaway scripts.
-      </p>
-      <h2>Why use this playground</h2>
-      <p>
-        This online JS/TS playground is built for fast experiments, learning,
-        and sharing. There is no backend for your code execution: everything
-        runs locally in your browser. It works on both desktop and mobile with a
-        streamlined interface.
-      </p>
-      <p>
-        TryJS is open source. You can find the project on
-        <a href="https://github.com/berkinduz/js-park" rel="noopener noreferrer"
+        TryJS is open source under the MIT license. View the source code on
+        <a href="https://github.com/berkinduz/try-js" rel="noopener noreferrer"
           >GitHub</a
-        >, browse a concise <a href="/features">features page</a>, and use the
-        live app at <a href="https://tryjs.app/">tryjs.app</a>.
+        >, explore all capabilities on the
+        <a href="/features">features page</a>, or start coding now at
+        <a href="https://tryjs.app/">tryjs.app</a>.
       </p>
     </section>
     <script type="module" src="/src/main.tsx"></script>

@@ -2,6 +2,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "www.tryjs.app" }],
+      "destination": "https://tryjs.app/:path",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!robots\\.txt|sitemap\\.xml|favicon\\.svg|assets/).*)",
@@ -11,7 +19,12 @@
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/(.*)",
