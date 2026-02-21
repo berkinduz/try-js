@@ -11,6 +11,7 @@ import { executeCode } from "./sandbox/executor";
 import { useKeyboard } from "./hooks/useKeyboard";
 import { ToastContainer } from "./components/Toast/Toast";
 import { Gallery } from "./components/Gallery/Gallery";
+import { ScreenshotModal } from "./components/Screenshot/ScreenshotModal";
 import { embedMode } from "./state/ui";
 import { encodeToHash } from "./utils/share";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
@@ -117,6 +118,7 @@ export function App() {
         {!isEmbed && <StatusBar />}
         {isEmbed && <EmbedOpenLink />}
         <Gallery />
+        <ScreenshotModal />
         <ToastContainer />
       </div>
     );
@@ -132,6 +134,7 @@ export function App() {
       {!isEmbed && <StatusBar />}
       {isEmbed && <EmbedOpenLink />}
       <Gallery />
+      <ScreenshotModal />
       <ToastContainer />
     </div>
   );

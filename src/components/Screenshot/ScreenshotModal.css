@@ -1,0 +1,198 @@
+.screenshot-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: screenshot-fade-in 0.15s ease-out;
+}
+
+.screenshot-modal {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  animation: screenshot-scale-in 0.15s ease-out;
+}
+
+.screenshot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.screenshot-title {
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.screenshot-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.screenshot-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.screenshot-body {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Preview area */
+.screenshot-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  overflow: auto;
+  max-height: 400px;
+}
+
+.screenshot-preview--transparent {
+  background:
+    repeating-conic-gradient(var(--bg-tertiary) 0% 25%, transparent 0% 50%)
+    50% / 16px 16px;
+}
+
+.screenshot-preview canvas {
+  display: block;
+}
+
+/* Controls row */
+.screenshot-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.screenshot-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-sans);
+}
+
+.screenshot-control--toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.screenshot-control--toggle input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.screenshot-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.screenshot-select {
+  height: 30px;
+  padding: 0 24px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23656d76' d='M5 6.5L1 2.5h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.15s;
+}
+
+.screenshot-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Action buttons */
+.screenshot-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.screenshot-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.screenshot-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.screenshot-btn--primary {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+.screenshot-btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+@keyframes screenshot-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes screenshot-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

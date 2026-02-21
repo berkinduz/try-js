@@ -3,11 +3,30 @@
   height: 100%;
 }
 
-.editor-copy {
+/* Action bar: top-right, shows on hover */
+.editor-actions {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 5;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.editor-wrapper:hover .editor-actions,
+.editor-actions:focus-within,
+.editor-share-wrap:has(.editor-dropdown) ~ .editor-actions,
+.editor-actions:has(.editor-dropdown) {
+  opacity: 1;
+}
+
+.editor-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,24 +34,77 @@
   height: 28px;
   padding: 0;
   border: none;
-  border-radius: 6px;
-  background: var(--bg-tertiary);
+  border-radius: 5px;
+  background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.1s, color 0.1s;
 }
 
-.editor-copy:hover {
-  background: var(--bg-secondary);
+.editor-action-btn:hover,
+.editor-action-btn.active {
+  background: var(--bg-tertiary);
   color: var(--text-primary);
 }
 
-.editor-copy__done {
-  font-size: 10px;
+.editor-action-btn__done {
+  font-size: 12px;
   font-weight: 600;
   color: var(--success);
 }
 
+/* Share dropdown wrapper */
+.editor-share-wrap {
+  position: relative;
+}
+
+.editor-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 170px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  animation: editor-dropdown-in 0.12s ease-out;
+}
+
+.editor-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+
+.editor-dropdown__item:hover {
+  background: var(--bg-tertiary);
+}
+
+.editor-dropdown__item svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+@keyframes editor-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Editor container */
 .editor-container {
   height: 100%;
   overflow: hidden;
@@ -54,7 +126,7 @@
   outline: none;
 }
 
-/* Placeholder overlay: disappears on focus/click so user doesn't try to delete it */
+/* Placeholder overlay */
 .editor-placeholder {
   position: absolute;
   top: 0;
@@ -69,3 +141,4 @@
   pointer-events: none;
   z-index: 1;
 }
+

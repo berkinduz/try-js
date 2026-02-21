@@ -65,6 +65,13 @@ function splitLastExpression(code: string): { body: string; lastExpr: string | n
   const stripped = lastLine.replace(/;+$/, "").trim();
   if (!stripped) return { body: code, lastExpr: null };
 
+  // Continuation-only closers from multiline expressions (e.g. "})();", ");", "]}").
+  // Treating these as standalone expressions breaks parsing when we split.
+  const firstChar = stripped[0];
+  if (firstChar === ")" || firstChar === "]" || firstChar === "}") {
+    return { body: code, lastExpr: null };
+  }
+
   // "}" or "};" alone is a block closer, not an expression – don't treat as last expr
   if (stripped === "}") return { body: code, lastExpr: null };
 

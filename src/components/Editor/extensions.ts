@@ -32,6 +32,7 @@ import {
   EditorView,
 } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
+import type { ViewUpdate } from "@codemirror/view";
 import type { Language } from "../../state/editor";
 import type { SyntaxThemeId, UiTheme } from "./themes";
 import { getEditorTheme } from "./themes";
@@ -51,7 +52,8 @@ export function createExtensions(
   lang: Language,
   uiTheme: UiTheme,
   syntaxThemeId: SyntaxThemeId,
-  onChange: (code: string) => void
+  onChange: (code: string) => void,
+  onSelectionChange?: (update: ViewUpdate) => void
 ): Extension[] {
   return [
     // Language
@@ -88,6 +90,9 @@ export function createExtensions(
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         onChange(update.state.doc.toString());
+      }
+      if (onSelectionChange && (update.selectionSet || update.docChanged)) {
+        onSelectionChange(update);
       }
     }),
   ];

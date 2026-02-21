@@ -71,11 +71,26 @@ function baseEditorTheme(isDark: boolean) {
       ".cm-activeLine": {
         backgroundColor: "var(--editor-active-line)",
       },
+      ".cm-selectionLayer .cm-selectionBackground": {
+        backgroundColor: "var(--editor-selection) !important",
+      },
       ".cm-selectionBackground": {
         backgroundColor: "var(--editor-selection) !important",
       },
       "&.cm-focused .cm-selectionBackground": {
         backgroundColor: "var(--editor-selection) !important",
+      },
+      "&.cm-focused .cm-selectionLayer .cm-selectionBackground": {
+        backgroundColor: "var(--editor-selection) !important",
+      },
+      ".cm-content ::selection": {
+        backgroundColor: "var(--editor-selection)",
+      },
+      ".cm-line::selection, .cm-line > span::selection": {
+        backgroundColor: "var(--editor-selection)",
+      },
+      ".cm-selectionMatch": {
+        backgroundColor: "var(--editor-selection)",
       },
       ".cm-cursor": {
         borderLeftColor: "var(--accent)",

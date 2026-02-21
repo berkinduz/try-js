@@ -125,14 +125,16 @@ console.log("Intersection:", intersection);`,
         code: `const delay = (ms, val) =>
   new Promise(resolve => setTimeout(() => resolve(val), ms));
 
-console.time("parallel");
-const results = await Promise.all([
-  delay(100, "first"),
-  delay(200, "second"),
-  delay(50, "third"),
-]);
-console.timeEnd("parallel");
-console.log(results);`,
+(async () => {
+  console.time("parallel");
+  const results = await Promise.all([
+    delay(100, "first"),
+    delay(200, "second"),
+    delay(50, "third"),
+  ]);
+  console.timeEnd("parallel");
+  console.log(results);
+})();`,
       },
       {
         title: "Async/Await Error Handling",
@@ -144,21 +146,23 @@ console.log(results);`,
   return { data: [1, 2, 3] };
 }
 
-// Success case
-try {
-  const result = await fetchData(false);
-  console.log("Success:", result);
-} catch (err) {
-  console.error("Failed:", err.message);
-}
+(async () => {
+  // Success case
+  try {
+    const result = await fetchData(false);
+    console.log("Success:", result);
+  } catch (err) {
+    console.error("Failed:", err.message);
+  }
 
-// Error case
-try {
-  const result = await fetchData(true);
-  console.log("Success:", result);
-} catch (err) {
-  console.error("Failed:", err.message);
-}`,
+  // Error case
+  try {
+    const result = await fetchData(true);
+    console.log("Success:", result);
+  } catch (err) {
+    console.error("Failed:", err.message);
+  }
+})();`,
       },
       {
         title: "Promise.race & allSettled",
@@ -170,21 +174,23 @@ try {
 const fail = (ms, msg) =>
   new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms));
 
-// race: first to finish wins
-const fastest = await Promise.race([
-  delay(200, "slow"),
-  delay(50, "fast"),
-  delay(100, "medium"),
-]);
-console.log("Winner:", fastest);
+(async () => {
+  // race: first to finish wins
+  const fastest = await Promise.race([
+    delay(200, "slow"),
+    delay(50, "fast"),
+    delay(100, "medium"),
+  ]);
+  console.log("Winner:", fastest);
 
-// allSettled: get all results, even failures
-const results = await Promise.allSettled([
-  delay(50, "ok"),
-  fail(100, "oops"),
-  delay(75, "also ok"),
-]);
-console.table(results);`,
+  // allSettled: get all results, even failures
+  const results = await Promise.allSettled([
+    delay(50, "ok"),
+    fail(100, "oops"),
+    delay(75, "also ok"),
+  ]);
+  console.log(results);
+})();`,
       },
       {
         title: "Event Loop Demo",

@@ -19,7 +19,7 @@
 }
 
 .toolbar__right--links {
-  gap: 2px;
+  gap: 4px;
 }
 
 /* Brand: JS/TS toggle + Park */
@@ -260,68 +260,6 @@
   color: var(--text-muted);
 }
 
-/* Share dropdown */
-.toolbar__share-wrap {
-  position: relative;
-}
-
-.toolbar__icon-btn.active {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.toolbar__dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  min-width: 170px;
-  padding: 4px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 50;
-  animation: dropdown-in 0.12s ease-out;
-}
-
-.toolbar__dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--text-primary);
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.1s;
-  text-align: left;
-}
-
-.toolbar__dropdown-item:hover {
-  background: var(--bg-tertiary);
-}
-
-.toolbar__dropdown-item svg {
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-@keyframes dropdown-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Mobile */
 @media (max-width: 767px) {
   .toolbar {
@@ -336,4 +274,5 @@
   .toolbar__separator {
     display: none;
   }
+
 }
