@@ -1,4 +1,4 @@
-import { useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import "./FeaturesPage.css";
 
 type FeatureItem = {
@@ -96,6 +96,44 @@ export function FeaturesPage() {
     () => `${(((activeIndex + 1) / FEATURES.length) * 100).toFixed(0)}%`,
     [activeIndex],
   );
+
+  // Set page-specific meta for /features
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = "TryJS Features — NPM Imports, Snippets, Sharing & Export";
+
+    const setMeta = (attr: string, key: string, content: string) => {
+      let el = document.querySelector(
+        `meta[${attr}="${key}"]`,
+      ) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+      return el;
+    };
+
+    setMeta(
+      "name",
+      "description",
+      "Explore TryJS features: import npm packages, browse code snippets, share runnable links, embed playgrounds, and export code as images.",
+    );
+
+    let canonical = document.querySelector(
+      'link[rel="canonical"]',
+    ) as HTMLLinkElement | null;
+    const prevCanonical = canonical?.getAttribute("href") ?? "";
+    if (canonical) {
+      canonical.setAttribute("href", "https://tryjs.app/features");
+    }
+
+    return () => {
+      document.title = prevTitle;
+      if (canonical) canonical.setAttribute("href", prevCanonical);
+    };
+  }, []);
 
   return (
     <main class="features-page">
