@@ -249,13 +249,26 @@ export function FeaturesPage() {
         </section>
 
         <footer class="features-footer">
+          <a
+            href="https://www.producthunt.com/products/tryjs?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-tryjs"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="features-footer__ph"
+          >
+            <img
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1083501&theme=dark&t=1771711071779"
+              alt="TryJS - Write & run JS/TS in your browser — instantly, for free | Product Hunt"
+              width="250"
+              height="54"
+            />
+          </a>
           <nav class="features-footer__links" aria-label="Footer navigation">
             <a href="/">Playground</a>
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>
             <a
-              href="https://github.com/berkinduz/js-park"
+              href="https://github.com/berkinduz/try-js"
               target="_blank"
               rel="noopener noreferrer"
             >
