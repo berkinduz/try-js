@@ -9,9 +9,29 @@ import { clearConsole, consoleOutput } from "./state/console";
 import { autoRunDelay } from "./state/settings";
 import { executeCode } from "./sandbox/executor";
 import { useKeyboard } from "./hooks/useKeyboard";
+import { ToastContainer } from "./components/Toast/Toast";
+import { Gallery } from "./components/Gallery/Gallery";
+import { embedMode } from "./state/ui";
+import { encodeToHash } from "./utils/share";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
 
+function EmbedOpenLink() {
+  const hash = encodeToHash({ code: code.value, language: language.value });
+  const url = `https://tryjs.app/${hash}`;
+  return (
+    <a
+      class="embed-open-link"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open in TryJS
+    </a>
+  );
+}
+
 export function App() {
+  const isEmbed = embedMode.value;
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -66,24 +86,26 @@ export function App() {
   if (isMobile) {
     return (
       <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <Toolbar />
-        <div class="mobile-tabs">
-          <button
-            class={`mobile-tab ${mobileTab === "editor" ? "active" : ""}`}
-            onClick={() => setMobileTab("editor")}
-          >
-            Editor
-          </button>
-          <button
-            class={`mobile-tab ${mobileTab === "console" ? "active" : ""}`}
-            onClick={() => setMobileTab("console")}
-          >
-            Console
-            {errorCount > 0 && (
-              <span class="mobile-tab__badge">{errorCount}</span>
-            )}
-          </button>
-        </div>
+        {!isEmbed && <Toolbar />}
+        {!isEmbed && (
+          <div class="mobile-tabs">
+            <button
+              class={`mobile-tab ${mobileTab === "editor" ? "active" : ""}`}
+              onClick={() => setMobileTab("editor")}
+            >
+              Editor
+            </button>
+            <button
+              class={`mobile-tab ${mobileTab === "console" ? "active" : ""}`}
+              onClick={() => setMobileTab("console")}
+            >
+              Console
+              {errorCount > 0 && (
+                <span class="mobile-tab__badge">{errorCount}</span>
+              )}
+            </button>
+          </div>
+        )}
         <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
           <div style={{ height: "100%", display: mobileTab === "editor" ? "block" : "none" }}>
             <Editor />
@@ -92,19 +114,25 @@ export function App() {
             <Console />
           </div>
         </div>
-        <StatusBar />
+        {!isEmbed && <StatusBar />}
+        {isEmbed && <EmbedOpenLink />}
+        <Gallery />
+        <ToastContainer />
       </div>
     );
   }
 
   return (
     <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Toolbar />
+      {!isEmbed && <Toolbar />}
       <SplitPane
         left={<Editor />}
         right={<Console />}
       />
-      <StatusBar />
+      {!isEmbed && <StatusBar />}
+      {isEmbed && <EmbedOpenLink />}
+      <Gallery />
+      <ToastContainer />
     </div>
   );
 }

@@ -1,5 +1,9 @@
-import { language, setLanguage } from "../../state/editor";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { language, setLanguage, code } from "../../state/editor";
 import type { Language } from "../../state/editor";
+import { shareToClipboard, generateEmbedCode } from "../../utils/share";
+import { showToast } from "../Toast/Toast";
+import { openGallery } from "../Gallery/Gallery";
 import "./Toolbar.css";
 
 const GITHUB_URL = "https://github.com/berkinduz/js-park";
@@ -8,6 +12,59 @@ const BMC_URL = "https://buymeacoffee.com/berkinduz";
 export function Toolbar() {
   const currentLang = language.value;
   const setLang = (lang: Language) => () => setLanguage(lang);
+
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on click-outside or Escape
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShareOpen(false);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [shareOpen]);
+
+  const handleCopyLink = async () => {
+    setShareOpen(false);
+    try {
+      const result = await shareToClipboard({
+        code: code.value,
+        language: language.value,
+      });
+      if (result.warning) {
+        showToast(result.warning, "warning", 4000);
+      } else {
+        showToast("Link copied to clipboard!");
+      }
+    } catch {
+      showToast("Failed to copy link", "error");
+    }
+  };
+
+  const handleCopyEmbed = async () => {
+    setShareOpen(false);
+    try {
+      const embedCode = generateEmbedCode({
+        code: code.value,
+        language: language.value,
+      });
+      await navigator.clipboard.writeText(embedCode);
+      showToast("Embed code copied!");
+    } catch {
+      showToast("Failed to copy embed code", "error");
+    }
+  };
 
   return (
     <div class="toolbar">
@@ -39,6 +96,61 @@ export function Toolbar() {
       </div>
 
       <div class="toolbar__right toolbar__right--links">
+        <button
+          type="button"
+          class="toolbar__icon-btn"
+          onClick={openGallery}
+          title="Browse snippets"
+          aria-label="Browse snippets"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+        </button>
+        <div class="toolbar__share-wrap" ref={shareRef}>
+          <button
+            type="button"
+            class={`toolbar__icon-btn ${shareOpen ? "active" : ""}`}
+            onClick={() => setShareOpen(!shareOpen)}
+            title="Share"
+            aria-label="Share"
+            aria-expanded={shareOpen}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg>
+          </button>
+          {shareOpen && (
+            <div class="toolbar__dropdown">
+              <button
+                type="button"
+                class="toolbar__dropdown-item"
+                onClick={handleCopyLink}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+                </svg>
+                Copy Link
+              </button>
+              <button
+                type="button"
+                class="toolbar__dropdown-item"
+                onClick={handleCopyEmbed}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                Copy Embed Code
+              </button>
+            </div>
+          )}
+        </div>
         <a
           href={BMC_URL}
           target="_blank"

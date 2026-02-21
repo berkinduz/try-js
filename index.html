@@ -45,9 +45,16 @@
     }
     </script>
 
+    <!-- Set embed attribute early to prevent layout flash -->
+    <script>
+      if (new URLSearchParams(location.search).get('embed') === '1')
+        document.documentElement.setAttribute('data-embed', '');
+    </script>
+
     <style>
       body { margin: 0; overflow: auto; }
       .app-wrap { height: 100vh; min-height: 100vh; }
+      [data-embed] .seo-content { display: none; }
       .seo-content {
         max-width: 720px;
         margin: 0 auto;

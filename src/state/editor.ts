@@ -7,16 +7,22 @@ import {
   DEFAULT_DARK_SYNTAX,
   DEFAULT_LIGHT_SYNTAX,
 } from "../components/Editor/themes";
+import { decodeFromHash } from "../utils/share";
 
 export type Language = "javascript" | "typescript";
 export type Theme = "light" | "dark";
 
+// Check URL hash for shared code (takes priority over localStorage)
+const sharedState = decodeFromHash(window.location.hash);
+
 const getStoredCode = (lang: Language): string => {
+  if (sharedState) return sharedState.code;
   const stored = localStorage.getItem(`jspark:code:${lang}`);
   return stored ?? (lang === "javascript" ? DEFAULT_JS_CODE : DEFAULT_TS_CODE);
 };
 
 const getStoredLanguage = (): Language => {
+  if (sharedState) return sharedState.language;
   const stored = localStorage.getItem("jspark:language");
   return stored === "typescript" ? "typescript" : "javascript";
 };
@@ -31,6 +37,11 @@ const getStoredSyntaxTheme = (): SyntaxThemeId => {
 export const language = signal<Language>(getStoredLanguage());
 export const code = signal<string>(getStoredCode(getStoredLanguage()));
 export const syntaxTheme = signal<SyntaxThemeId>(getStoredSyntaxTheme());
+
+// Clean URL hash after loading shared code
+if (sharedState) {
+  history.replaceState(null, "", window.location.pathname + window.location.search);
+}
 
 /** Site UI theme (light/dark) derived from syntax theme so they stay in sync. */
 export const theme = computed<Theme>(() => getUiModeForSyntax(syntaxTheme.value));

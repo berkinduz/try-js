@@ -1,4 +1,4 @@
-import { consoleOutput, executionTime, isRunning } from "../../state/console";
+import { consoleOutput, executionTime, isRunning, isLoadingModules } from "../../state/console";
 import { language, syntaxTheme, setSyntaxTheme } from "../../state/editor";
 import { editorFont, setEditorFont, EDITOR_FONTS } from "../../state/settings";
 import type { EditorFontId } from "../../state/settings";
@@ -35,7 +35,11 @@ export function StatusBar() {
       </div>
 
       <div class="statusbar__right">
-        {running && <span class="statusbar__item statusbar__running">Running...</span>}
+        {isLoadingModules.value && (
+          <span class="statusbar__item statusbar__running">Loading modules...</span>
+        )}
+
+        {running && !isLoadingModules.value && <span class="statusbar__item statusbar__running">Running...</span>}
 
         {execTime !== null && !running && (
           <span class="statusbar__item">
