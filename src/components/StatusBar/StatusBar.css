@@ -44,7 +44,10 @@
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .statusbar__help-btn:hover {
@@ -62,14 +65,21 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   background:
-    radial-gradient(120% 130% at 0% 0%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(
+      120% 130% at 0% 0%,
+      color-mix(in oklab, var(--accent) 12%, transparent),
+      transparent 60%
+    ),
     var(--bg-secondary);
   color: var(--text-secondary);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
   visibility: hidden;
   opacity: 0;
   transform: translateY(6px);
-  transition: visibility 0.15s, opacity 0.15s, transform 0.15s;
+  transition:
+    visibility 0.15s,
+    opacity 0.15s,
+    transform 0.15s;
   pointer-events: none;
   z-index: 120;
 }
@@ -166,7 +176,9 @@
   background-repeat: no-repeat;
   background-position: right 5px center;
   padding-right: 20px;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .statusbar__select:hover {
@@ -203,7 +215,9 @@
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .statusbar__shortcut-btn:hover {
@@ -233,7 +247,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0.15s, opacity 0.15s;
+  transition:
+    visibility 0.15s,
+    opacity 0.15s;
   z-index: 100;
   pointer-events: none;
 }
@@ -277,10 +293,39 @@
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .statusbar__snippets-btn:hover {
+  background: var(--border-subtle);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.statusbar__features-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.statusbar__features-link:hover {
   background: var(--border-subtle);
   color: var(--text-primary);
   border-color: var(--border);
@@ -352,7 +397,8 @@
   }
 
   .statusbar__help-btn,
-  .statusbar__snippets-btn {
+  .statusbar__snippets-btn,
+  .statusbar__features-link {
     height: 24px;
     padding: 2px 8px;
     border: 1px solid var(--border);

@@ -50,7 +50,9 @@
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .screenshot-close:hover {
@@ -59,11 +61,12 @@
 }
 
 .screenshot-body {
-  padding: 20px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1;
 }
 
 /* Preview area */
@@ -71,22 +74,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 120px;
   padding: 16px;
+  margin: 20px 20px 0;
   border-radius: var(--radius-sm);
   background: var(--bg-secondary);
-  overflow: auto;
-  max-height: 400px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 120px;
+  max-height: calc(85vh - 220px);
 }
 
 .screenshot-preview--transparent {
-  background:
-    repeating-conic-gradient(var(--bg-tertiary) 0% 25%, transparent 0% 50%)
+  background: repeating-conic-gradient(
+      var(--bg-tertiary) 0% 25%,
+      transparent 0% 50%
+    )
     50% / 16px 16px;
 }
 
 .screenshot-preview canvas {
   display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Controls + actions footer */
+.screenshot-footer {
+  flex-shrink: 0;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border);
 }
 
 /* Controls row */
@@ -169,7 +189,9 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .screenshot-btn:hover {
@@ -188,11 +210,21 @@
 }
 
 @keyframes screenshot-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes screenshot-scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
