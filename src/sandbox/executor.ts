@@ -1,5 +1,6 @@
 import { SANDBOX_BOOTSTRAP } from "./sandbox-bootstrap";
-import { transpile } from "./transpiler";
+import { SANDBOX_BOOTSTRAP_MODULE } from "./sandbox-bootstrap";
+import { transpile, hasImports, rewriteImports } from "./transpiler";
 import type { Language } from "../state/editor";
 import {
   addConsoleEntry,
@@ -7,8 +8,9 @@ import {
   clearConsole,
   isRunning,
   executionTime,
+  isLoadingModules,
 } from "../state/console";
-import { EXECUTION_TIMEOUT } from "../utils/constants";
+import { EXECUTION_TIMEOUT, MODULE_EXECUTION_TIMEOUT } from "../utils/constants";
 
 /**
  * REPL-style last expression evaluation.
@@ -106,6 +108,7 @@ function cleanup() {
     currentIframe = null;
   }
   pendingCode = null;
+  isLoadingModules.value = false;
 }
 
 function handleMessage(event: MessageEvent) {
@@ -130,7 +133,7 @@ function handleMessage(event: MessageEvent) {
       clearOnNextOutput = false;
     }
     let lineno = data.lineno;
-    let colno = data.colno;
+    const colno = data.colno;
     const message = data.message;
     let stack = data.stack;
     // Map iframe line to editor line; hide our internals from stack
@@ -172,6 +175,7 @@ function handleMessage(event: MessageEvent) {
       runningIndicatorId = null;
     }
     isRunning.value = false;
+    isLoadingModules.value = false;
     if (typeof data.executionTime === "number") {
       executionTime.value = data.executionTime;
     }
@@ -212,11 +216,19 @@ export function executeCode(source: string, lang: Language) {
   }
 
   const jsCode = result.code;
+
+  // Route to module execution if imports are detected
+  if (hasImports(jsCode)) {
+    executeModuleCode(jsCode);
+  } else {
+    executeEvalCode(jsCode);
+  }
+}
+
+/** Standard eval()-based execution path (no imports). */
+function executeEvalCode(jsCode: string) {
   const { body, lastExpr } = splitLastExpression(jsCode);
 
-  // Build the sandbox HTML.
-  // If we detected a last expression, run the body first, then eval the expression
-  // to capture its result (REPL-style). Otherwise, just run the full code.
   const execBlock = lastExpr
     ? `${body}
 var __jspark_result = eval(${JSON.stringify(lastExpr)});`
@@ -237,7 +249,6 @@ if (typeof __jspark_result !== "undefined") {
   userCodeStartLine = 2;
   userCodeLineCount = execBlock.split("\n").length;
 
-  // Code to run in iframe. No postMessage(done) – bootstrap sends done after eval().
   const codeToRun =
     "var __startTime = performance.now();\n" +
     execBlock +
@@ -246,7 +257,6 @@ if (typeof __jspark_result !== "undefined") {
 
   pendingCode = codeToRun;
 
-  // srcdoc = only bootstrap. It sends "ready"; we then postMessage the code (no HTML injection).
   const bootstrapForHtml = SANDBOX_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
   const srcdoc =
     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body><script>" +
@@ -271,7 +281,93 @@ if (typeof __jspark_result !== "undefined") {
     isRunning.value = false;
   }, EXECUTION_TIMEOUT);
 
-  // Listen for "done" to clear timeout
+  const onDone = (event: MessageEvent) => {
+    if (event.data?.source === "jspark" && event.data?.type === "done") {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      window.removeEventListener("message", onDone);
+    }
+  };
+  window.addEventListener("message", onDone);
+}
+
+/** Module-based execution path (code has imports, uses esm.sh). */
+function executeModuleCode(jsCode: string) {
+  isLoadingModules.value = true;
+
+  // Rewrite bare specifiers to esm.sh URLs
+  const rewritten = rewriteImports(jsCode);
+  const { body, lastExpr } = splitLastExpression(rewritten);
+
+  // Build module code with timing and result capture.
+  // In module mode we can use top-level await natively.
+  const execBlock = lastExpr
+    ? `${body}\nvar __jspark_result = ${lastExpr};`
+    : rewritten;
+
+  const resultBlock = lastExpr
+    ? `
+if (typeof __jspark_result !== "undefined") {
+  parent.postMessage({
+    source: "jspark",
+    type: "result",
+    value: window.__jspark_serialize(__jspark_result, 0)
+  }, "*");
+}`
+    : "";
+
+  // Line mapping: bootstrap is in a separate <script>, module code starts at line 1
+  userCodeStartLine = 3; // account for try { and timing var
+  userCodeLineCount = execBlock.split("\n").length;
+
+  const moduleCode = `
+var __startTime = performance.now();
+try {
+${execBlock}
+var __endTime = performance.now();
+${resultBlock}
+parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - __startTime }, "*");
+} catch (err) {
+parent.postMessage({
+  source: "jspark",
+  type: "error",
+  errorType: "error",
+  message: err.message || String(err),
+  stack: err.stack
+}, "*");
+parent.postMessage({ source: "jspark", type: "done", executionTime: 0 }, "*");
+}
+`;
+
+  const bootstrapForHtml = SANDBOX_BOOTSTRAP_MODULE.replace(/<\/script/gi, "<\\/script");
+  const moduleForHtml = moduleCode.replace(/<\/script/gi, "<\\/script");
+
+  const srcdoc =
+    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" +
+    "<script>" + bootstrapForHtml + "</script>" +
+    "<script type=\"module\">" + moduleForHtml + "</script>" +
+    "</body></html>";
+
+  const iframe = document.createElement("iframe");
+  iframe.sandbox.add("allow-scripts");
+  iframe.style.display = "none";
+  currentIframe = iframe;
+  iframe.srcdoc = srcdoc;
+  document.body.appendChild(iframe);
+
+  // Longer timeout for module execution (network fetches)
+  timeoutId = setTimeout(() => {
+    cleanup();
+    addErrorEntry(
+      "error",
+      `Execution timed out after ${MODULE_EXECUTION_TIMEOUT / 1000}s. Check your imports or network connection.`
+    );
+    executionDone = true;
+    isRunning.value = false;
+  }, MODULE_EXECUTION_TIMEOUT);
+
   const onDone = (event: MessageEvent) => {
     if (event.data?.source === "jspark" && event.data?.type === "done") {
       if (timeoutId) {

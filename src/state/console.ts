@@ -27,6 +27,7 @@ let nextId = 0;
 export const consoleOutput = signal<OutputEntry[]>([]);
 export const isRunning = signal(false);
 export const executionTime = signal<number | null>(null);
+export const isLoadingModules = signal(false);
 
 export function addConsoleEntry(
   method: ConsoleEntry["method"],
