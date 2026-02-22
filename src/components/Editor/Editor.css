@@ -133,12 +133,129 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 8px 0 0 3rem;
-  font-family: var(--font-mono);
-  font-size: var(--font-size);
-  line-height: 1.6;
-  color: var(--text-muted);
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.editor-placeholder:hover {
+  opacity: 1;
+}
+
+.editor-placeholder__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.editor-placeholder__brand {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.editor-placeholder:hover .editor-placeholder__brand {
+  color: var(--accent);
+}
+
+.editor-placeholder__hero {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.editor-placeholder__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.editor-placeholder__divider::before,
+.editor-placeholder__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  opacity: 0.6;
+}
+
+.editor-placeholder__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.editor-placeholder__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 110px;
+  padding: 10px 8px 9px;
+  border: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.editor-placeholder__card:hover {
+  border-color: var(--text-muted);
+  border-style: solid;
+  background: color-mix(in srgb, var(--bg-secondary) 50%, transparent);
+}
+
+.editor-placeholder__card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+.editor-placeholder__card:hover .editor-placeholder__card-icon {
+  color: var(--text-secondary);
+}
+
+.editor-placeholder__card-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.editor-placeholder__card-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+@media (max-width: 580px) {
+  .editor-placeholder__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .editor-placeholder__card {
+    width: 100px;
+  }
 }
 

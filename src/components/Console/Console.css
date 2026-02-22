@@ -58,10 +58,38 @@
 }
 
 .console-empty {
-  padding: 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 12px;
   color: var(--text-muted);
-  font-style: italic;
+  font-size: 12px;
   user-select: none;
+  opacity: 0.6;
+}
+
+.console-empty__prompt {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+.console-empty__text {
+  line-height: 1.4;
+}
+
+.console-empty kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 4px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 /* Entry */
