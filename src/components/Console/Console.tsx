@@ -50,7 +50,10 @@ export function Console() {
       <div class="console-list" ref={listRef} onScroll={onScroll}>
         {entries.length === 0 ? (
           <div class="console-empty">
-            Console output will appear here...
+            <span class="console-empty__prompt">{">"}</span>
+            <span class="console-empty__text">
+              Output from <kbd>console.log</kbd>, errors, and timers will appear here
+            </span>
           </div>
         ) : (
           entries.map((entry) => (

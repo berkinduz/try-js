@@ -8,13 +8,71 @@ import {
   getLanguageExtension,
   getThemeExtension,
 } from "./extensions";
-import { code, language, theme, syntaxTheme, setCode } from "../../state/editor";
+import { code, language, theme, syntaxTheme, setCode, setLanguage } from "../../state/editor";
 import { shareToClipboard, generateEmbedCode } from "../../utils/share";
 import { showToast } from "../Toast/Toast";
 import { openScreenshotModal } from "../Screenshot/ScreenshotModal";
 import { selectedText } from "../../state/selection";
 import { setSelection, clearSelection } from "../../state/selection";
+import { openGallery } from "../Gallery/Gallery";
 import "./Editor.css";
+
+const PLACEHOLDER_EXAMPLES = [
+  {
+    label: "NPM Imports",
+    icon: "package",
+    desc: "Use any npm package directly",
+    code: `import confetti from "canvas-confetti";
+import dayjs from "dayjs";
+import _ from "lodash";
+
+const now = dayjs().format("HH:mm:ss");
+console.log(\`It's \${now}\`);
+
+const nums = _.shuffle([1, 2, 3, 4, 5]);
+console.log("Shuffled:", nums);`,
+  },
+  {
+    label: "Async/Await",
+    icon: "zap",
+    desc: "Run async code instantly",
+    code: `const delay = (ms, val) =>
+  new Promise(r => setTimeout(() => r(val), ms));
+
+(async () => {
+  const results = await Promise.all([
+    delay(100, "first"),
+    delay(200, "second"),
+    delay(50,  "third"),
+  ]);
+
+  console.log(results);
+})();`,
+  },
+  {
+    label: "TypeScript",
+    icon: "type",
+    desc: "Full TS support, zero config",
+    code: `type Result<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: string };
+
+function divide(a: number, b: number): Result<number> {
+  if (b === 0) return { ok: false, error: "Division by zero" };
+  return { ok: true, value: a / b };
+}
+
+console.log(divide(10, 3));
+console.log(divide(10, 0));`,
+    lang: "typescript" as const,
+  },
+  {
+    label: "Snippets",
+    icon: "grid",
+    desc: "Browse ready-made examples",
+    action: "gallery" as const,
+  },
+] as const;
 
 export function Editor() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -174,16 +232,59 @@ export function Editor() {
 
   const showPlaceholder = code.value === "" && !editorFocused;
 
+  const handleExampleClick = (example: (typeof PLACEHOLDER_EXAMPLES)[number]) => {
+    if ("action" in example && example.action === "gallery") {
+      openGallery();
+      return;
+    }
+    if ("code" in example) {
+      if ("lang" in example && example.lang) {
+        setLanguage(example.lang);
+      }
+      setCode(example.code);
+    }
+  };
+
   return (
     <div class="editor-wrapper">
       {showPlaceholder && (
-        <div
-          class="editor-placeholder"
-          aria-hidden="true"
-        >
-          // Welcome to TryJS
-          <br />
-          // Write or paste your code below
+        <div class="editor-placeholder" aria-hidden="true">
+          <div class="editor-placeholder__inner">
+            <span class="editor-placeholder__brand">TryJS</span>
+            <p class="editor-placeholder__hero">
+              Start typing to run code
+            </p>
+            <div class="editor-placeholder__divider">
+              <span>or try an example</span>
+            </div>
+            <div class="editor-placeholder__grid">
+              {PLACEHOLDER_EXAMPLES.map((ex) => (
+                <button
+                  key={ex.label}
+                  type="button"
+                  class="editor-placeholder__card"
+                  onClick={() => handleExampleClick(ex)}
+                >
+                  <span class="editor-placeholder__card-icon">
+                    {ex.icon === "package" && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    )}
+                    {ex.icon === "zap" && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    )}
+                    {ex.icon === "type" && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    )}
+                    {ex.icon === "grid" && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    )}
+                  </span>
+                  <span class="editor-placeholder__card-label">{ex.label}</span>
+                  <span class="editor-placeholder__card-desc">{ex.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
       <div class="editor-actions">
