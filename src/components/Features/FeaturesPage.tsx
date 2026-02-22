@@ -41,6 +41,20 @@ const FEATURES: FeatureItem[] = [
     imageAlt: "TryJS snippet gallery and editor preview",
   },
   {
+    id: "web-playground",
+    tab: "Web Playground",
+    title: "Build with HTML, CSS and JS in one place",
+    summary:
+      "Switch to Web Playground mode for a tabbed editor with live preview — no separate tools needed.",
+    points: [
+      "HTML, CSS, and JS tabs with syntax highlighting",
+      "Live preview updates as you type",
+      "Built-in console for debugging output",
+    ],
+    image: "/tryjs_web.png",
+    imageAlt: "TryJS Web Playground with live preview",
+  },
+  {
     id: "share-embed",
     tab: "Share / Embed",
     title: "Send runnable context instead of static code blocks",
@@ -100,7 +114,7 @@ export function FeaturesPage() {
   // Set page-specific meta for /features
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = "TryJS Features — NPM Imports, Snippets, Sharing & Export";
+    document.title = "TryJS Features — NPM Imports, Snippets, Web Playground, Sharing & Export";
 
     const setMeta = (attr: string, key: string, content: string) => {
       let el = document.querySelector(
@@ -118,7 +132,7 @@ export function FeaturesPage() {
     setMeta(
       "name",
       "description",
-      "Explore TryJS features: import npm packages, browse code snippets, share runnable links, embed playgrounds, and export code as images.",
+      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS in Web Playground, share runnable links, and export code as images.",
     );
 
     let canonical = document.querySelector(
@@ -144,8 +158,8 @@ export function FeaturesPage() {
             <h1>Online JavaScript &amp; TypeScript Playground</h1>
             <p>
               TryJS is a fast JavaScript and TypeScript playground for testing
-              ideas, importing npm packages, sharing runnable examples, and
-              exporting code visuals.
+              ideas, importing npm packages, building with HTML/CSS/JS,
+              sharing runnable examples, and exporting code visuals.
             </p>
           </div>
           <div class="features-head__actions">

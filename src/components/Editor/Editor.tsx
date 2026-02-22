@@ -15,6 +15,7 @@ import {
   syntaxTheme,
   setCode,
   setLanguage,
+  setMode,
 } from "../../state/editor";
 import { shareToClipboard, generateEmbedCode } from "../../utils/share";
 import { showToast } from "../Toast/Toast";
@@ -39,21 +40,10 @@ const nums = _.shuffle([1, 2, 3, 4, 5]);
 console.log("Shuffled:", nums);`,
   },
   {
-    label: "Async/Await",
-    icon: "zap",
-    desc: "Run async code instantly",
-    code: `const delay = (ms, val) =>
-  new Promise(r => setTimeout(() => r(val), ms));
-
-(async () => {
-  const results = await Promise.all([
-    delay(100, "first"),
-    delay(200, "second"),
-    delay(50,  "third"),
-  ]);
-
-  console.log(results);
-})();`,
+    label: "Snippets",
+    icon: "grid",
+    desc: "Browse ready-to-run examples",
+    action: "gallery" as const,
   },
   {
     label: "TypeScript",
@@ -73,10 +63,10 @@ console.log(divide(10, 0));`,
     lang: "typescript" as const,
   },
   {
-    label: "Snippets",
-    icon: "grid",
-    desc: "Browse ready-made examples",
-    action: "gallery" as const,
+    label: "Web Playground",
+    icon: "globe",
+    desc: "Build with HTML, CSS & JS",
+    action: "web" as const,
   },
 ] as const;
 
@@ -249,6 +239,10 @@ export function Editor() {
       openGallery();
       return;
     }
+    if ("action" in example && example.action === "web") {
+      setMode("web");
+      return;
+    }
     if ("code" in example) {
       if ("lang" in example && example.lang) {
         setLanguage(example.lang);
@@ -293,7 +287,7 @@ export function Editor() {
                         <line x1="12" y1="22.08" x2="12" y2="12" />
                       </svg>
                     )}
-                    {ex.icon === "zap" && (
+                    {ex.icon === "grid" && (
                       <svg
                         width="16"
                         height="16"
@@ -304,7 +298,10 @@ export function Editor() {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
                       </svg>
                     )}
                     {ex.icon === "type" && (
@@ -323,7 +320,7 @@ export function Editor() {
                         <line x1="12" y1="4" x2="12" y2="20" />
                       </svg>
                     )}
-                    {ex.icon === "grid" && (
+                    {ex.icon === "globe" && (
                       <svg
                         width="16"
                         height="16"
@@ -334,10 +331,9 @@ export function Editor() {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
                       </svg>
                     )}
                   </span>

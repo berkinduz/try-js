@@ -1,0 +1,111 @@
+.web-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.web-editor__tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 8px;
+  height: 32px;
+  align-items: stretch;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.web-editor__tab {
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: -0.3px;
+}
+
+.web-editor__tab:hover {
+  color: var(--text-secondary);
+}
+
+.web-editor__tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.web-editor__body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.web-editor__container {
+  height: 100%;
+  overflow: hidden;
+}
+
+.web-editor__container .cm-editor {
+  height: 100%;
+}
+
+.web-editor__container .cm-scroller {
+  overflow: auto;
+}
+
+/* Placeholder overlay */
+.web-editor__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.web-editor__placeholder-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.web-editor__placeholder-brand {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: #e44d26;
+  letter-spacing: -0.5px;
+}
+
+.web-editor__placeholder-hero {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.web-editor__placeholder-btn {
+  margin-top: 4px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.web-editor__placeholder-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-muted);
+}

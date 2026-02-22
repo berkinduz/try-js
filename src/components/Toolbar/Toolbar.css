@@ -90,6 +90,98 @@
   background: #235a97;
 }
 
+/* Web mode toggle button */
+.toolbar__web-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.toolbar__web-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-color: var(--text-muted);
+}
+
+.toolbar__web-btn.active {
+  background: #e44d26;
+  color: #fff;
+  border-color: #e44d26;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toolbar__web-btn.active:hover {
+  background: #c9401e;
+  border-color: #c9401e;
+}
+
+.toolbar__web-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.toolbar__web-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 15px;
+  padding: 0 6px;
+  border: 1px solid rgba(122, 94, 0, 0.35);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #3d3000;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  line-height: 1;
+}
+
+/* Back button (web mode → JS/TS) */
+.toolbar__back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toolbar__back-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Web mode active label (shown in left when web mode is on) */
+.toolbar__web-active-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #e44d26;
+  letter-spacing: -0.3px;
+}
+
 /* Separator */
 .toolbar__separator {
   width: 1px;

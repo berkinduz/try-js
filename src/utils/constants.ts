@@ -2,6 +2,10 @@ export const DEFAULT_JS_CODE = "";
 
 export const DEFAULT_TS_CODE = "";
 
+export const DEFAULT_WEB_HTML = "";
+export const DEFAULT_WEB_CSS = "";
+export const DEFAULT_WEB_JS = "";
+
 export const AUTO_RUN_DELAY = 500;
 export const EXECUTION_TIMEOUT = 5000;
 export const MODULE_EXECUTION_TIMEOUT = 15000;
