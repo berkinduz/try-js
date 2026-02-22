@@ -1,5 +1,7 @@
 import { Compartment } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
 import {
   autocompletion,
   closeBrackets,
@@ -37,10 +39,15 @@ import type { Language } from "../../state/editor";
 import type { SyntaxThemeId, UiTheme } from "./themes";
 import { getEditorTheme } from "./themes";
 
+/** All language modes the editor can handle. */
+export type EditorLanguage = Language | "html" | "css";
+
 export const languageCompartment = new Compartment();
 export const themeCompartment = new Compartment();
 
-export function getLanguageExtension(lang: Language): Extension {
+export function getLanguageExtension(lang: EditorLanguage): Extension {
+  if (lang === "html") return html();
+  if (lang === "css") return css();
   return javascript({ typescript: lang === "typescript", jsx: false });
 }
 
@@ -49,7 +56,7 @@ export function getThemeExtension(uiTheme: UiTheme, syntaxThemeId: SyntaxThemeId
 }
 
 export function createExtensions(
-  lang: Language,
+  lang: EditorLanguage,
   uiTheme: UiTheme,
   syntaxThemeId: SyntaxThemeId,
   onChange: (code: string) => void,

@@ -9,13 +9,25 @@ const MAX_URL_LENGTH = 4000;
 export interface SharedState {
   code: string;
   language: Language;
+  mode?: "js" | "web";
+  html?: string;
+  css?: string;
+  webJs?: string;
 }
 
 /**
  * Encode code + language into a URL-safe hash fragment.
  * Format: #code=<lz-compressed>&lang=js|ts
+ * Web mode: #mode=web&html=<lz>&css=<lz>&js=<lz>
  */
 export function encodeToHash(state: SharedState): string {
+  if (state.mode === "web") {
+    const parts = [`mode=web`];
+    if (state.html) parts.push(`html=${compressToEncodedURIComponent(state.html)}`);
+    if (state.css) parts.push(`css=${compressToEncodedURIComponent(state.css)}`);
+    if (state.webJs) parts.push(`wjs=${compressToEncodedURIComponent(state.webJs)}`);
+    return `#${parts.join("&")}`;
+  }
   const compressed = compressToEncodedURIComponent(state.code);
   const lang = state.language === "typescript" ? "ts" : "js";
   return `#code=${compressed}&lang=${lang}`;
@@ -28,6 +40,23 @@ export function encodeToHash(state: SharedState): string {
 export function decodeFromHash(hash: string): SharedState | null {
   if (!hash || hash.length < 2) return null;
   const params = new URLSearchParams(hash.slice(1));
+
+  // Web mode
+  if (params.get("mode") === "web") {
+    const htmlCompressed = params.get("html");
+    const cssCompressed = params.get("css");
+    const wjsCompressed = params.get("wjs");
+    return {
+      code: "",
+      language: "javascript",
+      mode: "web",
+      html: htmlCompressed ? (decompressFromEncodedURIComponent(htmlCompressed) ?? "") : "",
+      css: cssCompressed ? (decompressFromEncodedURIComponent(cssCompressed) ?? "") : "",
+      webJs: wjsCompressed ? (decompressFromEncodedURIComponent(wjsCompressed) ?? "") : "",
+    };
+  }
+
+  // JS/TS mode
   const compressed = params.get("code");
   const lang = params.get("lang");
   if (!compressed) return null;

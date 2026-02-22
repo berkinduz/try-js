@@ -11,6 +11,7 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 - **Instant execution** — code auto-runs on change with debounce; `Cmd+Enter` runs immediately
 - **JavaScript & TypeScript** — toggle with one click; TypeScript is transpiled in-browser via Sucrase
 - **NPM imports** — bare specifiers like `import confetti from "canvas-confetti"` are rewritten to esm.sh and executed in the sandbox
+- **Web Playground** — switch to a tabbed HTML/CSS/JS editor with live preview and built-in console
 - **Snippet gallery** — ready-to-run examples across JS fundamentals, async patterns, and TypeScript essentials
 - **Share & embed** — copy a URL that preserves editor state, or embed as an iframe in docs and blog posts
 - **Export as image** — generate code screenshots with syntax themes, Safari/minimal frames, padding options, and gradient backgrounds (download PNG or copy to clipboard)
@@ -66,7 +67,9 @@ src/
   components/
     Editor/            # CodeMirror editor, themes, extensions
     Console/           # Console output display
-    Toolbar/           # Language toggle, GitHub/BMC links
+    WebEditor/         # Tabbed HTML/CSS/JS editor for web mode
+    WebPreview/        # Live iframe preview with console drawer
+    Toolbar/           # Language toggle, web mode switch, links
     StatusBar/         # Help, snippets, shortcuts, theme/font selects
     SplitPane/         # Draggable editor/console split
     Gallery/           # Snippet gallery modal

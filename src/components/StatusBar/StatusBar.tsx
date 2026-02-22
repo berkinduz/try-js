@@ -4,7 +4,7 @@ import {
   isRunning,
   isLoadingModules,
 } from "../../state/console";
-import { syntaxTheme, setSyntaxTheme } from "../../state/editor";
+import { syntaxTheme, setSyntaxTheme, mode } from "../../state/editor";
 import { editorFont, setEditorFont, EDITOR_FONTS } from "../../state/settings";
 import type { EditorFontId } from "../../state/settings";
 import { SYNTAX_THEMES } from "../Editor/themes";
@@ -13,6 +13,7 @@ import { openGallery } from "../Gallery/Gallery";
 import "./StatusBar.css";
 
 export function StatusBar() {
+  const isWeb = mode.value === "web";
   const entries = consoleOutput.value;
   const execTime = executionTime.value;
   const running = isRunning.value;
@@ -139,39 +140,41 @@ export function StatusBar() {
       </div>
 
       <div class="statusbar__right">
-        <div class="statusbar__metrics">
-          {isLoadingModules.value && (
-            <span class="statusbar__item statusbar__running">
-              Loading modules...
+        {!isWeb && (
+          <div class="statusbar__metrics">
+            {isLoadingModules.value && (
+              <span class="statusbar__item statusbar__running">
+                Loading modules...
+              </span>
+            )}
+
+            {running && !isLoadingModules.value && (
+              <span class="statusbar__item statusbar__running">Running...</span>
+            )}
+
+            {execTime !== null && !running && (
+              <span class="statusbar__item">
+                {execTime < 1 ? "<1ms" : `${Math.round(execTime)}ms`}
+              </span>
+            )}
+
+            {errorCount > 0 && (
+              <span class="statusbar__item statusbar__errors">
+                ✕ {errorCount}
+              </span>
+            )}
+
+            {warnCount > 0 && (
+              <span class="statusbar__item statusbar__warnings">
+                ⚠ {warnCount}
+              </span>
+            )}
+
+            <span class="statusbar__item statusbar__log-count">
+              {entries.length} log{entries.length !== 1 ? "s" : ""}
             </span>
-          )}
-
-          {running && !isLoadingModules.value && (
-            <span class="statusbar__item statusbar__running">Running...</span>
-          )}
-
-          {execTime !== null && !running && (
-            <span class="statusbar__item">
-              {execTime < 1 ? "<1ms" : `${Math.round(execTime)}ms`}
-            </span>
-          )}
-
-          {errorCount > 0 && (
-            <span class="statusbar__item statusbar__errors">
-              ✕ {errorCount}
-            </span>
-          )}
-
-          {warnCount > 0 && (
-            <span class="statusbar__item statusbar__warnings">
-              ⚠ {warnCount}
-            </span>
-          )}
-
-          <span class="statusbar__item statusbar__log-count">
-            {entries.length} log{entries.length !== 1 ? "s" : ""}
-          </span>
-        </div>
+          </div>
+        )}
 
         <div class="statusbar__appearance">
           <div class="statusbar__shortcut-wrap">

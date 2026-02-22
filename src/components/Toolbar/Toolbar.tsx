@@ -1,4 +1,4 @@
-import { language, setLanguage } from "../../state/editor";
+import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import "./Toolbar.css";
 
@@ -7,38 +7,86 @@ const BMC_URL = "https://buymeacoffee.com/berkinduz";
 
 export function Toolbar() {
   const currentLang = language.value;
+  const currentMode = mode.value;
+  const isWeb = currentMode === "web";
   const setLang = (lang: Language) => () => setLanguage(lang);
+
+  const toggleWebMode = () => {
+    setMode(isWeb ? "js" : "web");
+  };
 
   return (
     <div class="toolbar">
       <div class="toolbar__left">
         <div class="toolbar__brand">
-          <div class="toolbar__lang-toggle">
-            <button
-              type="button"
-              class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" ? "active" : ""}`}
-              onClick={setLang("javascript")}
-              title="JavaScript"
-              aria-label="JavaScript"
-              aria-pressed={currentLang === "javascript"}
-            >
-              JS
-            </button>
-            <button
-              type="button"
-              class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" ? "active" : ""}`}
-              onClick={setLang("typescript")}
-              title="TypeScript"
-              aria-label="TypeScript"
-              aria-pressed={currentLang === "typescript"}
-            >
-              TS
-            </button>
-          </div>
+          {isWeb ? (
+            <>
+              <button
+                type="button"
+                class="toolbar__back-btn"
+                onClick={toggleWebMode}
+                title="Back to JS/TS playground"
+                aria-label="Back to JS/TS playground"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+              </button>
+              <span class="toolbar__web-active-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+                </svg>
+                Web Playground
+              </span>
+            </>
+          ) : (
+            <div class="toolbar__lang-toggle">
+              <button
+                type="button"
+                class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" ? "active" : ""}`}
+                onClick={setLang("javascript")}
+                title="JavaScript"
+                aria-label="JavaScript"
+                aria-pressed={currentLang === "javascript"}
+              >
+                JS
+              </button>
+              <button
+                type="button"
+                class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" ? "active" : ""}`}
+                onClick={setLang("typescript")}
+                title="TypeScript"
+                aria-label="TypeScript"
+                aria-pressed={currentLang === "typescript"}
+              >
+                TS
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       <div class="toolbar__right toolbar__right--links">
+        {!isWeb && (
+          <button
+            type="button"
+            class="toolbar__web-btn"
+            onClick={toggleWebMode}
+            title="Web Playground"
+            aria-label="Web Playground, new"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+            </svg>
+            <span class="toolbar__web-label">Web Playground</span>
+            <span class="toolbar__web-badge">NEW</span>
+          </button>
+        )}
         <a
           href={BMC_URL}
           target="_blank"

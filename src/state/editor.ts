@@ -1,5 +1,11 @@
 import { signal, computed } from "@preact/signals";
-import { DEFAULT_JS_CODE, DEFAULT_TS_CODE } from "../utils/constants";
+import {
+  DEFAULT_JS_CODE,
+  DEFAULT_TS_CODE,
+  DEFAULT_WEB_HTML,
+  DEFAULT_WEB_CSS,
+  DEFAULT_WEB_JS,
+} from "../utils/constants";
 import type { SyntaxThemeId } from "../components/Editor/themes";
 import {
   SYNTAX_THEMES,
@@ -11,6 +17,8 @@ import { decodeFromHash } from "../utils/share";
 
 export type Language = "javascript" | "typescript";
 export type Theme = "light" | "dark";
+export type AppMode = "js" | "web";
+export type WebTab = "html" | "css" | "js";
 
 // Check URL hash for shared code (takes priority over localStorage)
 const sharedState = decodeFromHash(window.location.hash);
@@ -82,3 +90,53 @@ document.documentElement.setAttribute(
   "data-theme",
   getUiModeForSyntax(getStoredSyntaxTheme())
 );
+
+/* ============================================
+   Web Mode State
+   ============================================ */
+
+const getStoredMode = (): AppMode => {
+  if (sharedState && "mode" in sharedState && sharedState.mode === "web") return "web";
+  const stored = localStorage.getItem("jspark:mode");
+  return stored === "web" ? "web" : "js";
+};
+
+const getStoredWebCode = (tab: WebTab): string => {
+  if (sharedState && "mode" in sharedState && sharedState.mode === "web") {
+    if (tab === "html") return (sharedState as any).html ?? DEFAULT_WEB_HTML;
+    if (tab === "css") return (sharedState as any).css ?? DEFAULT_WEB_CSS;
+    return (sharedState as any).webJs ?? DEFAULT_WEB_JS;
+  }
+  const stored = localStorage.getItem(`jspark:web:${tab}`);
+  if (stored !== null) return stored;
+  if (tab === "html") return DEFAULT_WEB_HTML;
+  if (tab === "css") return DEFAULT_WEB_CSS;
+  return DEFAULT_WEB_JS;
+};
+
+export const mode = signal<AppMode>(getStoredMode());
+export const webHtml = signal<string>(getStoredWebCode("html"));
+export const webCss = signal<string>(getStoredWebCode("css"));
+export const webJs = signal<string>(getStoredWebCode("js"));
+export const webActiveTab = signal<WebTab>("html");
+
+export function setMode(m: AppMode) {
+  mode.value = m;
+  localStorage.setItem("jspark:mode", m);
+}
+
+export function setWebCode(tab: WebTab, newCode: string) {
+  if (tab === "html") webHtml.value = newCode;
+  else if (tab === "css") webCss.value = newCode;
+  else webJs.value = newCode;
+}
+
+export function setWebActiveTab(tab: WebTab) {
+  webActiveTab.value = tab;
+}
+
+export function getWebCode(tab: WebTab): string {
+  if (tab === "html") return webHtml.value;
+  if (tab === "css") return webCss.value;
+  return webJs.value;
+}
