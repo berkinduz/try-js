@@ -53,21 +53,29 @@
 
 .toolbar__logo-short {
   flex-shrink: 0;
+  transition: max-width 0.3s ease-out, opacity 0.2s ease-out;
+  max-width: 20px;
+  overflow: hidden;
+  display: inline-block;
 }
 
 .toolbar__logo-full {
   max-width: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: max-width 0.3s ease-out, margin 0.3s ease-out;
-  margin-left: 0;
+  transition: max-width 0.3s ease-out;
   font-size: 12px;
   font-weight: 700;
+  display: inline-block;
+}
+
+.toolbar__logo:hover .toolbar__logo-short {
+  max-width: 0;
+  opacity: 0;
 }
 
 .toolbar__logo:hover .toolbar__logo-full {
-  max-width: 80px;
-  margin-left: 4px;
+  max-width: 90px;
 }
 
 /* JS: only left corners slightly rounded */
@@ -78,7 +86,8 @@
 }
 
 .toolbar__logo--js:hover {
-  color: var(--text-primary);
+  background: #f7df1e;
+  color: #000;
 }
 
 .toolbar__logo--js.active {
@@ -99,7 +108,8 @@
 }
 
 .toolbar__logo--ts:hover {
-  color: var(--text-primary);
+  background: #3178c6;
+  color: #fff;
 }
 
 .toolbar__logo--ts.active {
