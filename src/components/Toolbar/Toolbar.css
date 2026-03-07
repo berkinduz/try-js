@@ -37,6 +37,8 @@
 }
 
 .toolbar__logo {
+  display: flex;
+  align-items: center;
   font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 800;
@@ -46,6 +48,26 @@
   border: none;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+}
+
+.toolbar__logo-short {
+  flex-shrink: 0;
+}
+
+.toolbar__logo-full {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.3s ease-out, margin 0.3s ease-out;
+  margin-left: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.toolbar__logo:hover .toolbar__logo-full {
+  max-width: 80px;
+  margin-left: 4px;
 }
 
 /* JS: only left corners slightly rounded */
