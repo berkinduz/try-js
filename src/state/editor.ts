@@ -6,6 +6,7 @@ import {
   DEFAULT_WEB_CSS,
   DEFAULT_WEB_JS,
 } from "../utils/constants";
+import { preloadTypeScript } from "../sandbox/type-checker";
 import type { SyntaxThemeId } from "../components/Editor/themes";
 import {
   SYNTAX_THEMES,
@@ -66,7 +67,12 @@ export function setLanguage(lang: Language) {
   localStorage.setItem("jspark:language", lang);
   // Load code for new language
   code.value = getStoredCode(lang);
+  // Pre-load TS compiler so type-checking is fast when the user runs code
+  if (lang === "typescript") preloadTypeScript();
 }
+
+// If the user starts in TypeScript mode, preload the compiler immediately
+if (getStoredLanguage() === "typescript") preloadTypeScript();
 
 export function setCode(newCode: string) {
   code.value = newCode;
