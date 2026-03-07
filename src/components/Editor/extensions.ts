@@ -4,6 +4,7 @@ import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import {
   autocompletion,
+  acceptCompletion,
   closeBrackets,
   closeBracketsKeymap,
 } from "@codemirror/autocomplete";
@@ -85,6 +86,8 @@ export function createExtensions(
     highlightSelectionMatches(),
     // Keymaps
     keymap.of([
+      // Accept completion on Tab (before indentWithTab so it takes priority)
+      { key: "Tab", run: acceptCompletion },
       ...closeBracketsKeymap,
       ...defaultKeymap,
       ...searchKeymap,

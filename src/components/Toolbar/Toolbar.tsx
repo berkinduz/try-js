@@ -52,7 +52,8 @@ export function Toolbar() {
                 aria-label="JavaScript"
                 aria-pressed={currentLang === "javascript"}
               >
-                JS
+                <span class="toolbar__logo-short">JS</span>
+                <span class="toolbar__logo-full">JavaScript</span>
               </button>
               <button
                 type="button"
@@ -62,7 +63,8 @@ export function Toolbar() {
                 aria-label="TypeScript"
                 aria-pressed={currentLang === "typescript"}
               >
-                TS
+                <span class="toolbar__logo-short">TS</span>
+                <span class="toolbar__logo-full">TypeScript</span>
               </button>
             </div>
           )}
