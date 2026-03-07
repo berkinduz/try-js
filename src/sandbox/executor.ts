@@ -1,6 +1,7 @@
 import { SANDBOX_BOOTSTRAP } from "./sandbox-bootstrap";
 import { SANDBOX_BOOTSTRAP_MODULE } from "./sandbox-bootstrap";
 import { transpile, hasImports, rewriteImports } from "./transpiler";
+import { checkTypes } from "./type-checker";
 import type { Language } from "../state/editor";
 import {
   addConsoleEntry,
@@ -97,6 +98,26 @@ let pendingCode: string | null = null;
 // Clear console on first output of this run (avoids empty-console flicker between runs).
 let clearOnNextOutput = false;
 
+// Type-checking state: run id prevents stale results from a previous run.
+let typeCheckRunId = 0;
+let typeCheckPromise: Promise<import("./type-checker").TypeDiagnostic[]> | null = null;
+
+/** Append pending type diagnostics to the console (called after execution finishes). */
+function flushTypeErrors() {
+  if (!typeCheckPromise) return;
+  const capturedRunId = typeCheckRunId;
+  const promise = typeCheckPromise;
+  typeCheckPromise = null;
+  promise.then((diagnostics) => {
+    if (typeCheckRunId !== capturedRunId) return; // stale
+    for (const d of diagnostics) {
+      if (d.category === "error" || d.category === "warning") {
+        addErrorEntry("error", `Type Error: ${d.message}`, undefined, d.line, d.col);
+      }
+    }
+  });
+}
+
 // Delay before showing the "Running..." indicator.
 // Most executions finish in <50ms, so this prevents flicker.
 const RUNNING_INDICATOR_DELAY = 150;
@@ -186,6 +207,8 @@ function handleMessage(event: MessageEvent) {
     if (typeof data.executionTime === "number") {
       executionTime.value = data.executionTime;
     }
+    // Show type errors (if any) after execution output
+    flushTypeErrors();
   }
 }
 
@@ -197,6 +220,14 @@ export function executeCode(source: string, lang: Language) {
   clearOnNextOutput = true; // clear on first output (avoids empty-console flicker)
   executionDone = false;
   executionTime.value = null;
+
+  // Start type checking for TypeScript (non-blocking, results shown after execution)
+  ++typeCheckRunId;
+  if (lang === "typescript") {
+    typeCheckPromise = checkTypes(source).catch(() => []);
+  } else {
+    typeCheckPromise = null;
+  }
 
   // Don't set isRunning = true immediately.
   // Instead, wait RUNNING_INDICATOR_DELAY ms. If execution finishes
@@ -219,6 +250,7 @@ export function executeCode(source: string, lang: Language) {
       runningIndicatorId = null;
     }
     isRunning.value = false;
+    flushTypeErrors();
     return;
   }
 
@@ -286,6 +318,7 @@ if (typeof __jspark_result !== "undefined") {
     );
     executionDone = true;
     isRunning.value = false;
+    flushTypeErrors();
   }, EXECUTION_TIMEOUT);
 
   const onDone = (event: MessageEvent) => {
@@ -373,6 +406,7 @@ parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - 
     );
     executionDone = true;
     isRunning.value = false;
+    flushTypeErrors();
   }, MODULE_EXECUTION_TIMEOUT);
 
   const onDone = (event: MessageEvent) => {
