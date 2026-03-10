@@ -20,6 +20,8 @@ import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
+import { RegexPage } from "./components/Regex/RegexPage";
+import { RegexDetailPage } from "./components/Regex/RegexDetailPage";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -50,6 +52,15 @@ export function App() {
   const snippetMatch = path.match(/^\/snippets\/(.+)$/);
   if (snippetMatch) {
     return <SnippetDetailPage slug={snippetMatch[1]} />;
+  }
+
+  if (path === "/regex") {
+    return <RegexPage />;
+  }
+
+  const regexMatch = path.match(/^\/regex\/(.+)$/);
+  if (regexMatch) {
+    return <RegexDetailPage slug={regexMatch[1]} />;
   }
 
   const isEmbed = embedMode.value;

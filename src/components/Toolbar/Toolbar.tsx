@@ -72,6 +72,21 @@ export function Toolbar() {
       </div>
 
       <div class="toolbar__right toolbar__right--links">
+        <a
+          href="/regex"
+          class="toolbar__link toolbar__bmc"
+          title="Regex Playground"
+          aria-label="Regex Playground"
+          style={{ textDecoration: "none" }}
+        >
+          <span class="toolbar__bmc-text">Regex</span>
+          <span class="toolbar__bmc-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+          </span>
+        </a>
         {!isWeb && (
           <button
             type="button"
