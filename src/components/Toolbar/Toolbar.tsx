@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "preact/hooks";
 import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import "./Toolbar.css";
@@ -10,10 +11,24 @@ export function Toolbar() {
   const currentMode = mode.value;
   const isWeb = currentMode === "web";
   const setLang = (lang: Language) => () => setLanguage(lang);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleWebMode = () => {
     setMode(isWeb ? "js" : "web");
   };
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [menuOpen]);
 
   return (
     <div class="toolbar">
@@ -72,38 +87,79 @@ export function Toolbar() {
       </div>
 
       <div class="toolbar__right toolbar__right--links">
-        <a
-          href="/regex"
-          class="toolbar__link toolbar__bmc"
-          title="Regex Playground"
-          aria-label="Regex Playground"
-          style={{ textDecoration: "none" }}
-        >
-          <span class="toolbar__bmc-text">Regex</span>
-          <span class="toolbar__bmc-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6" />
-              <polyline points="8 6 2 12 8 18" />
-            </svg>
-          </span>
-        </a>
-        {!isWeb && (
+        {/* Navigation dropdown */}
+        <div class="toolbar__dropdown" ref={menuRef}>
           <button
             type="button"
-            class="toolbar__web-btn"
-            onClick={toggleWebMode}
-            title="Web Playground"
-            aria-label="Web Playground, new"
+            class={`toolbar__icon-btn toolbar__dropdown-trigger ${menuOpen ? "active" : ""}`}
+            onClick={() => setMenuOpen((v) => !v)}
+            title="More"
+            aria-label="Navigation menu"
+            aria-expanded={menuOpen}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
-            <span class="toolbar__web-label">Web Playground</span>
-            <span class="toolbar__web-badge">NEW</span>
           </button>
-        )}
+          {menuOpen && (
+            <div class="toolbar__dropdown-menu">
+              {!isWeb && (
+                <button
+                  type="button"
+                  class="toolbar__dropdown-item"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    toggleWebMode();
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+                  </svg>
+                  Web Playground
+                </button>
+              )}
+              <a
+                class="toolbar__dropdown-item"
+                href="/regex"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                Regex Playground
+              </a>
+              <a
+                class="toolbar__dropdown-item"
+                href="/snippets"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 18l6-6-6-6" />
+                  <path d="M8 6l-6 6 6 6" />
+                  <line x1="14" y1="4" x2="10" y2="20" />
+                </svg>
+                Snippets
+              </a>
+              <a
+                class="toolbar__dropdown-item"
+                href="/features"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                Features
+              </a>
+            </div>
+          )}
+        </div>
+
         <a
           href={BMC_URL}
           target="_blank"
