@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useState, useCallback } from "preact/hooks";
 import {
   findRegexBySlug,
   getAllRegexPatterns,
@@ -13,6 +13,40 @@ function getRelatedPatterns(current: RegexPattern): RegexPattern[] {
   const sameCat = all.filter((p) => p.category === current.category);
   const others = all.filter((p) => p.category !== current.category);
   return [...sameCat, ...others].slice(0, 4);
+}
+
+function CopyablePattern({ pattern, flags }: { pattern: string; flags: string }) {
+  const [copied, setCopied] = useState(false);
+  const text = `/${pattern}/${flags}`;
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [text]);
+
+  return (
+    <div class="regex-detail__pattern">
+      <code>{text}</code>
+      <button
+        type="button"
+        class="regex-copy-btn"
+        onClick={handleCopy}
+        title="Copy regex"
+        aria-label="Copy regex"
+      >
+        {copied ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
 }
 
 export function RegexDetailPage({ slug }: { slug: string }) {
@@ -119,9 +153,7 @@ export function RegexDetailPage({ slug }: { slug: string }) {
             </div>
 
             {/* Pattern display */}
-            <div class="regex-detail__pattern">
-              /{pattern.pattern}/{pattern.flags}
-            </div>
+            <CopyablePattern pattern={pattern.pattern} flags={pattern.flags} />
 
             {/* Explanation */}
             <div class="regex-detail__section">
@@ -159,6 +191,7 @@ export function RegexDetailPage({ slug }: { slug: string }) {
               Try It — Interactive Tester
             </h2>
             <RegexPlayground
+              key={pattern.slug}
               initialPattern={pattern.pattern}
               initialFlags={pattern.flags}
               initialTestInput={pattern.testInput}

@@ -69,6 +69,28 @@
   color: var(--text-primary);
 }
 
+/* ---------- Copy button ---------- */
+.regex-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.regex-copy-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
 /* ---------- Pattern input row ---------- */
 .regex-pattern-row {
   display: flex;
@@ -388,6 +410,10 @@
 }
 
 .regex-detail__pattern {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 14px 24px;
   background: color-mix(in srgb, var(--bg-primary) 60%, var(--bg-secondary));
   border-bottom: 1px solid var(--border);
@@ -395,7 +421,12 @@
   font-size: 14px;
   color: var(--accent);
   overflow-x: auto;
+}
+
+.regex-detail__pattern code {
   white-space: pre;
+  overflow-x: auto;
+  min-width: 0;
 }
 
 .regex-detail__section {
