@@ -407,8 +407,9 @@
 }
 
 .toolbar__explore:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--border);
+  background: color-mix(in srgb, var(--info) 15%, var(--bg-tertiary));
+  border-color: color-mix(in srgb, var(--info) 35%, var(--border));
+  color: var(--text-primary);
 }
 
 .toolbar__explore:hover .toolbar__explore-text {
@@ -416,9 +417,9 @@
 }
 
 .toolbar__explore.active {
-  background: var(--bg-tertiary);
+  background: color-mix(in srgb, var(--info) 15%, var(--bg-tertiary));
+  border-color: color-mix(in srgb, var(--info) 35%, var(--border));
   color: var(--text-primary);
-  border-color: var(--border);
 }
 
 .toolbar__explore.active .toolbar__explore-text {
