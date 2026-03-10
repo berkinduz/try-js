@@ -91,18 +91,21 @@ export function Toolbar() {
         <div class="toolbar__dropdown" ref={menuRef}>
           <button
             type="button"
-            class={`toolbar__icon-btn toolbar__dropdown-trigger ${menuOpen ? "active" : ""}`}
+            class={`toolbar__link toolbar__explore ${menuOpen ? "active" : ""}`}
             onClick={() => setMenuOpen((v) => !v)}
-            title="More"
-            aria-label="Navigation menu"
+            title="Explore playgrounds"
+            aria-label="Explore playgrounds"
             aria-expanded={menuOpen}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1" />
-              <rect x="14" y="3" width="7" height="7" rx="1" />
-              <rect x="3" y="14" width="7" height="7" rx="1" />
-              <rect x="14" y="14" width="7" height="7" rx="1" />
-            </svg>
+            <span class="toolbar__explore-text">Explore</span>
+            <span class="toolbar__explore-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+            </span>
           </button>
           {menuOpen && (
             <div class="toolbar__dropdown-menu">
