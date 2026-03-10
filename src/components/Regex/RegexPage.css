@@ -1,0 +1,526 @@
+/* ============================================
+   Regex Playground — Styles
+   Reuses snippets-page patterns from SnippetsPage.css
+   ============================================ */
+
+/* ---------- Playground container ---------- */
+.regex-playground {
+  margin-top: 20px;
+}
+
+.regex-playground__editor-wrap {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.regex-playground__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.regex-playground__toolbar-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+/* ---------- Flag toggles ---------- */
+.regex-flags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.regex-flag-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.regex-flag-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.regex-flag-btn--active {
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg-secondary));
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  color: var(--text-primary);
+}
+
+/* ---------- Pattern input row ---------- */
+.regex-pattern-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.regex-pattern-slash {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text-muted);
+  padding: 0 2px 0 16px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.regex-pattern-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+}
+
+.regex-pattern-input::placeholder {
+  color: var(--text-muted);
+}
+
+.regex-pattern-flags-display {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text-muted);
+  padding-right: 16px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* ---------- Error ---------- */
+.regex-error {
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--error);
+  background: color-mix(in srgb, var(--error) 8%, var(--bg-secondary));
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---------- Test input area ---------- */
+.regex-test-area {
+  padding: 16px;
+  min-height: 140px;
+}
+
+.regex-test-area label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.regex-test-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.regex-test-input:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+/* ---------- Results area ---------- */
+.regex-results {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+}
+
+.regex-results__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.regex-results__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.regex-results__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.regex-results__count strong {
+  color: var(--accent);
+}
+
+/* Highlighted output */
+.regex-highlighted {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.regex-match {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 2px;
+  padding: 1px 0;
+  outline: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.regex-match:nth-child(even of .regex-match) {
+  background: color-mix(in srgb, var(--info) 25%, transparent);
+  outline-color: color-mix(in srgb, var(--info) 45%, transparent);
+}
+
+.regex-no-match {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ---------- Match details ---------- */
+.regex-match-details {
+  margin-top: 12px;
+}
+
+.regex-match-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.regex-match-table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.regex-match-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.regex-match-table tr:last-child td {
+  border-bottom: none;
+}
+
+.regex-match-table__index {
+  color: var(--text-muted);
+  width: 60px;
+}
+
+.regex-match-table__value {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.regex-match-table__group {
+  color: var(--info);
+}
+
+/* ---------- Tabs ---------- */
+.regex-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.regex-tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.regex-tab:hover {
+  color: var(--text-primary);
+}
+
+.regex-tab--active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Explain mode ---------- */
+.regex-explain {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.regex-explain__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.regex-explain__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.regex-explain__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+}
+
+.regex-explain__token {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.regex-explain__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* ---------- Detail page: breakdown ---------- */
+.regex-detail {
+  margin-top: 20px;
+}
+
+.regex-detail__card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.regex-detail__header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.regex-detail__header h2 {
+  margin: 0 0 6px;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.regex-detail__header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.regex-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.regex-detail__pattern {
+  padding: 14px 24px;
+  background: color-mix(in srgb, var(--bg-primary) 60%, var(--bg-secondary));
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.regex-detail__section {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.regex-detail__section:last-child {
+  border-bottom: none;
+}
+
+.regex-detail__section h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.regex-detail__section p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.regex-detail__section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.regex-detail__section li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+
+.regex-detail__actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- Snippet grid for regex ---------- */
+.regex-snippet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+/* ---------- Action buttons row ---------- */
+.regex-playground__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.regex-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.regex-explain-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.regex-explain-btn--active {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-secondary));
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  color: var(--text-primary);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .regex-playground__toolbar {
+    padding: 8px 12px;
+  }
+
+  .regex-pattern-slash {
+    padding-left: 12px;
+  }
+
+  .regex-test-area {
+    padding: 12px;
+  }
+
+  .regex-results {
+    padding: 12px;
+  }
+
+  .regex-explain {
+    padding: 12px;
+  }
+
+  .regex-detail__header {
+    padding: 16px;
+  }
+
+  .regex-detail__section {
+    padding: 12px 16px;
+  }
+
+  .regex-detail__actions {
+    padding: 12px 16px;
+  }
+
+  .regex-detail__pattern {
+    padding: 12px 16px;
+  }
+
+  .regex-snippet-grid {
+    grid-template-columns: 1fr;
+  }
+}
