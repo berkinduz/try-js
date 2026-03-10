@@ -10,6 +10,8 @@ const ALL_FLAGS = [
   { flag: "d", label: "d", title: "Indices — include match indices" },
 ] as const;
 
+const VALID_FLAGS = new Set(["g", "i", "m", "s", "u", "d"]);
+
 interface Match {
   value: string;
   index: number;
@@ -23,6 +25,19 @@ interface Props {
   initialTestInput?: string;
 }
 
+/** If user pastes `/pattern/flags`, strip the literal delimiters and extract flags. */
+function parseRegexInput(raw: string): { pattern: string; flags: string } | null {
+  const m = raw.match(/^\/(.+)\/([gimsud]*)$/);
+  if (m) {
+    return { pattern: m[1], flags: m[2] };
+  }
+  return null;
+}
+
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
 export function RegexPlayground({
   initialPattern = "",
   initialFlags = "g",
@@ -33,6 +48,7 @@ export function RegexPlayground({
   const [testInput, setTestInput] = useState(initialTestInput);
   const [showExplain, setShowExplain] = useState(false);
   const [activeTab, setActiveTab] = useState<"matches" | "table">("matches");
+  const [copied, setCopied] = useState(false);
 
   const toggleFlag = useCallback(
     (f: string) => {
@@ -41,9 +57,27 @@ export function RegexPlayground({
     []
   );
 
+  const handlePatternInput = useCallback((e: Event) => {
+    const raw = (e.target as HTMLInputElement).value;
+    // Auto-detect pasted regex literal like /pattern/flags
+    const parsed = parseRegexInput(raw);
+    if (parsed) {
+      setPattern(parsed.pattern);
+      if (parsed.flags) setFlags(parsed.flags);
+    } else {
+      setPattern(raw);
+    }
+  }, []);
+
+  const handleCopyPattern = useCallback(() => {
+    copyToClipboard(`/${pattern}/${flags}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [pattern, flags]);
+
   // Build regex and find matches
-  const { regex, error, matches } = useMemo(() => {
-    if (!pattern) return { regex: null, error: null, matches: [] as Match[] };
+  const { error, matches } = useMemo(() => {
+    if (!pattern) return { error: null, matches: [] as Match[] };
     try {
       const re = new RegExp(pattern, flags);
       const results: Match[] = [];
@@ -73,9 +107,9 @@ export function RegexPlayground({
         }
       }
 
-      return { regex: re, error: null, matches: results };
+      return { error: null, matches: results };
     } catch (e: any) {
-      return { regex: null, error: e.message as string, matches: [] as Match[] };
+      return { error: e.message as string, matches: [] as Match[] };
     }
   }, [pattern, flags, testInput]);
 
@@ -86,7 +120,6 @@ export function RegexPlayground({
     const parts: { text: string; isMatch: boolean }[] = [];
     let lastEnd = 0;
 
-    // Sort matches by index to handle properly
     const sorted = [...matches].sort((a, b) => a.index - b.index);
 
     for (const m of sorted) {
@@ -140,13 +173,31 @@ export function RegexPlayground({
           type="text"
           class="regex-pattern-input"
           value={pattern}
-          onInput={(e) => setPattern((e.target as HTMLInputElement).value)}
+          onInput={handlePatternInput}
           placeholder="Enter regex pattern..."
           spellcheck={false}
           autocomplete="off"
           autocapitalize="off"
         />
         <span class="regex-pattern-flags-display">/{flags || " "}</span>
+        <button
+          type="button"
+          class="regex-copy-btn"
+          onClick={handleCopyPattern}
+          title="Copy regex"
+          aria-label="Copy regex"
+        >
+          {copied ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Error */}
@@ -164,7 +215,7 @@ export function RegexPlayground({
         />
       </div>
 
-      {/* Results */}
+      {/* Results — always show when there's a pattern and test input */}
       {pattern && testInput && !error && (
         <div class="regex-results">
           <div class="regex-results__header">
