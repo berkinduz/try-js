@@ -384,59 +384,39 @@
   color: var(--text-muted);
 }
 
-/* Explore button: slide-in text like BMC */
+/* Explore button: static label + icon, no slide animation */
 .toolbar__explore {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  gap: 8px;
-  justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  overflow: hidden;
-  transition: width 0.3s ease-out, background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s;
-}
-
-.toolbar__explore:hover,
-.toolbar__explore.active {
-  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
   padding: 0 10px;
-  justify-content: flex-end;
-}
-
-.toolbar__explore-text {
-  max-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 600;
-  transition: max-width 0.3s ease-out;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
 
 .toolbar__explore:hover {
-  background: color-mix(in srgb, var(--info) 15%, var(--bg-tertiary));
-  border-color: color-mix(in srgb, var(--info) 35%, var(--border));
+  background: var(--bg-tertiary);
   color: var(--text-primary);
-}
-
-.toolbar__explore:hover .toolbar__explore-text {
-  max-width: 60px;
 }
 
 .toolbar__explore.active {
   background: color-mix(in srgb, var(--info) 15%, var(--bg-tertiary));
   border-color: color-mix(in srgb, var(--info) 35%, var(--border));
   color: var(--text-primary);
-}
-
-.toolbar__explore.active .toolbar__explore-text {
-  max-width: 60px;
 }
 
 .toolbar__explore-icon {
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
 
