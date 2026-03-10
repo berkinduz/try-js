@@ -282,6 +282,10 @@ export function FeaturesPage() {
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>
+            <a href="/snippets">Snippets</a>
+            <span class="features-footer__dot" aria-hidden>
+              ·
+            </span>
             <a
               href="https://github.com/berkinduz/try-js"
               target="_blank"

@@ -18,6 +18,8 @@ import { embedMode } from "./state/ui";
 import { encodeToHash } from "./utils/share";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { FeaturesPage } from "./components/Features/FeaturesPage";
+import { SnippetsPage } from "./components/Snippets/SnippetsPage";
+import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -36,10 +38,18 @@ function EmbedOpenLink() {
 
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
-  const isFeaturesPage = path === "/features";
 
-  if (isFeaturesPage) {
+  if (path === "/features") {
     return <FeaturesPage />;
+  }
+
+  if (path === "/snippets") {
+    return <SnippetsPage />;
+  }
+
+  const snippetMatch = path.match(/^\/snippets\/(.+)$/);
+  if (snippetMatch) {
+    return <SnippetDetailPage slug={snippetMatch[1]} />;
   }
 
   const isEmbed = embedMode.value;
