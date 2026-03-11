@@ -69,7 +69,7 @@ export function RegexPage() {
             Interactive Tester
           </h2>
           <RegexPlayground
-            initialPattern="\\b\\w+@\\w+\\.\\w{2,}\\b"
+            initialPattern={"\\b\\w+@\\w+\\.\\w{2,}\\b"}
             initialFlags="gi"
             initialTestInput={"alice@example.com\nBob.smith@Company.co.uk\nnot-an-email\njane@test.org"}
           />
