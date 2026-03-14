@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import { language, setLanguage, mode, setMode } from "../../state/editor";
+import { language, setLanguage } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import "./Toolbar.css";
 
@@ -8,20 +8,9 @@ const BMC_URL = "https://buymeacoffee.com/berkinduz";
 
 export function Toolbar() {
   const currentLang = language.value;
-  const currentMode = mode.value;
-  const isWeb = currentMode === "web";
-  const isReact = currentMode === "react";
   const setLang = (lang: Language) => () => setLanguage(lang);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const toggleWebMode = () => {
-    setMode(isWeb ? "js" : "web");
-  };
-
-  const toggleReactMode = () => {
-    setMode(isReact ? "js" : "react");
-  };
 
   // Close menu on outside click
   useEffect(() => {
@@ -39,79 +28,30 @@ export function Toolbar() {
     <div class="toolbar">
       <div class="toolbar__left">
         <div class="toolbar__brand">
-          {isWeb ? (
-            <>
-              <button
-                type="button"
-                class="toolbar__back-btn"
-                onClick={toggleWebMode}
-                title="Back to JS/TS playground"
-                aria-label="Back to JS/TS playground"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12" />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-              </button>
-              <span class="toolbar__web-active-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-                </svg>
-                Web Playground
-              </span>
-            </>
-          ) : isReact ? (
-            <>
-              <button
-                type="button"
-                class="toolbar__back-btn"
-                onClick={toggleReactMode}
-                title="Back to JS/TS playground"
-                aria-label="Back to JS/TS playground"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12" />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-              </button>
-              <span class="toolbar__react-active-label">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="2.5" />
-                  <ellipse cx="12" cy="12" rx="10" ry="4" />
-                  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
-                  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
-                </svg>
-                React Playground
-              </span>
-            </>
-          ) : (
-            <div class="toolbar__lang-toggle">
-              <button
-                type="button"
-                class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" ? "active" : ""}`}
-                onClick={setLang("javascript")}
-                title="JavaScript"
-                aria-label="JavaScript"
-                aria-pressed={currentLang === "javascript"}
-              >
-                <span class="toolbar__logo-short">JS</span>
-                <span class="toolbar__logo-full">JavaScript</span>
-              </button>
-              <button
-                type="button"
-                class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" ? "active" : ""}`}
-                onClick={setLang("typescript")}
-                title="TypeScript"
-                aria-label="TypeScript"
-                aria-pressed={currentLang === "typescript"}
-              >
-                <span class="toolbar__logo-short">TS</span>
-                <span class="toolbar__logo-full">TypeScript</span>
-              </button>
-            </div>
-          )}
+          <div class="toolbar__lang-toggle">
+            <button
+              type="button"
+              class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" ? "active" : ""}`}
+              onClick={setLang("javascript")}
+              title="JavaScript"
+              aria-label="JavaScript"
+              aria-pressed={currentLang === "javascript"}
+            >
+              <span class="toolbar__logo-short">JS</span>
+              <span class="toolbar__logo-full">JavaScript</span>
+            </button>
+            <button
+              type="button"
+              class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" ? "active" : ""}`}
+              onClick={setLang("typescript")}
+              title="TypeScript"
+              aria-label="TypeScript"
+              aria-pressed={currentLang === "typescript"}
+            >
+              <span class="toolbar__logo-short">TS</span>
+              <span class="toolbar__logo-full">TypeScript</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -138,41 +78,18 @@ export function Toolbar() {
           </button>
           {menuOpen && (
             <div class="toolbar__dropdown-menu">
-              {!isWeb && (
-                <button
-                  type="button"
-                  class="toolbar__dropdown-item"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    toggleWebMode();
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-                  </svg>
-                  Web Playground
-                </button>
-              )}
-              {!isReact && (
-                <button
-                  type="button"
-                  class="toolbar__dropdown-item"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    toggleReactMode();
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="2.5" />
-                    <ellipse cx="12" cy="12" rx="10" ry="4" />
-                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
-                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
-                  </svg>
-                  React Playground
-                </button>
-              )}
+              <a
+                class="toolbar__dropdown-item"
+                href="/web"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+                </svg>
+                Web Playground
+              </a>
               <a
                 class="toolbar__dropdown-item"
                 href="/regex"
