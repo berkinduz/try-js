@@ -39,6 +39,10 @@ import type { ViewUpdate } from "@codemirror/view";
 import type { Language } from "../../state/editor";
 import type { SyntaxThemeId, UiTheme } from "./themes";
 import { getEditorTheme } from "./themes";
+import { getCompletionSources } from "./completions";
+import type { CompletionMode } from "./completions";
+import { tsCompletionSource } from "../../sandbox/ts-completions";
+import { tsHoverTooltip } from "./hover";
 
 /** All language modes the editor can handle. */
 export type EditorLanguage = Language | "html" | "css" | "jsx";
@@ -57,6 +61,14 @@ export function getThemeExtension(uiTheme: UiTheme, syntaxThemeId: SyntaxThemeId
   return getEditorTheme(uiTheme, syntaxThemeId);
 }
 
+/** Map editor language to completion mode. */
+function getCompletionMode(lang: EditorLanguage): CompletionMode | null {
+  if (lang === "javascript") return "javascript";
+  if (lang === "typescript") return "typescript";
+  if (lang === "jsx") return "jsx";
+  return null; // HTML/CSS use their own built-in completions
+}
+
 export function createExtensions(
   lang: EditorLanguage,
   uiTheme: UiTheme,
@@ -64,6 +76,13 @@ export function createExtensions(
   onChange: (code: string) => void,
   onSelectionChange?: (update: ViewUpdate) => void
 ): Extension[] {
+  const completionMode = getCompletionMode(lang);
+
+  // Build override completion sources for JS/TS/JSX
+  const overrideSources = completionMode
+    ? [...getCompletionSources(completionMode), tsCompletionSource]
+    : [];
+
   return [
     // Language
     languageCompartment.of(getLanguageExtension(lang)),
@@ -80,11 +99,29 @@ export function createExtensions(
     indentOnInput(),
     bracketMatching(),
     closeBrackets(),
-    autocompletion(),
+    autocompletion({
+      activateOnTyping: true,
+      maxRenderedOptions: 40,
+      icons: true,
+      override: overrideSources.length > 0 ? overrideSources : undefined,
+      defaultKeymap: true,
+      optionClass: (completion: { type?: string }) => {
+        if (completion.type === "snippet") return "cm-completion-snippet";
+        if (completion.type === "function" || completion.type === "method")
+          return "cm-completion-function";
+        if (completion.type === "keyword") return "cm-completion-keyword";
+        if (completion.type === "type" || completion.type === "class")
+          return "cm-completion-type";
+        if (completion.type === "property") return "cm-completion-property";
+        return "";
+      },
+    }),
     rectangularSelection(),
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
+    // Hover tooltips (only for JS/TS/JSX)
+    ...(completionMode ? [tsHoverTooltip] : []),
     // Keymaps
     keymap.of([
       // Accept completion on Tab (before indentWithTab so it takes priority)
