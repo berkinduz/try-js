@@ -24,6 +24,7 @@ import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { RegexPage } from "./components/Regex/RegexPage";
 import { RegexDetailPage } from "./components/Regex/RegexDetailPage";
+import { ReactPlaygroundPage } from "./components/ReactPlayground/ReactPlaygroundPage";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -54,6 +55,10 @@ export function App() {
   const snippetMatch = path.match(/^\/snippets\/(.+)$/);
   if (snippetMatch) {
     return <SnippetDetailPage slug={snippetMatch[1]} />;
+  }
+
+  if (path === "/react") {
+    return <ReactPlaygroundPage />;
   }
 
   if (path === "/regex") {

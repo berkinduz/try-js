@@ -49,6 +49,9 @@ export function SnippetsPage() {
             <a class="snippets-btn snippets-btn--primary" href="/">
               Open Playground
             </a>
+            <a class="snippets-btn" href="/react">
+              React Playground
+            </a>
             <a class="snippets-btn" href="/regex">
               Regex Playground
             </a>
@@ -80,6 +83,10 @@ export function SnippetsPage() {
         <footer class="snippets-footer">
           <nav class="snippets-footer__links" aria-label="Footer navigation">
             <a href="/">Playground</a>
+            <span class="snippets-footer__dot" aria-hidden>
+              ·
+            </span>
+            <a href="/react">React</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
