@@ -891,12 +891,6 @@ function reactHooksSource(ctx: CompletionContext): CompletionResult | null {
 }
 
 // ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
-export type CompletionMode = "javascript" | "typescript" | "jsx";
-
-// ---------------------------------------------------------------------------
 // Global identifier completions (top-level: console, Math, JSON …)
 // ---------------------------------------------------------------------------
 
