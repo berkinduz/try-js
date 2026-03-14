@@ -7,7 +7,7 @@ import { SplitPane } from "../SplitPane/SplitPane";
 import { StatusBar } from "../StatusBar/StatusBar";
 import { ToastContainer } from "../Toast/Toast";
 import { ToolbarLinks } from "../Toolbar/ToolbarLinks";
-import { mode, webHtml, webCss, webJs, reactCode } from "../../state/editor";
+import { mode, webHtml, webCss, webJs, reactCode, reactCss } from "../../state/editor";
 import { clearConsole } from "../../state/console";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
@@ -102,6 +102,7 @@ export function WebPlaygroundPage() {
   const webCssVal = webCss.value;
   const webJsVal = webJs.value;
   const reactCodeVal = reactCode.value;
+  const reactCssVal = reactCss.value;
 
   useEffect(() => {
     if (subMode !== "vanilla") return;
@@ -118,9 +119,10 @@ export function WebPlaygroundPage() {
     if (subMode !== "react") return;
     const timer = setTimeout(() => {
       localStorage.setItem("jspark:react:code", reactCodeVal);
+      localStorage.setItem("jspark:react:css", reactCssVal);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [reactCodeVal, subMode]);
+  }, [reactCodeVal, reactCssVal, subMode]);
 
   // Keyboard shortcuts
   useKeyboard([
@@ -134,6 +136,7 @@ export function WebPlaygroundPage() {
           localStorage.setItem("jspark:web:js", webJs.value);
         } else {
           localStorage.setItem("jspark:react:code", reactCode.value);
+          localStorage.setItem("jspark:react:css", reactCss.value);
         }
       },
     },

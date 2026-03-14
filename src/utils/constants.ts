@@ -12,7 +12,7 @@ function Counter() {
   const [count, setCount] = useState(0);
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
+    <div className="container">
       <h1>React Playground</h1>
       <p>Count: {count}</p>
       <button onClick={() => setCount(count + 1)}>Increment</button>
@@ -21,6 +21,24 @@ function Counter() {
 }
 
 export default Counter;
+`;
+
+export const DEFAULT_REACT_CSS = `.container {
+  font-family: system-ui, sans-serif;
+  padding: 2rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #e5e5e5;
+}
 `;
 
 export const AUTO_RUN_DELAY = 500;
