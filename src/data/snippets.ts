@@ -8,6 +8,7 @@ export interface Snippet {
   slug: string;
   seoTitle: string;
   seoDescription: string;
+  faq?: { question: string; answer: string }[];
 }
 
 export interface SnippetCategory {
