@@ -42,17 +42,33 @@ const FEATURES: FeatureItem[] = [
   },
   {
     id: "web-playground",
-    tab: "Web Playground",
-    title: "Build with HTML, CSS and JS in one place",
+    tab: "Web & React",
+    title: "Build vanilla HTML or React components in one place",
     summary:
-      "Switch to Web Playground mode for a tabbed editor with live preview — no separate tools needed.",
+      "The Web Playground gives you a tabbed HTML/CSS/JS editor with live preview. Switch to React mode for JSX with hooks, npm imports, and instant component rendering — all in the same workspace.",
     points: [
-      "HTML, CSS, and JS tabs with syntax highlighting",
-      "Live preview updates as you type",
-      "Built-in console for debugging output",
+      "Vanilla mode: HTML, CSS, and JS tabs with live preview",
+      "React mode: JSX editor with useState, useEffect, and npm imports",
+      "Toggle between Vanilla and React with one click",
+      "Built-in console captures logs, warnings, and errors",
     ],
     image: "/tryjs_web.png",
-    imageAlt: "TryJS Web Playground with live preview",
+    imageAlt: "TryJS Web Playground with Vanilla and React modes",
+  },
+  {
+    id: "regex-playground",
+    tab: "Regex",
+    title: "Test and understand regular expressions visually",
+    summary:
+      "Write a regex pattern, paste your test string, and see matches highlighted in real-time. Toggle flags, inspect capture groups, and use Explain mode to break down any regex into human-readable steps.",
+    points: [
+      "Real-time match highlighting with flag toggles (g, i, m, s, u, d)",
+      "Capture group and match index inspection",
+      "Explain mode breaks regex into readable steps",
+      "Curated library of 15+ common patterns (email, URL, phone, etc.)",
+    ],
+    image: "/tryjs_web.png",
+    imageAlt: "TryJS Regex Playground with pattern matching",
   },
   {
     id: "share-embed",
@@ -114,7 +130,7 @@ export function FeaturesPage() {
   // Set page-specific meta for /features
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = "TryJS Features — NPM Imports, Snippets, Web Playground, Sharing & Export";
+    document.title = "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export";
 
     const setMeta = (attr: string, key: string, content: string) => {
       let el = document.querySelector(
@@ -132,7 +148,7 @@ export function FeaturesPage() {
     setMeta(
       "name",
       "description",
-      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS in Web Playground, share runnable links, and export code as images.",
+      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
     );
 
     let canonical = document.querySelector(
@@ -158,8 +174,9 @@ export function FeaturesPage() {
             <h1>Online JavaScript &amp; TypeScript Playground</h1>
             <p>
               TryJS is a fast JavaScript and TypeScript playground for testing
-              ideas, importing npm packages, building with HTML/CSS/JS,
-              sharing runnable examples, and exporting code visuals.
+              ideas, importing npm packages, building with HTML/CSS/JS or
+              React, testing regex patterns, sharing runnable examples, and
+              exporting code visuals.
             </p>
           </div>
           <div class="features-head__actions">
