@@ -131,12 +131,12 @@
 }
 
 /* ========================================
-   Playgrounds section (inline nav)
+   Playgrounds section (right-side inline nav)
    ======================================== */
 .toolbar__playgrounds {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 1px;
 }
 
@@ -148,7 +148,7 @@
   letter-spacing: 0.5px;
   color: var(--text-muted);
   line-height: 1;
-  padding-left: 1px;
+  padding-right: 1px;
 }
 
 .toolbar__playgrounds-links {
@@ -184,37 +184,6 @@
 }
 
 .toolbar__pg-link:hover svg {
-  opacity: 1;
-}
-
-/* Right-side nav links (Snippets, Features) */
-.toolbar__nav-link {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-
-.toolbar__nav-link:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.toolbar__nav-link svg {
-  opacity: 0.5;
-  flex-shrink: 0;
-}
-
-.toolbar__nav-link:hover svg {
   opacity: 1;
 }
 
@@ -261,6 +230,61 @@
 .toolbar__link:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+}
+
+/* ========================================
+   More menu (Snippets & Features dropdown)
+   ======================================== */
+.toolbar__menu-wrapper {
+  position: relative;
+}
+
+.toolbar__menu-trigger.active {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.toolbar__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+}
+
+.toolbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.toolbar__dropdown-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.toolbar__dropdown-item svg {
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.toolbar__dropdown-item:hover svg {
+  opacity: 1;
 }
 
 /* Buy Me a Coffee: icon + text slides open to the left on hover */
@@ -314,11 +338,11 @@
     display: none;
   }
 
-  .toolbar__nav-link-text {
+  .toolbar__separator {
     display: none;
   }
 
-  .toolbar__separator {
+  .toolbar__pg-link span {
     display: none;
   }
 }
