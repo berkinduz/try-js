@@ -24,9 +24,9 @@ const BASE_URL = "https://tryjs.app";
 const MAIN_PAGES = [
   {
     route: "/web",
-    title: "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
+    title: "Web & React Playground Online — HTML, CSS, JS & React JSX Editor | TryJS",
     description:
-      "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Switch to React mode for JSX with hooks and npm imports — all in your browser.",
+      "Free online web and React playground. Write HTML, CSS, and JavaScript with live preview, or switch to React mode for JSX with hooks and npm imports — all in your browser. No setup required.",
   },
   {
     route: "/regex",
