@@ -96,9 +96,9 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  <!-- React Playground -->
+  <!-- Web Playground (Vanilla + React) -->
   <url>
-    <loc>https://tryjs.app/react</loc>
+    <loc>https://tryjs.app/web</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
