@@ -1,0 +1,137 @@
+.react-preview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--console-bg);
+}
+
+.react-preview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.react-preview__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.react-preview__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.react-preview__iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+  min-height: 0;
+}
+
+/* Console drawer */
+.react-preview__console {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+.react-preview__console-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.react-preview__console-toggle:hover {
+  background: var(--bg-tertiary);
+}
+
+.react-preview__console-chevron {
+  margin-left: auto;
+  transition: transform 0.15s;
+}
+
+.react-preview__console.open .react-preview__console-chevron {
+  transform: rotate(180deg);
+}
+
+.react-preview__console-badge {
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.react-preview__console-badge.error {
+  background: var(--error);
+  color: #fff;
+}
+
+.react-preview__console-list {
+  max-height: 160px;
+  overflow-y: auto;
+  background: var(--console-bg);
+}
+
+.react-preview__console-empty {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.react-preview__console-entry {
+  padding: 3px 12px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.react-preview__console-entry--warn {
+  background: var(--console-warn-bg);
+  color: var(--console-warn-fg);
+}
+
+.react-preview__console-entry--error {
+  background: var(--console-error-bg);
+  color: var(--console-error-fg);
+}
+
+.react-preview__console-entry--info {
+  color: var(--console-info-fg);
+}

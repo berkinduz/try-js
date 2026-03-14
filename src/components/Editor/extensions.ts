@@ -41,7 +41,7 @@ import type { SyntaxThemeId, UiTheme } from "./themes";
 import { getEditorTheme } from "./themes";
 
 /** All language modes the editor can handle. */
-export type EditorLanguage = Language | "html" | "css";
+export type EditorLanguage = Language | "html" | "css" | "jsx";
 
 export const languageCompartment = new Compartment();
 export const themeCompartment = new Compartment();
@@ -49,6 +49,7 @@ export const themeCompartment = new Compartment();
 export function getLanguageExtension(lang: EditorLanguage): Extension {
   if (lang === "html") return html();
   if (lang === "css") return css();
+  if (lang === "jsx") return javascript({ typescript: false, jsx: true });
   return javascript({ typescript: lang === "typescript", jsx: false });
 }
 

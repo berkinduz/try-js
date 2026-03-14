@@ -5,6 +5,7 @@ import {
   DEFAULT_WEB_HTML,
   DEFAULT_WEB_CSS,
   DEFAULT_WEB_JS,
+  DEFAULT_REACT_CODE,
 } from "../utils/constants";
 import { preloadTypeScript } from "../sandbox/type-checker";
 import type { SyntaxThemeId } from "../components/Editor/themes";
@@ -18,7 +19,7 @@ import { decodeFromHash } from "../utils/share";
 
 export type Language = "javascript" | "typescript";
 export type Theme = "light" | "dark";
-export type AppMode = "js" | "web";
+export type AppMode = "js" | "web" | "react";
 export type WebTab = "html" | "css" | "js";
 
 // Check URL hash for shared code (takes priority over localStorage)
@@ -103,8 +104,11 @@ document.documentElement.setAttribute(
 
 const getStoredMode = (): AppMode => {
   if (sharedState && "mode" in sharedState && sharedState.mode === "web") return "web";
+  if (sharedState && "mode" in sharedState && (sharedState as any).mode === "react") return "react";
   const stored = localStorage.getItem("jspark:mode");
-  return stored === "web" ? "web" : "js";
+  if (stored === "web") return "web";
+  if (stored === "react") return "react";
+  return "js";
 };
 
 const getStoredWebCode = (tab: WebTab): string => {
@@ -125,6 +129,17 @@ export const webHtml = signal<string>(getStoredWebCode("html"));
 export const webCss = signal<string>(getStoredWebCode("css"));
 export const webJs = signal<string>(getStoredWebCode("js"));
 export const webActiveTab = signal<WebTab>("html");
+
+const getStoredReactCode = (): string => {
+  const stored = localStorage.getItem("jspark:react:code");
+  return stored ?? DEFAULT_REACT_CODE;
+};
+
+export const reactCode = signal<string>(getStoredReactCode());
+
+export function setReactCode(newCode: string) {
+  reactCode.value = newCode;
+}
 
 export function setMode(m: AppMode) {
   mode.value = m;
