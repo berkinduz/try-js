@@ -136,7 +136,7 @@
 .toolbar__playgrounds {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 1px;
 }
 
@@ -148,7 +148,6 @@
   letter-spacing: 0.5px;
   color: var(--text-muted);
   line-height: 1;
-  padding-right: 1px;
 }
 
 .toolbar__playgrounds-links {
