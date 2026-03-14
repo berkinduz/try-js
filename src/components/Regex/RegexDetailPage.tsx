@@ -5,6 +5,7 @@ import {
   type RegexPattern,
 } from "../../data/regexPatterns";
 import { RegexPlayground } from "./RegexPlayground";
+import { applySeo } from "../../utils/seo";
 import "./RegexPage.css";
 import "../../components/Snippets/SnippetsPage.css";
 
@@ -55,51 +56,50 @@ export function RegexDetailPage({ slug }: { slug: string }) {
   useEffect(() => {
     if (!pattern) return;
 
-    const prevTitle = document.title;
-    document.title = `${pattern.seoTitle} | TryJS`;
-
-    const desc = document.querySelector(
-      'meta[name="description"]'
-    ) as HTMLMetaElement | null;
-    const prevDesc = desc?.getAttribute("content") ?? "";
-    if (desc) desc.setAttribute("content", pattern.seoDescription);
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]'
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-    if (canonical) {
-      canonical.setAttribute(
-        "href",
-        `https://tryjs.app/regex/${pattern.slug}`
-      );
-    }
-
-    // Inject FAQ structured data
-    const faqScript = document.createElement("script");
-    faqScript.type = "application/ld+json";
-    faqScript.id = "regex-faq-schema";
-    faqScript.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: pattern.faq.map((f) => ({
-        "@type": "Question",
-        name: f.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: f.answer,
+    return applySeo({
+      title: `${pattern.seoTitle} | TryJS`,
+      description: pattern.seoDescription,
+      canonical: `https://tryjs.app/regex/${pattern.slug}`,
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: pattern.faq.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: f.answer,
+            },
+          })),
         },
-      })),
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "TryJS",
+              item: "https://tryjs.app/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Regex Playground",
+              item: "https://tryjs.app/regex",
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: pattern.title,
+              item: `https://tryjs.app/regex/${pattern.slug}`,
+            },
+          ],
+        },
+      ],
+      jsonLdId: "regex-detail-schema",
     });
-    document.head.appendChild(faqScript);
-
-    return () => {
-      document.title = prevTitle;
-      if (desc) desc.setAttribute("content", prevDesc);
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-      const el = document.getElementById("regex-faq-schema");
-      if (el) el.remove();
-    };
   }, [slug, pattern]);
 
   if (!pattern) {
