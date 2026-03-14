@@ -54,8 +54,8 @@ export function RegexPage() {
             <a class="snippets-btn snippets-btn--primary" href="/">
               JS Playground
             </a>
-            <a class="snippets-btn" href="/react">
-              React Playground
+            <a class="snippets-btn" href="/web">
+              Web Playground
             </a>
             <a class="snippets-btn" href="/snippets">
               Code Snippets
@@ -104,7 +104,7 @@ export function RegexPage() {
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
-            <a href="/react">React</a>
+            <a href="/web">Web</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>

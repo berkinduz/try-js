@@ -282,7 +282,7 @@ export function FeaturesPage() {
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>
-            <a href="/react">React</a>
+            <a href="/web">Web</a>
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>
