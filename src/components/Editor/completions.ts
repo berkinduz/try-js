@@ -896,6 +896,84 @@ function reactHooksSource(ctx: CompletionContext): CompletionResult | null {
 
 export type CompletionMode = "javascript" | "typescript" | "jsx";
 
+// ---------------------------------------------------------------------------
+// Global identifier completions (top-level: console, Math, JSON …)
+// ---------------------------------------------------------------------------
+
+const GLOBAL_IDENTIFIERS: Completion[] = [
+  { label: "console", type: "variable", detail: "Console", boost: 5 },
+  { label: "Math", type: "variable", detail: "Math", boost: 3 },
+  { label: "JSON", type: "variable", detail: "JSON", boost: 3 },
+  { label: "Object", type: "class", detail: "ObjectConstructor", boost: 2 },
+  { label: "Array", type: "class", detail: "ArrayConstructor", boost: 2 },
+  { label: "Promise", type: "class", detail: "PromiseConstructor", boost: 2 },
+  { label: "Number", type: "class", detail: "NumberConstructor", boost: 1 },
+  { label: "String", type: "class", detail: "StringConstructor", boost: 1 },
+  { label: "Boolean", type: "class", detail: "BooleanConstructor", boost: 1 },
+  { label: "Date", type: "class", detail: "DateConstructor", boost: 1 },
+  { label: "RegExp", type: "class", detail: "RegExpConstructor", boost: 1 },
+  { label: "Map", type: "class", detail: "MapConstructor", boost: 1 },
+  { label: "Set", type: "class", detail: "SetConstructor", boost: 1 },
+  { label: "WeakMap", type: "class", detail: "WeakMapConstructor" },
+  { label: "WeakSet", type: "class", detail: "WeakSetConstructor" },
+  { label: "WeakRef", type: "class", detail: "WeakRefConstructor" },
+  { label: "Symbol", type: "class", detail: "SymbolConstructor" },
+  { label: "Error", type: "class", detail: "ErrorConstructor", boost: 1 },
+  { label: "TypeError", type: "class", detail: "TypeErrorConstructor" },
+  { label: "RangeError", type: "class", detail: "RangeErrorConstructor" },
+  { label: "document", type: "variable", detail: "Document", boost: 2 },
+  { label: "window", type: "variable", detail: "Window", boost: 1 },
+  { label: "globalThis", type: "variable", detail: "typeof globalThis" },
+  { label: "performance", type: "variable", detail: "Performance" },
+  { label: "undefined", type: "keyword", detail: "undefined" },
+  { label: "NaN", type: "keyword", detail: "number" },
+  { label: "Infinity", type: "keyword", detail: "number" },
+  { label: "parseInt", type: "function", detail: "(s: string, radix?: number): number" },
+  { label: "parseFloat", type: "function", detail: "(s: string): number" },
+  { label: "isNaN", type: "function", detail: "(v: any): boolean" },
+  { label: "isFinite", type: "function", detail: "(v: any): boolean" },
+  { label: "setTimeout", type: "function", detail: "(fn, ms?): number" },
+  { label: "setInterval", type: "function", detail: "(fn, ms?): number" },
+  { label: "clearTimeout", type: "function", detail: "(id?: number): void" },
+  { label: "clearInterval", type: "function", detail: "(id?: number): void" },
+  { label: "fetch", type: "function", detail: "(input: string, init?): Promise<Response>", boost: 2 },
+  { label: "structuredClone", type: "function", detail: "<T>(value: T): T" },
+  { label: "queueMicrotask", type: "function", detail: "(fn: () => void): void" },
+  { label: "requestAnimationFrame", type: "function", detail: "(cb: Function): number" },
+  { label: "atob", type: "function", detail: "(s: string): string" },
+  { label: "btoa", type: "function", detail: "(s: string): string" },
+  { label: "encodeURIComponent", type: "function", detail: "(s: string): string" },
+  { label: "decodeURIComponent", type: "function", detail: "(s: string): string" },
+  { label: "Proxy", type: "class", detail: "ProxyConstructor" },
+  { label: "Reflect", type: "variable", detail: "typeof Reflect" },
+  { label: "ArrayBuffer", type: "class", detail: "ArrayBufferConstructor" },
+  { label: "DataView", type: "class", detail: "DataViewConstructor" },
+  { label: "Uint8Array", type: "class", detail: "TypedArray" },
+  { label: "Int32Array", type: "class", detail: "TypedArray" },
+  { label: "Float64Array", type: "class", detail: "TypedArray" },
+];
+
+function globalIdentifierSource(ctx: CompletionContext): CompletionResult | null {
+  const word = ctx.matchBefore(/\w+/);
+  if (!word || word.from === word.to) return null;
+
+  // Don't show global identifiers after a dot (that's handled by dotAccessCompletion)
+  const charBefore = word.from > 0 ? ctx.state.doc.sliceString(word.from - 1, word.from) : "";
+  if (charBefore === ".") return null;
+
+  return {
+    from: word.from,
+    options: GLOBAL_IDENTIFIERS,
+    validFor: /^\w*$/,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+export type CompletionMode = "javascript" | "typescript" | "jsx";
+
 export function getCompletionSources(mode: CompletionMode) {
   const isTs = mode === "typescript";
   const isJsx = mode === "jsx";
@@ -904,6 +982,7 @@ export function getCompletionSources(mode: CompletionMode) {
     dotAccessCompletion,
     npmImportCompletion,
     snippetSource(isTs, isJsx),
+    globalIdentifierSource,
   ];
 
   if (isJsx) {
