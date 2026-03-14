@@ -10,12 +10,17 @@ export function Toolbar() {
   const currentLang = language.value;
   const currentMode = mode.value;
   const isWeb = currentMode === "web";
+  const isReact = currentMode === "react";
   const setLang = (lang: Language) => () => setLanguage(lang);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleWebMode = () => {
     setMode(isWeb ? "js" : "web");
+  };
+
+  const toggleReactMode = () => {
+    setMode(isReact ? "js" : "react");
   };
 
   // Close menu on outside click
@@ -55,6 +60,30 @@ export function Toolbar() {
                   <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
                 </svg>
                 Web Playground
+              </span>
+            </>
+          ) : isReact ? (
+            <>
+              <button
+                type="button"
+                class="toolbar__back-btn"
+                onClick={toggleReactMode}
+                title="Back to JS/TS playground"
+                aria-label="Back to JS/TS playground"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+              </button>
+              <span class="toolbar__react-active-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="2.5" />
+                  <ellipse cx="12" cy="12" rx="10" ry="4" />
+                  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
+                  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
+                </svg>
+                React Playground
               </span>
             </>
           ) : (
@@ -124,6 +153,24 @@ export function Toolbar() {
                     <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
                   </svg>
                   Web Playground
+                </button>
+              )}
+              {!isReact && (
+                <button
+                  type="button"
+                  class="toolbar__dropdown-item"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    toggleReactMode();
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2.5" />
+                    <ellipse cx="12" cy="12" rx="10" ry="4" />
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
+                  </svg>
+                  React Playground
                 </button>
               )}
               <a

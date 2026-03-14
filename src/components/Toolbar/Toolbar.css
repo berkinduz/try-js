@@ -214,6 +214,18 @@
   letter-spacing: -0.3px;
 }
 
+/* React mode active label */
+.toolbar__react-active-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #61dafb;
+  letter-spacing: -0.3px;
+}
+
 /* Separator */
 .toolbar__separator {
   width: 1px;

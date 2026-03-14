@@ -6,7 +6,9 @@ import { StatusBar } from "./components/StatusBar/StatusBar";
 import { SplitPane } from "./components/SplitPane/SplitPane";
 import { WebEditor } from "./components/WebEditor/WebEditor";
 import { WebPreview, webConsoleOutput } from "./components/WebPreview/WebPreview";
-import { code, language, mode, webHtml, webCss, webJs } from "./state/editor";
+import { ReactEditor } from "./components/ReactEditor/ReactEditor";
+import { ReactPreview, reactConsoleOutput } from "./components/ReactPreview/ReactPreview";
+import { code, language, mode, webHtml, webCss, webJs, reactCode } from "./state/editor";
 import { clearConsole, consoleOutput } from "./state/console";
 import { autoRunDelay } from "./state/settings";
 import { executeCode } from "./sandbox/executor";
@@ -65,6 +67,7 @@ export function App() {
 
   const isEmbed = embedMode.value;
   const isWeb = mode.value === "web";
+  const isReact = mode.value === "react";
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console" | "preview">("editor");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -82,32 +85,35 @@ export function App() {
     if (!isWeb) {
       webConsoleOutput.value = [];
     }
-  }, [isWeb]);
+    if (!isReact) {
+      reactConsoleOutput.value = [];
+    }
+  }, [isWeb, isReact]);
 
   const run = useCallback(() => {
-    if (mode.value === "web") return;
+    if (mode.value === "web" || mode.value === "react") return;
     executeCode(code.value, language.value);
   }, []);
 
-  // Auto-run on code change (JS/TS mode only — web mode preview handles its own refresh)
+  // Auto-run on code change (JS/TS mode only — web/react mode preview handles its own refresh)
   useEffect(() => {
-    if (isWeb) return;
+    if (isWeb || isReact) return;
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       executeCode(code.value, language.value);
     }, autoRunDelay.value);
 
     return () => clearTimeout(debounceRef.current);
-  }, [code.value, language.value, isWeb]);
+  }, [code.value, language.value, isWeb, isReact]);
 
   // Save code to localStorage on change (debounced)
   useEffect(() => {
-    if (isWeb) return;
+    if (isWeb || isReact) return;
     const timer = setTimeout(() => {
       localStorage.setItem(`jspark:code:${language.value}`, code.value);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [code.value, language.value, isWeb]);
+  }, [code.value, language.value, isWeb, isReact]);
 
   // Save web code to localStorage (debounced)
   useEffect(() => {
@@ -120,6 +126,15 @@ export function App() {
     return () => clearTimeout(timer);
   }, [webHtml.value, webCss.value, webJs.value, isWeb]);
 
+  // Save react code to localStorage (debounced)
+  useEffect(() => {
+    if (!isReact) return;
+    const timer = setTimeout(() => {
+      localStorage.setItem("jspark:react:code", reactCode.value);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [reactCode.value, isReact]);
+
   // Keyboard shortcuts
   useKeyboard([
     { key: "Enter", mod: true, handler: run },
@@ -131,6 +146,8 @@ export function App() {
           localStorage.setItem("jspark:web:html", webHtml.value);
           localStorage.setItem("jspark:web:css", webCss.value);
           localStorage.setItem("jspark:web:js", webJs.value);
+        } else if (isReact) {
+          localStorage.setItem("jspark:react:code", reactCode.value);
         } else {
           localStorage.setItem(`jspark:code:${language.value}`, code.value);
         }
@@ -145,8 +162,8 @@ export function App() {
   ).length;
 
   // Determine the right second tab label for mobile
-  const secondTabLabel = isWeb ? "Preview" : "Console";
-  const secondTabId = isWeb ? "preview" : "console";
+  const secondTabLabel = (isWeb || isReact) ? "Preview" : "Console";
+  const secondTabId = (isWeb || isReact) ? "preview" : "console";
 
   if (isMobile) {
     return (
@@ -165,7 +182,7 @@ export function App() {
               onClick={() => setMobileTab(secondTabId as any)}
             >
               {secondTabLabel}
-              {!isWeb && errorCount > 0 && (
+              {!isWeb && !isReact && errorCount > 0 && (
                 <span class="mobile-tab__badge">{errorCount}</span>
               )}
             </button>
@@ -173,16 +190,16 @@ export function App() {
         )}
         <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
           <div style={{ height: "100%", display: mobileTab === "editor" ? "block" : "none" }}>
-            {isWeb ? <WebEditor /> : <Editor />}
+            {isWeb ? <WebEditor /> : isReact ? <ReactEditor /> : <Editor />}
           </div>
           <div style={{ height: "100%", display: mobileTab !== "editor" ? "block" : "none" }}>
-            {isWeb ? <WebPreview /> : <Console />}
+            {isWeb ? <WebPreview /> : isReact ? <ReactPreview /> : <Console />}
           </div>
         </div>
         {!isEmbed && <StatusBar />}
         {isEmbed && <EmbedOpenLink />}
-        {!isWeb && <Gallery />}
-        {!isWeb && <ScreenshotModal />}
+        {!isWeb && !isReact && <Gallery />}
+        {!isWeb && !isReact && <ScreenshotModal />}
         <ToastContainer />
       </div>
     );
@@ -192,13 +209,13 @@ export function App() {
     <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {!isEmbed && <Toolbar />}
       <SplitPane
-        left={isWeb ? <WebEditor /> : <Editor />}
-        right={isWeb ? <WebPreview /> : <Console />}
+        left={isWeb ? <WebEditor /> : isReact ? <ReactEditor /> : <Editor />}
+        right={isWeb ? <WebPreview /> : isReact ? <ReactPreview /> : <Console />}
       />
       {!isEmbed && <StatusBar />}
       {isEmbed && <EmbedOpenLink />}
-      {!isWeb && <Gallery />}
-      {!isWeb && <ScreenshotModal />}
+      {!isWeb && !isReact && <Gallery />}
+      {!isWeb && !isReact && <ScreenshotModal />}
       <ToastContainer />
     </div>
   );
