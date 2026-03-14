@@ -104,10 +104,124 @@ function baseEditorTheme(isDark: boolean) {
         backgroundColor: "var(--bg-secondary)",
         border: "1px solid var(--border)",
         color: "var(--text-primary)",
+        borderRadius: "6px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+      },
+      ".cm-tooltip-autocomplete": {
+        minWidth: "220px",
+        maxWidth: "420px",
+      },
+      ".cm-tooltip-autocomplete ul": {
+        fontFamily: "var(--editor-font)",
+        fontSize: "calc(var(--font-size) - 1px)",
+        maxHeight: "280px",
+      },
+      ".cm-tooltip-autocomplete ul li": {
+        padding: "3px 8px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
       },
       ".cm-tooltip-autocomplete ul li[aria-selected]": {
         backgroundColor: "var(--accent)",
         color: "#000",
+      },
+      ".cm-tooltip-autocomplete .cm-completionLabel": {
+        flex: "1",
+      },
+      ".cm-tooltip-autocomplete .cm-completionDetail": {
+        opacity: "0.6",
+        fontSize: "0.9em",
+        fontStyle: "italic",
+        marginLeft: "auto",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        maxWidth: "200px",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon": {
+        width: "16px",
+        height: "16px",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "12px",
+        borderRadius: "3px",
+        flexShrink: "0",
+        opacity: "0.8",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-function::after": {
+        content: "'ƒ'",
+        color: isDark ? "#61afef" : "#4078f2",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-method::after": {
+        content: "'ƒ'",
+        color: isDark ? "#61afef" : "#4078f2",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-variable::after": {
+        content: "'x'",
+        color: isDark ? "#e06c75" : "#e45649",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-property::after": {
+        content: "'●'",
+        color: isDark ? "#d19a66" : "#986801",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-keyword::after": {
+        content: "'K'",
+        color: isDark ? "#c678dd" : "#a626a4",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-type::after": {
+        content: "'T'",
+        color: isDark ? "#e5c07b" : "#0184bc",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-class::after": {
+        content: "'C'",
+        color: isDark ? "#e5c07b" : "#c18401",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-enum::after": {
+        content: "'E'",
+        color: isDark ? "#98c379" : "#50a14f",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-namespace::after": {
+        content: "'N'",
+        color: isDark ? "#56b6c2" : "#0184bc",
+        fontWeight: "bold",
+      },
+      ".cm-tooltip-autocomplete .cm-completionIcon-text::after": {
+        content: "'\"'",
+        color: isDark ? "#98c379" : "#50a14f",
+      },
+      // Snippet icon (snippet type from @codemirror/autocomplete does not have a default icon)
+      ".cm-completion-snippet .cm-completionIcon::after": {
+        content: "'⟩'",
+        color: isDark ? "#c678dd" : "#a626a4",
+        fontWeight: "bold",
+      },
+      // Hover tooltip
+      ".cm-hover-tooltip": {
+        padding: "6px 10px",
+        maxWidth: "500px",
+        lineHeight: "1.5",
+      },
+      ".cm-hover-sig": {
+        fontFamily: "var(--editor-font)",
+        fontSize: "calc(var(--font-size) - 1px)",
+        color: isDark ? "#61afef" : "#4078f2",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+      },
+      ".cm-hover-doc": {
+        marginTop: "4px",
+        fontSize: "12px",
+        color: "var(--text-muted)",
+        whiteSpace: "pre-wrap",
       },
       ".cm-panels": {
         backgroundColor: "var(--bg-secondary)",

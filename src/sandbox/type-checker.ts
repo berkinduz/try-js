@@ -227,6 +227,9 @@ declare var Proxy: ProxyConstructor;
 declare var Reflect: { apply(target: Function, thisArg: any, args: any[]): any; construct(target: Function, args: any[], newTarget?: Function): any; defineProperty(target: object, key: string | symbol, desc: any): boolean; deleteProperty(target: object, key: string | symbol): boolean; get(target: object, key: string | symbol, receiver?: any): any; getOwnPropertyDescriptor(target: object, key: string | symbol): any; getPrototypeOf(target: object): any; has(target: object, key: string | symbol): boolean; isExtensible(target: object): boolean; ownKeys(target: object): (string | symbol)[]; preventExtensions(target: object): boolean; set(target: object, key: string | symbol, value: any, receiver?: any): boolean; setPrototypeOf(target: object, proto: any): boolean; };
 `;
 
+/** @internal Exposed for ts-completions.ts to reuse the same lib declarations. */
+export const __MINIMAL_LIB = MINIMAL_LIB;
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
