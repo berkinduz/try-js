@@ -20,6 +20,7 @@ import {
 import { shareToClipboard, generateEmbedCode } from "../../utils/share";
 import { showToast } from "../Toast/Toast";
 import { openScreenshotModal } from "../Screenshot/ScreenshotModal";
+import { trackEvent } from "../../utils/analytics";
 import { selectedText } from "../../state/selection";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
@@ -87,6 +88,7 @@ export function Editor() {
   };
 
   const handleShareLink = async () => {
+    trackEvent("code_share", { method: "url" });
     setShareOpen(false);
     try {
       const codeToShare = selectedText.value || code.value;
@@ -109,6 +111,7 @@ export function Editor() {
   };
 
   const handleCopyEmbed = async () => {
+    trackEvent("code_share", { method: "embed" });
     setShareOpen(false);
     try {
       const embedCode = generateEmbedCode({
@@ -123,6 +126,7 @@ export function Editor() {
   };
 
   const handleExportImage = () => {
+    trackEvent("screenshot_export");
     setShareOpen(false);
     const codeToExport = selectedText.value || code.value;
     openScreenshotModal(codeToExport);
