@@ -96,6 +96,13 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <!-- React Playground -->
+  <url>
+    <loc>https://tryjs.app/react</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <!-- Regex Playground -->
   <url>
     <loc>https://tryjs.app/regex</loc>

@@ -54,6 +54,9 @@ export function RegexPage() {
             <a class="snippets-btn snippets-btn--primary" href="/">
               JS Playground
             </a>
+            <a class="snippets-btn" href="/react">
+              React Playground
+            </a>
             <a class="snippets-btn" href="/snippets">
               Code Snippets
             </a>
@@ -98,6 +101,10 @@ export function RegexPage() {
         <footer class="snippets-footer">
           <nav class="snippets-footer__links" aria-label="Footer navigation">
             <a href="/">Playground</a>
+            <span class="snippets-footer__dot" aria-hidden>
+              ·
+            </span>
+            <a href="/react">React</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
