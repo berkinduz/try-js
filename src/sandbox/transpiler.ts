@@ -31,6 +31,22 @@ export function transpile(
   }
 }
 
+/** Transpile JSX code (for React playground). */
+export function transpileJsx(source: string): TranspileResult | TranspileError {
+  try {
+    const result = transform(source, {
+      transforms: ["jsx", "imports"],
+      jsxRuntime: "automatic",
+      production: true,
+      disableESTransforms: false,
+    });
+    return { code: result.code, error: null };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return { code: null, error: message };
+  }
+}
+
 // --- NPM import support ---
 
 const ESM_SH_BASE = "https://esm.sh/";
