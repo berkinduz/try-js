@@ -1,4 +1,5 @@
-import { Compartment } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
+import type { Extension } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
@@ -34,7 +35,6 @@ import {
   rectangularSelection,
   EditorView,
 } from "@codemirror/view";
-import type { Extension } from "@codemirror/state";
 import type { ViewUpdate } from "@codemirror/view";
 import type { Language } from "../../state/editor";
 import type { SyntaxThemeId, UiTheme } from "./themes";
@@ -78,8 +78,9 @@ export function createExtensions(
 ): Extension[] {
   const completionMode = getCompletionMode(lang);
 
-  // Build override completion sources for JS/TS/JSX
-  const overrideSources = completionMode
+  // Additional completion sources — injected via languageData so they
+  // work alongside (not replacing) the built-in lang-javascript completions.
+  const extraSources = completionMode
     ? [...getCompletionSources(completionMode), tsCompletionSource]
     : [];
 
@@ -88,6 +89,15 @@ export function createExtensions(
     languageCompartment.of(getLanguageExtension(lang)),
     // Theme (UI + syntax)
     themeCompartment.of(getThemeExtension(uiTheme, syntaxThemeId)),
+    // Register extra completion sources via languageData so they merge
+    // with the built-in sources from @codemirror/lang-javascript.
+    ...(extraSources.length > 0
+      ? [
+          EditorState.languageData.of(() => [
+            { autocomplete: extraSources },
+          ]),
+        ]
+      : []),
     // Core
     lineNumbers(),
     highlightActiveLineGutter(),
@@ -103,7 +113,6 @@ export function createExtensions(
       activateOnTyping: true,
       maxRenderedOptions: 40,
       icons: true,
-      override: overrideSources.length > 0 ? overrideSources : undefined,
       defaultKeymap: true,
       optionClass: (completion: { type?: string }) => {
         if (completion.type === "snippet") return "cm-completion-snippet";
