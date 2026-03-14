@@ -135,9 +135,8 @@
    ======================================== */
 .toolbar__playgrounds {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
+  align-items: center;
+  gap: 8px;
 }
 
 .toolbar__playgrounds-label {
@@ -148,7 +147,6 @@
   letter-spacing: 0.5px;
   color: var(--text-muted);
   line-height: 1;
-  padding-right: 1px;
 }
 
 .toolbar__playgrounds-links {
