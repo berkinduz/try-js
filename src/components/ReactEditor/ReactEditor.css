@@ -28,6 +28,11 @@
   display: flex;
   align-items: center;
   letter-spacing: -0.3px;
+  cursor: pointer;
+}
+
+.react-editor__tab:hover {
+  color: var(--text-primary);
 }
 
 .react-editor__tab.active {

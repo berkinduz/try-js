@@ -6,6 +6,7 @@ import {
   DEFAULT_WEB_CSS,
   DEFAULT_WEB_JS,
   DEFAULT_REACT_CODE,
+  DEFAULT_REACT_CSS,
 } from "../utils/constants";
 import { preloadTypeScript } from "../sandbox/type-checker";
 import type { SyntaxThemeId } from "../components/Editor/themes";
@@ -138,10 +139,20 @@ const getStoredReactCode = (): string => {
   return stored ?? DEFAULT_REACT_CODE;
 };
 
+const getStoredReactCss = (): string => {
+  const stored = localStorage.getItem("jspark:react:css");
+  return stored ?? DEFAULT_REACT_CSS;
+};
+
 export const reactCode = signal<string>(getStoredReactCode());
+export const reactCss = signal<string>(getStoredReactCss());
 
 export function setReactCode(newCode: string) {
   reactCode.value = newCode;
+}
+
+export function setReactCss(newCss: string) {
+  reactCss.value = newCss;
 }
 
 export function setMode(m: AppMode) {
