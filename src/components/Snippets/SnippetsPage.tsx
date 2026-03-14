@@ -1,37 +1,38 @@
 import { useEffect } from "preact/hooks";
-import { SNIPPET_CATEGORIES } from "../../data/snippets";
+import { SNIPPET_CATEGORIES, getAllSnippets } from "../../data/snippets";
+import { applySeo } from "../../utils/seo";
 import "./SnippetsPage.css";
 
 export function SnippetsPage() {
   useEffect(() => {
-    const prevTitle = document.title;
-    document.title =
-      "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS";
-
-    const desc = document.querySelector(
-      'meta[name="description"]',
-    ) as HTMLMetaElement | null;
-    const prevDesc = desc?.getAttribute("content") ?? "";
-    if (desc) {
-      desc.setAttribute(
-        "content",
+    const allSnippets = getAllSnippets();
+    return applySeo({
+      title: "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS",
+      description:
         "Browse runnable JavaScript and TypeScript code snippets. Closures, async/await, promises, destructuring, generics, type guards, and more — all editable in TryJS playground.",
-      );
-    }
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]',
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-    if (canonical) {
-      canonical.setAttribute("href", "https://tryjs.app/snippets");
-    }
-
-    return () => {
-      document.title = prevTitle;
-      if (desc) desc.setAttribute("content", prevDesc);
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-    };
+      canonical: "https://tryjs.app/snippets",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "JavaScript & TypeScript Code Snippets",
+          description:
+            "A curated collection of runnable JavaScript and TypeScript code snippets covering closures, async/await, promises, generics, type guards, and more.",
+          url: "https://tryjs.app/snippets",
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: allSnippets.length,
+            itemListElement: allSnippets.slice(0, 10).map((s, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: s.seoTitle,
+              url: `https://tryjs.app/snippets/${s.slug}`,
+            })),
+          },
+        },
+      ],
+      jsonLdId: "snippets-page-schema",
+    });
   }, []);
 
   return (

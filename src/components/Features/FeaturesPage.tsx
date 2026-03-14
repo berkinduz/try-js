@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
+import { applySeo } from "../../utils/seo";
 import "./FeaturesPage.css";
 
 type FeatureItem = {
@@ -129,40 +130,29 @@ export function FeaturesPage() {
 
   // Set page-specific meta for /features
   useEffect(() => {
-    const prevTitle = document.title;
-    document.title = "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export";
-
-    const setMeta = (attr: string, key: string, content: string) => {
-      let el = document.querySelector(
-        `meta[${attr}="${key}"]`,
-      ) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, key);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-      return el;
-    };
-
-    setMeta(
-      "name",
-      "description",
-      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
-    );
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]',
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-    if (canonical) {
-      canonical.setAttribute("href", "https://tryjs.app/features");
-    }
-
-    return () => {
-      document.title = prevTitle;
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-    };
+    return applySeo({
+      title: "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export",
+      description:
+        "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
+      canonical: "https://tryjs.app/features",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "TryJS Features",
+          description: "Key features of the TryJS online JavaScript and TypeScript playground.",
+          url: "https://tryjs.app/features",
+          numberOfItems: FEATURES.length,
+          itemListElement: FEATURES.map((f, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: f.tab,
+            description: f.summary,
+          })),
+        },
+      ],
+      jsonLdId: "features-page-schema",
+    });
   }, []);
 
   return (
