@@ -8,18 +8,23 @@ import {
   getLanguageExtension,
   getThemeExtension,
 } from "../Editor/extensions";
-import { theme, syntaxTheme, reactCode, setReactCode } from "../../state/editor";
-import { DEFAULT_REACT_CODE } from "../../utils/constants";
+import { theme, syntaxTheme, reactCode, reactCss, setReactCode, setReactCss } from "../../state/editor";
+import { DEFAULT_REACT_CODE, DEFAULT_REACT_CSS } from "../../utils/constants";
 import "./ReactEditor.css";
 
-export function ReactEditor() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
-  const [editorFocused, setEditorFocused] = useState(false);
+type ReactTab = "jsx" | "css";
 
-  // Create editor on mount
+export function ReactEditor() {
+  const jsxContainerRef = useRef<HTMLDivElement>(null);
+  const cssContainerRef = useRef<HTMLDivElement>(null);
+  const jsxViewRef = useRef<EditorView | null>(null);
+  const cssViewRef = useRef<EditorView | null>(null);
+  const [editorFocused, setEditorFocused] = useState(false);
+  const [activeTab, setActiveTab] = useState<ReactTab>("jsx");
+
+  // Create JSX editor on mount
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!jsxContainerRef.current) return;
 
     const view = new EditorView({
       state: EditorState.create({
@@ -31,10 +36,10 @@ export function ReactEditor() {
           (newCode) => setReactCode(newCode),
         ),
       }),
-      parent: containerRef.current,
+      parent: jsxContainerRef.current,
     });
 
-    viewRef.current = view;
+    jsxViewRef.current = view;
 
     const onFocus = () => setEditorFocused(true);
     const onBlur = () => setEditorFocused(false);
@@ -45,31 +50,64 @@ export function ReactEditor() {
       view.contentDOM.removeEventListener("focus", onFocus);
       view.contentDOM.removeEventListener("blur", onBlur);
       view.destroy();
-      viewRef.current = null;
+      jsxViewRef.current = null;
     };
   }, []);
 
-  // Sync theme
+  // Create CSS editor on mount
   useEffect(() => {
-    const view = viewRef.current;
-    if (!view) return;
-    view.dispatch({
-      effects: themeCompartment.reconfigure(
-        getThemeExtension(theme.value, syntaxTheme.value),
-      ),
+    if (!cssContainerRef.current) return;
+
+    const view = new EditorView({
+      state: EditorState.create({
+        doc: reactCss.value,
+        extensions: createExtensions(
+          "css",
+          theme.value,
+          syntaxTheme.value,
+          (newCode) => setReactCss(newCode),
+        ),
+      }),
+      parent: cssContainerRef.current,
     });
+
+    cssViewRef.current = view;
+
+    return () => {
+      view.destroy();
+      cssViewRef.current = null;
+    };
+  }, []);
+
+  // Sync theme for both editors
+  useEffect(() => {
+    const effects = themeCompartment.reconfigure(
+      getThemeExtension(theme.value, syntaxTheme.value),
+    );
+    jsxViewRef.current?.dispatch({ effects });
+    cssViewRef.current?.dispatch({ effects });
   }, [theme.value, syntaxTheme.value]);
 
   const isEmpty = reactCode.value === "";
 
   const loadStarter = () => {
     setReactCode(DEFAULT_REACT_CODE);
-    const view = viewRef.current;
-    if (view) {
-      const currentDoc = view.state.doc.toString();
+    setReactCss(DEFAULT_REACT_CSS);
+    const jsxView = jsxViewRef.current;
+    if (jsxView) {
+      const currentDoc = jsxView.state.doc.toString();
       if (currentDoc !== DEFAULT_REACT_CODE) {
-        view.dispatch({
+        jsxView.dispatch({
           changes: { from: 0, to: currentDoc.length, insert: DEFAULT_REACT_CODE },
+        });
+      }
+    }
+    const cssView = cssViewRef.current;
+    if (cssView) {
+      const currentDoc = cssView.state.doc.toString();
+      if (currentDoc !== DEFAULT_REACT_CSS) {
+        cssView.dispatch({
+          changes: { from: 0, to: currentDoc.length, insert: DEFAULT_REACT_CSS },
         });
       }
     }
@@ -78,10 +116,23 @@ export function ReactEditor() {
   return (
     <div class="react-editor">
       <div class="react-editor__tabs">
-        <span class="react-editor__tab active">App.jsx</span>
+        <button
+          type="button"
+          class={`react-editor__tab ${activeTab === "jsx" ? "active" : ""}`}
+          onClick={() => setActiveTab("jsx")}
+        >
+          App.jsx
+        </button>
+        <button
+          type="button"
+          class={`react-editor__tab ${activeTab === "css" ? "active" : ""}`}
+          onClick={() => setActiveTab("css")}
+        >
+          App.css
+        </button>
       </div>
       <div class="react-editor__body">
-        {isEmpty && !editorFocused && (
+        {isEmpty && !editorFocused && activeTab === "jsx" && (
           <div class="react-editor__placeholder" aria-hidden="true">
             <div class="react-editor__placeholder-inner">
               <span class="react-editor__placeholder-brand">React Playground</span>
@@ -96,7 +147,16 @@ export function ReactEditor() {
             </div>
           </div>
         )}
-        <div ref={containerRef} class="react-editor__container" />
+        <div
+          ref={jsxContainerRef}
+          class="react-editor__container"
+          style={{ display: activeTab === "jsx" ? "block" : "none" }}
+        />
+        <div
+          ref={cssContainerRef}
+          class="react-editor__container"
+          style={{ display: activeTab === "css" ? "block" : "none" }}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "preact/hooks";
 import { signal } from "@preact/signals";
-import { reactCode } from "../../state/editor";
+import { reactCode, reactCss } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
 import { transpileJsx } from "../../sandbox/transpiler";
 import { rewriteImports } from "../../sandbox/transpiler";
@@ -48,7 +48,7 @@ const CONSOLE_BOOTSTRAP = `
 })();
 `;
 
-function buildSrcdoc(userCode: string): string {
+function buildSrcdoc(userCode: string, userCss: string): string {
   // Transpile JSX → JS
   const transpiled = transpileJsx(userCode);
   if (transpiled.error !== null) {
@@ -80,12 +80,14 @@ function buildSrcdoc(userCode: string): string {
 
   const safeBootstrap = CONSOLE_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
   const safeJs = jsCode.replace(/<\/script/gi, "<\\/script");
+  const safeCss = userCss.replace(/<\/style/gi, "<\\/style");
 
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>${safeCss}</style>
 <script>${safeBootstrap}<\/script>
 </head>
 <body>
@@ -146,6 +148,7 @@ export function ReactPreview() {
   const consoleEndRef = useRef<HTMLDivElement>(null);
 
   const code = reactCode.value;
+  const css = reactCss.value;
   const entries = reactConsoleOutput.value;
   const isOpen = reactConsoleOpen.value;
 
@@ -175,11 +178,11 @@ export function ReactPreview() {
       const iframe = iframeRef.current;
       if (!iframe) return;
       reactConsoleOutput.value = [];
-      iframe.srcdoc = buildSrcdoc(code);
+      iframe.srcdoc = buildSrcdoc(code, css);
     }, autoRunDelay.value);
 
     return () => clearTimeout(debounceRef.current);
-  }, [code]);
+  }, [code, css]);
 
   const errorCount = entries.filter((e) => e.method === "error").length;
 
