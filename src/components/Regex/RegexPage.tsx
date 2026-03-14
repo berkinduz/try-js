@@ -1,6 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { getRegexCategories } from "../../data/regexPatterns";
 import { RegexPlayground } from "./RegexPlayground";
+import { applySeo } from "../../utils/seo";
 import "./RegexPage.css";
 import "../../components/Snippets/SnippetsPage.css";
 
@@ -8,34 +9,33 @@ export function RegexPage() {
   const categories = getRegexCategories();
 
   useEffect(() => {
-    const prevTitle = document.title;
-    document.title =
-      "Regex Playground Online — Test Regular Expressions Instantly | TryJS";
-
-    const desc = document.querySelector(
-      'meta[name="description"]'
-    ) as HTMLMetaElement | null;
-    const prevDesc = desc?.getAttribute("content") ?? "";
-    if (desc) {
-      desc.setAttribute(
-        "content",
-        "Free online regex tester and playground. Write regular expressions, see matches highlighted in real-time, explore capture groups, and browse a library of common regex patterns — all in your browser."
-      );
-    }
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]'
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-    if (canonical) {
-      canonical.setAttribute("href", "https://tryjs.app/regex");
-    }
-
-    return () => {
-      document.title = prevTitle;
-      if (desc) desc.setAttribute("content", prevDesc);
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-    };
+    return applySeo({
+      title: "Regex Playground Online — Test Regular Expressions Instantly | TryJS",
+      description:
+        "Free online regex tester and playground. Write regular expressions, see matches highlighted in real-time, explore capture groups, and browse a library of common regex patterns — all in your browser.",
+      canonical: "https://tryjs.app/regex",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "TryJS — Regex Playground",
+          description:
+            "Free online regex tester. Write patterns, see matches highlighted in real-time, inspect capture groups, and explore a curated library of common regex patterns.",
+          url: "https://tryjs.app/regex",
+          applicationCategory: "DeveloperApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          featureList: [
+            "Real-time regex match highlighting",
+            "Flag toggles (g, i, m, s, u, d)",
+            "Capture group and match index inspection",
+            "Explain mode for human-readable breakdowns",
+            "Curated library of 15+ common patterns",
+          ],
+        },
+      ],
+      jsonLdId: "regex-page-schema",
+    });
   }, []);
 
   return (
