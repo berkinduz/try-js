@@ -91,13 +91,10 @@ export function createExtensions(
     themeCompartment.of(getThemeExtension(uiTheme, syntaxThemeId)),
     // Register extra completion sources via languageData so they merge
     // with the built-in sources from @codemirror/lang-javascript.
-    ...(extraSources.length > 0
-      ? [
-          EditorState.languageData.of(() => [
-            { autocomplete: extraSources },
-          ]),
-        ]
-      : []),
+    // Each source must be a separate { autocomplete: fn } entry.
+    ...extraSources.map((source) =>
+      EditorState.languageData.of(() => [{ autocomplete: source }]),
+    ),
     // Core
     lineNumbers(),
     highlightActiveLineGutter(),
