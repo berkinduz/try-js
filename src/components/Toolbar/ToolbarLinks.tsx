@@ -14,6 +14,18 @@ interface Playground {
 
 const ALL_PLAYGROUNDS: Playground[] = [
   {
+    path: "/",
+    label: "JS/TS",
+    title: "JavaScript & TypeScript Playground",
+    icon: (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 3H4a1 1 0 00-1 1v16a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1z" />
+        <path d="M9 17V10l-2 3" />
+        <path d="M15 10c-1.5 0-2 .5-2 1.5s.5 1.5 2 2 2 .5 2 1.5-.5 1.5-2 1.5" />
+      </svg>
+    ),
+  },
+  {
     path: "/web",
     label: "Web",
     title: "Web & React Playground",
