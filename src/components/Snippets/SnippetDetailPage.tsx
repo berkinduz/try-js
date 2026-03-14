@@ -140,6 +140,10 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
+            <a href="/react">React</a>
+            <span class="snippets-footer__dot" aria-hidden>
+              ·
+            </span>
             <a href="/snippets">Snippets</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
