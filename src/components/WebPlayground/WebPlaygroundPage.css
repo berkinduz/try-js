@@ -1,0 +1,91 @@
+/* Vanilla / React segmented toggle — mirrors JS/TS toggle style */
+.web-page-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.web-page-toggle__btn {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 4px 10px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+}
+
+.web-page-toggle__short {
+  flex-shrink: 0;
+  transition: max-width 0.3s ease-out, opacity 0.2s ease-out;
+  max-width: 30px;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.web-page-toggle__full {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.3s ease-out;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.web-page-toggle__btn:hover .web-page-toggle__short {
+  max-width: 0;
+  opacity: 0;
+}
+
+.web-page-toggle__btn:hover .web-page-toggle__full {
+  max-width: 90px;
+}
+
+/* Vanilla: left side */
+.web-page-toggle__btn--vanilla {
+  border-radius: 4px 0 0 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.web-page-toggle__btn--vanilla:hover {
+  background: #e44d26;
+  color: #fff;
+}
+
+.web-page-toggle__btn--vanilla.active {
+  background: #e44d26;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.web-page-toggle__btn--vanilla.active:hover {
+  background: #c9401e;
+}
+
+/* React: right side */
+.web-page-toggle__btn--react {
+  border-radius: 0 4px 4px 0;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.web-page-toggle__btn--react:hover {
+  background: #61dafb;
+  color: #000;
+}
+
+.web-page-toggle__btn--react.active {
+  background: #61dafb;
+  color: #000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.web-page-toggle__btn--react.active:hover {
+  background: #4fc3e8;
+}
