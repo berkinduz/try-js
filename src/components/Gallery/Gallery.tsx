@@ -4,6 +4,7 @@ import { SNIPPET_CATEGORIES } from "../../data/snippets";
 import type { Snippet } from "../../data/snippets";
 import { setCode, setLanguage, language } from "../../state/editor";
 import { clearConsole } from "../../state/console";
+import { trackEvent } from "../../utils/analytics";
 import "./Gallery.css";
 
 export const galleryOpen = signal(false);
@@ -17,6 +18,7 @@ function closeGallery() {
 }
 
 function loadSnippet(snippet: Snippet) {
+  trackEvent("snippet_load", { title: snippet.title, language: snippet.language });
   clearConsole();
   if (snippet.language !== language.value) {
     setLanguage(snippet.language);

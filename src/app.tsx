@@ -14,6 +14,7 @@ import { Gallery } from "./components/Gallery/Gallery";
 import { ScreenshotModal } from "./components/Screenshot/ScreenshotModal";
 import { embedMode } from "./state/ui";
 import { encodeToHash } from "./utils/share";
+import { trackEvent } from "./utils/analytics";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
@@ -84,6 +85,7 @@ export function App() {
   }, []);
 
   const run = useCallback(() => {
+    trackEvent("code_run", { language: language.value, trigger: "manual" });
     executeCode(code.value, language.value);
   }, []);
 

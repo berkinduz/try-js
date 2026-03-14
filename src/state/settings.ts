@@ -1,5 +1,6 @@
 import { signal } from "@preact/signals";
 import { AUTO_RUN_DELAY, DEFAULT_SPLIT_RATIO } from "../utils/constants";
+import { trackEvent } from "../utils/analytics";
 
 export type EditorFontId = "geist-mono" | "fira-code" | "jetbrains-mono";
 
@@ -54,6 +55,7 @@ export function setSplitRatio(val: number) {
 }
 
 export function setEditorFont(id: EditorFontId) {
+  trackEvent("font_change", { font: id });
   editorFont.value = id;
   saveSetting("editorFont", id);
   const font = EDITOR_FONTS.find((f) => f.id === id);

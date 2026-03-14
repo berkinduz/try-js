@@ -16,6 +16,7 @@ import {
   DEFAULT_LIGHT_SYNTAX,
 } from "../components/Editor/themes";
 import { decodeFromHash } from "../utils/share";
+import { trackEvent } from "../utils/analytics";
 
 export type Language = "javascript" | "typescript";
 export type Theme = "light" | "dark";
@@ -61,6 +62,7 @@ export const fileExtension = computed(() =>
 );
 
 export function setLanguage(lang: Language) {
+  trackEvent("language_switch", { language: lang });
   // Save current code for current language
   localStorage.setItem(`jspark:code:${language.value}`, code.value);
   // Switch language
@@ -87,6 +89,7 @@ export function toggleTheme() {
 }
 
 export function setSyntaxTheme(id: SyntaxThemeId) {
+  trackEvent("theme_change", { theme: id });
   syntaxTheme.value = id;
   localStorage.setItem("jspark:syntaxTheme", id);
   document.documentElement.setAttribute("data-theme", getUiModeForSyntax(id));
@@ -142,6 +145,7 @@ export function setReactCode(newCode: string) {
 }
 
 export function setMode(m: AppMode) {
+  trackEvent("mode_switch", { mode: m });
   mode.value = m;
   localStorage.setItem("jspark:mode", m);
 }

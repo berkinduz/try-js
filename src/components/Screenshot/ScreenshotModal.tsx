@@ -13,6 +13,7 @@ import type {
   ScreenshotFrame,
   ScreenshotBackground,
 } from "../../utils/screenshot";
+import { trackEvent } from "../../utils/analytics";
 import { showToast } from "../Toast/Toast";
 import "./ScreenshotModal.css";
 
@@ -96,6 +97,7 @@ export function ScreenshotModal() {
   };
 
   const handleDownload = () => {
+    trackEvent("screenshot_download", { theme: previewTheme, background });
     const canvas = renderScreenshot(codeToRender, getOptions());
     canvas.toBlob((blob) => {
       if (!blob) return;
@@ -110,6 +112,7 @@ export function ScreenshotModal() {
   };
 
   const handleCopy = async () => {
+    trackEvent("screenshot_copy", { theme: previewTheme, background });
     const canvas = renderScreenshot(codeToRender, getOptions());
     canvas.toBlob(async (blob) => {
       if (!blob) return;
