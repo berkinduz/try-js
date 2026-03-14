@@ -10,6 +10,7 @@ import { mode, webHtml, webCss, webJs, reactCode } from "../../state/editor";
 import { clearConsole } from "../../state/console";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
+import { applySeo } from "../../utils/seo";
 import "./WebPlaygroundPage.css";
 
 type WebSubMode = "vanilla" | "react";
@@ -46,39 +47,47 @@ export function WebPlaygroundPage() {
 
   // SEO meta tags
   useEffect(() => {
-    const prevTitle = document.title;
-    const desc = document.querySelector(
-      'meta[name="description"]'
-    ) as HTMLMetaElement | null;
-    const prevDesc = desc?.getAttribute("content") ?? "";
-    const canonical = document.querySelector(
-      'link[rel="canonical"]'
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-
-    document.title =
-      subMode === "react"
+    const isReact = subMode === "react";
+    return applySeo({
+      title: isReact
         ? "React Playground Online — Write & Run React JSX Instantly | TryJS"
-        : "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS";
-
-    if (desc) {
-      desc.setAttribute(
-        "content",
-        subMode === "react"
-          ? "Free online React playground. Write React components with JSX, see live preview instantly, import npm packages, and use hooks — all in your browser. No setup required."
-          : "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required."
-      );
-    }
-
-    if (canonical) {
-      canonical.setAttribute("href", "https://tryjs.app/web");
-    }
-
-    return () => {
-      document.title = prevTitle;
-      if (desc) desc.setAttribute("content", prevDesc);
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-    };
+        : "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
+      description: isReact
+        ? "Free online React playground. Write React components with JSX, see live preview instantly, import npm packages, and use hooks — all in your browser. No setup required."
+        : "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required.",
+      canonical: "https://tryjs.app/web",
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: isReact
+            ? "TryJS — React Playground"
+            : "TryJS — Web Playground",
+          description: isReact
+            ? "Free online React playground with JSX, hooks, npm imports, and live preview."
+            : "Free online web playground with HTML, CSS, and JavaScript tabbed editor and live preview.",
+          url: "https://tryjs.app/web",
+          applicationCategory: "DeveloperApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          featureList: isReact
+            ? [
+                "React JSX editor with live preview",
+                "React hooks (useState, useEffect, useRef, useMemo)",
+                "NPM package imports via esm.sh",
+                "Built-in console for debugging",
+                "Toggle between Vanilla and React modes",
+              ]
+            : [
+                "HTML, CSS, and JavaScript tabbed editor",
+                "Live preview updates as you type",
+                "Built-in console for debugging",
+                "Toggle between Vanilla and React modes",
+              ],
+        },
+      ],
+      jsonLdId: "web-page-schema",
+    });
   }, [subMode]);
 
   // Clear stale console when switching sub-mode

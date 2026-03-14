@@ -5,6 +5,7 @@ import {
   type Snippet,
 } from "../../data/snippets";
 import { encodeToHash } from "../../utils/share";
+import { applySeo } from "../../utils/seo";
 import "./SnippetsPage.css";
 
 function getRelatedSnippets(current: Snippet): Snippet[] {
@@ -19,33 +20,40 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!result) return;
-    const { snippet } = result;
+    const { snippet, category } = result;
 
-    const prevTitle = document.title;
-    document.title = `${snippet.seoTitle} | TryJS`;
-
-    const desc = document.querySelector(
-      'meta[name="description"]',
-    ) as HTMLMetaElement | null;
-    const prevDesc = desc?.getAttribute("content") ?? "";
-    if (desc) desc.setAttribute("content", snippet.seoDescription);
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]',
-    ) as HTMLLinkElement | null;
-    const prevCanonical = canonical?.getAttribute("href") ?? "";
-    if (canonical) {
-      canonical.setAttribute(
-        "href",
-        `https://tryjs.app/snippets/${snippet.slug}`,
-      );
-    }
-
-    return () => {
-      document.title = prevTitle;
-      if (desc) desc.setAttribute("content", prevDesc);
-      if (canonical) canonical.setAttribute("href", prevCanonical);
-    };
+    return applySeo({
+      title: `${snippet.seoTitle} | TryJS`,
+      description: snippet.seoDescription,
+      canonical: `https://tryjs.app/snippets/${snippet.slug}`,
+      jsonLd: [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "TryJS",
+              item: "https://tryjs.app/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Code Snippets",
+              item: "https://tryjs.app/snippets",
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: snippet.title,
+              item: `https://tryjs.app/snippets/${snippet.slug}`,
+            },
+          ],
+        },
+      ],
+      jsonLdId: "snippet-detail-schema",
+    });
   }, [slug, result]);
 
   if (!result) {
