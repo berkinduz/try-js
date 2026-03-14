@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "preact/hooks";
 import { language, setLanguage } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import "./Toolbar.css";
@@ -8,6 +9,19 @@ const BMC_URL = "https://buymeacoffee.com/berkinduz";
 export function Toolbar() {
   const currentLang = language.value;
   const setLang = (lang: Language) => () => setLanguage(lang);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [menuOpen]);
 
   return (
     <div class="toolbar">
@@ -38,11 +52,11 @@ export function Toolbar() {
             </button>
           </div>
         </div>
+      </div>
 
-        <div class="toolbar__separator" />
-
-        <nav class="toolbar__playgrounds" aria-label="Playgrounds">
-          <span class="toolbar__playgrounds-label">Playgrounds</span>
+      <div class="toolbar__right toolbar__right--links">
+        <nav class="toolbar__playgrounds" aria-label="Other Playgrounds">
+          <span class="toolbar__playgrounds-label">Other Playgrounds</span>
           <div class="toolbar__playgrounds-links">
             <a href="/web" class="toolbar__pg-link" title="Web & React Playground">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -61,33 +75,52 @@ export function Toolbar() {
             </a>
           </div>
         </nav>
-      </div>
 
-      <div class="toolbar__right toolbar__right--links">
-        <a
-          href="/snippets"
-          class="toolbar__nav-link"
-          title="Code Snippets"
-          aria-label="Code Snippets"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 18l6-6-6-6" />
-            <path d="M8 6l-6 6 6 6" />
-            <line x1="14" y1="4" x2="10" y2="20" />
-          </svg>
-          <span class="toolbar__nav-link-text">Snippets</span>
-        </a>
-        <a
-          href="/features"
-          class="toolbar__nav-link"
-          title="Features"
-          aria-label="Features"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
-          <span class="toolbar__nav-link-text">Features</span>
-        </a>
+        <div class="toolbar__separator" />
+
+        <div class="toolbar__menu-wrapper" ref={menuRef}>
+          <button
+            type="button"
+            class={`toolbar__icon-btn toolbar__menu-trigger ${menuOpen ? "active" : ""}`}
+            title="More"
+            aria-label="More options"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          </button>
+          {menuOpen && (
+            <div class="toolbar__dropdown">
+              <a
+                href="/snippets"
+                class="toolbar__dropdown-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 18l6-6-6-6" />
+                  <path d="M8 6l-6 6 6 6" />
+                  <line x1="14" y1="4" x2="10" y2="20" />
+                </svg>
+                Snippets
+              </a>
+              <a
+                href="/features"
+                class="toolbar__dropdown-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                Features
+              </a>
+            </div>
+          )}
+        </div>
+
         <a
           href={BMC_URL}
           target="_blank"
