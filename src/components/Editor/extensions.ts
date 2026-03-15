@@ -21,7 +21,7 @@ import {
   foldKeymap,
   indentOnInput,
 } from "@codemirror/language";
-import { lintKeymap } from "@codemirror/lint";
+import { lintKeymap, lintGutter } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import {
   crosshairCursor,
@@ -43,6 +43,7 @@ import { getCompletionSources } from "./completions";
 import type { CompletionMode } from "./completions";
 import { tsCompletionSource } from "../../sandbox/ts-completions";
 import { tsHoverTooltip } from "./hover";
+import { importQuickFixLinter } from "./import-quick-fixes";
 
 /** All language modes the editor can handle. */
 export type EditorLanguage = Language | "html" | "css" | "jsx";
@@ -128,6 +129,8 @@ export function createExtensions(
     highlightSelectionMatches(),
     // Hover tooltips (only for JS/TS/JSX)
     ...(completionMode ? [tsHoverTooltip] : []),
+    // Import quick-fix linter with lightbulb actions (only for JS/TS/JSX)
+    ...(completionMode ? [importQuickFixLinter, lintGutter()] : []),
     // Keymaps
     keymap.of([
       // Accept completion on Tab (before indentWithTab so it takes priority)
