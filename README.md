@@ -4,9 +4,46 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 **Live:** [tryjs.app](https://tryjs.app) · **Features:** [tryjs.app/features](https://tryjs.app/features)
 
-![TryJS playground preview](public/tryjs.png)
+![TryJS playground preview](public/tryJS_JS_gif.gif)
 
 ## Features
+
+### JavaScript & TypeScript Playground
+
+![TryJS JavaScript playground demo](public/tryJS_JS_gif.gif)
+
+- **Instant execution** — code auto-runs on change with configurable debounce; `Cmd+Enter` runs immediately
+- **JavaScript & TypeScript** — toggle with one click; TypeScript is transpiled in-browser via Sucrase
+- **NPM imports** — bare specifiers like `import confetti from "canvas-confetti"` are rewritten to [esm.sh](https://esm.sh) and executed in the sandbox
+- **REPL-style evaluation** — bare expressions display their result in the console, like Chrome DevTools
+- **Console output** — supports `log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
+- **Sandboxed execution** — code runs in an iframe sandbox with a 5-second timeout (15s for module loading)
+
+### Themes & Editor Customization
+
+![TryJS theme change demo](public/tryJS_theme_change_gif.gif)
+
+- **6 syntax themes** — One Dark, One Light, Dracula, GitHub Light, Monokai, Solarized Dark
+- **3 editor fonts** — Geist Mono, Fira Code, JetBrains Mono
+- **Configurable editor** — font size, tab size, word wrap, and auto-run delay — all persisted to localStorage
+
+### Web Playground (HTML/CSS/JS)
+
+![TryJS HTML playground demo](public/tryjs_html_gif.gif)
+
+- **Vanilla mode** — tabbed HTML/CSS/JS editor with a live iframe preview and built-in console drawer
+
+### React Playground
+
+![TryJS React playground demo](public/tryjs_react_gif.gif)
+
+- **React mode** — write JSX components with a CSS tab; live-rendered with React 19 from esm.sh, including error/warning badges and a starter template
+
+### Code-to-PNG Export
+
+![TryJS export to image demo](public/tryjs_export_image_gif.gif)
+
+- **Export as image** — generate code screenshots with syntax themes, Safari/minimal frames, padding options, and gradient backgrounds (download PNG or copy to clipboard)
 
 ### Editor & IntelliSense
 
@@ -16,23 +53,6 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 - **TypeScript type checking** — background semantic diagnostics surface structural errors in the console after execution
 - **npm import suggestions** — type `import ... from "` to get suggestions from 50+ popular packages (lodash, zod, dayjs, axios…)
 - **React/JSX completions** — hooks (`useState`, `useEffect`…), JSX attributes (`className`, `onClick`…), and component scaffolding snippets
-- **6 syntax themes** — One Dark, One Light, Dracula, GitHub Light, Monokai, Solarized Dark
-- **3 editor fonts** — Geist Mono, Fira Code, JetBrains Mono
-- **Configurable editor** — font size, tab size, word wrap, and auto-run delay — all persisted to localStorage
-
-### JavaScript & TypeScript Playground
-
-- **Instant execution** — code auto-runs on change with configurable debounce; `Cmd+Enter` runs immediately
-- **JavaScript & TypeScript** — toggle with one click; TypeScript is transpiled in-browser via Sucrase
-- **NPM imports** — bare specifiers like `import confetti from "canvas-confetti"` are rewritten to [esm.sh](https://esm.sh) and executed in the sandbox
-- **REPL-style evaluation** — bare expressions display their result in the console, like Chrome DevTools
-- **Console output** — supports `log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
-- **Sandboxed execution** — code runs in an iframe sandbox with a 5-second timeout (15s for module loading)
-
-### Web Playground
-
-- **Vanilla mode** — tabbed HTML/CSS/JS editor with a live iframe preview and built-in console drawer
-- **React mode** — write JSX components with a CSS tab; live-rendered with React 19 from esm.sh, including error/warning badges and a starter template
 
 ### Regex Playground
 
@@ -54,7 +74,6 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 - **Share as URL** — copy a link that preserves full editor state via lz-string compression in the URL hash
 - **Embed code** — generate an iframe embed snippet for docs and blog posts (`?embed=1` hides UI chrome)
-- **Export as image** — generate code screenshots with syntax themes, Safari/minimal frames, padding options, and gradient backgrounds (download PNG or copy to clipboard)
 
 ### General
 
