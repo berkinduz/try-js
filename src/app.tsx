@@ -22,7 +22,6 @@ import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { RegexPage } from "./components/Regex/RegexPage";
 import { RegexDetailPage } from "./components/Regex/RegexDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
-import { FeedbackButton } from "./components/Feedback/FeedbackButton";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -39,42 +38,33 @@ function EmbedOpenLink() {
   );
 }
 
-function PageWithFeedback({ children }: { children: preact.ComponentChildren }) {
-  return (
-    <>
-      {children}
-      <FeedbackButton />
-    </>
-  );
-}
-
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
 
   if (path === "/features") {
-    return <PageWithFeedback><FeaturesPage /></PageWithFeedback>;
+    return <FeaturesPage />;
   }
 
   if (path === "/snippets") {
-    return <PageWithFeedback><SnippetsPage /></PageWithFeedback>;
+    return <SnippetsPage />;
   }
 
   const snippetMatch = path.match(/^\/snippets\/(.+)$/);
   if (snippetMatch) {
-    return <PageWithFeedback><SnippetDetailPage slug={snippetMatch[1]} /></PageWithFeedback>;
+    return <SnippetDetailPage slug={snippetMatch[1]} />;
   }
 
   if (path === "/web") {
-    return <PageWithFeedback><WebPlaygroundPage /></PageWithFeedback>;
+    return <WebPlaygroundPage />;
   }
 
   if (path === "/regex") {
-    return <PageWithFeedback><RegexPage /></PageWithFeedback>;
+    return <RegexPage />;
   }
 
   const regexMatch = path.match(/^\/regex\/(.+)$/);
   if (regexMatch) {
-    return <PageWithFeedback><RegexDetailPage slug={regexMatch[1]} /></PageWithFeedback>;
+    return <RegexDetailPage slug={regexMatch[1]} />;
   }
 
   const isEmbed = embedMode.value;
@@ -176,7 +166,6 @@ export function App() {
         <Gallery />
         <ScreenshotModal />
         <ToastContainer />
-        {!isEmbed && <FeedbackButton />}
       </div>
     );
   }
@@ -193,7 +182,6 @@ export function App() {
       <Gallery />
       <ScreenshotModal />
       <ToastContainer />
-      {!isEmbed && <FeedbackButton />}
     </div>
   );
 }
