@@ -14,20 +14,6 @@ type FeatureItem = {
 
 const FEATURES: FeatureItem[] = [
   {
-    id: "npm-imports",
-    tab: "NPM Imports",
-    title: "Run package-based examples without setup churn",
-    summary:
-      "Bare specifiers are rewritten to esm.sh and executed inside the sandbox, so experiments stay fast.",
-    points: [
-      "Use imports directly in editor code",
-      "No local install, no bundler config",
-      "Good for trying APIs before committing",
-    ],
-    image: "/tryjs_import.png",
-    imageAlt: "TryJS NPM imports code example",
-  },
-  {
     id: "snippets",
     tab: "Snippets",
     title: "Start from runnable patterns, not blank files",
@@ -38,8 +24,8 @@ const FEATURES: FeatureItem[] = [
       "Good defaults for teaching and demos",
       "Quick path from idea to variation",
     ],
-    image: "/tryjs.png",
-    imageAlt: "TryJS snippet gallery and editor preview",
+    image: "/tryJS_JS_gif.gif",
+    imageAlt: "TryJS JavaScript playground demo",
   },
   {
     id: "web-playground",
@@ -53,8 +39,38 @@ const FEATURES: FeatureItem[] = [
       "Toggle between Vanilla and React with one click",
       "Built-in console captures logs, warnings, and errors",
     ],
-    image: "/tryjs_web.png",
-    imageAlt: "TryJS Web Playground with Vanilla and React modes",
+    image: "/tryjs_html_gif.gif",
+    imageAlt: "TryJS Web Playground with HTML/CSS/JS live preview",
+  },
+  {
+    id: "react-playground",
+    tab: "React",
+    title: "Write JSX components with live rendering",
+    summary:
+      "React mode gives you a JSX editor with a CSS tab, live-rendered using React 19 from esm.sh. Use hooks, import npm packages, and see your component update as you type.",
+    points: [
+      "JSX editor with useState, useEffect, and full hook support",
+      "Live component preview powered by React 19 via esm.sh",
+      "Error and warning badges surface issues inline",
+      "Starter template to go from zero to running in one click",
+    ],
+    image: "/tryjs_react_gif.gif",
+    imageAlt: "TryJS React playground demo",
+  },
+  {
+    id: "themes",
+    tab: "Themes",
+    title: "Six syntax themes, three editor fonts",
+    summary:
+      "Swap between One Dark, One Light, Dracula, GitHub Light, Monokai, and Solarized Dark — and pair them with Geist Mono, Fira Code, or JetBrains Mono. Your choice persists across sessions.",
+    points: [
+      "6 syntax themes with instant preview",
+      "3 curated monospace fonts",
+      "Configurable font size, tab size, word wrap, auto-run delay",
+      "All preferences saved to localStorage",
+    ],
+    image: "/tryJS_theme_change_gif.gif",
+    imageAlt: "TryJS theme change demo",
   },
   {
     id: "regex-playground",
@@ -96,8 +112,22 @@ const FEATURES: FeatureItem[] = [
       "Gradient and transparent backgrounds",
       "Download or copy-to-clipboard flow",
     ],
-    image: "/export_image.png",
-    imageAlt: "TryJS export to image preview",
+    image: "/tryjs_export_image_gif.gif",
+    imageAlt: "TryJS export code to image demo",
+  },
+  {
+    id: "npm-imports",
+    tab: "NPM Imports",
+    title: "Run package-based examples without setup churn",
+    summary:
+      "Bare specifiers are rewritten to esm.sh and executed inside the sandbox, so experiments stay fast.",
+    points: [
+      "Use imports directly in editor code",
+      "No local install, no bundler config",
+      "Good for trying APIs before committing",
+    ],
+    image: "/tryjs_import.png",
+    imageAlt: "TryJS NPM imports code example",
   },
 ];
 
