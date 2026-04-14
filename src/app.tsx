@@ -22,6 +22,7 @@ import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { RegexPage } from "./components/Regex/RegexPage";
 import { RegexDetailPage } from "./components/Regex/RegexDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
+import { FeedbackButton } from "./components/Feedback/FeedbackButton";
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -38,33 +39,42 @@ function EmbedOpenLink() {
   );
 }
 
+function PageWithFeedback({ children }: { children: preact.ComponentChildren }) {
+  return (
+    <>
+      {children}
+      <FeedbackButton />
+    </>
+  );
+}
+
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
 
   if (path === "/features") {
-    return <FeaturesPage />;
+    return <PageWithFeedback><FeaturesPage /></PageWithFeedback>;
   }
 
   if (path === "/snippets") {
-    return <SnippetsPage />;
+    return <PageWithFeedback><SnippetsPage /></PageWithFeedback>;
   }
 
   const snippetMatch = path.match(/^\/snippets\/(.+)$/);
   if (snippetMatch) {
-    return <SnippetDetailPage slug={snippetMatch[1]} />;
+    return <PageWithFeedback><SnippetDetailPage slug={snippetMatch[1]} /></PageWithFeedback>;
   }
 
   if (path === "/web") {
-    return <WebPlaygroundPage />;
+    return <PageWithFeedback><WebPlaygroundPage /></PageWithFeedback>;
   }
 
   if (path === "/regex") {
-    return <RegexPage />;
+    return <PageWithFeedback><RegexPage /></PageWithFeedback>;
   }
 
   const regexMatch = path.match(/^\/regex\/(.+)$/);
   if (regexMatch) {
-    return <RegexDetailPage slug={regexMatch[1]} />;
+    return <PageWithFeedback><RegexDetailPage slug={regexMatch[1]} /></PageWithFeedback>;
   }
 
   const isEmbed = embedMode.value;
@@ -75,6 +85,11 @@ export function App() {
   // Ensure JS mode on root page (web/react now live at /web)
   useEffect(() => {
     if (mode.value !== "js") mode.value = "js";
+  }, []);
+
+  // Track main playground view
+  useEffect(() => {
+    trackEvent("playground_view", { language: language.value });
   }, []);
 
   // Handle resize
@@ -161,6 +176,7 @@ export function App() {
         <Gallery />
         <ScreenshotModal />
         <ToastContainer />
+        {!isEmbed && <FeedbackButton />}
       </div>
     );
   }
@@ -177,6 +193,7 @@ export function App() {
       <Gallery />
       <ScreenshotModal />
       <ToastContainer />
+      {!isEmbed && <FeedbackButton />}
     </div>
   );
 }

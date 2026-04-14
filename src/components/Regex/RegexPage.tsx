@@ -2,6 +2,7 @@ import { useEffect } from "preact/hooks";
 import { getRegexCategories } from "../../data/regexPatterns";
 import { RegexPlayground } from "./RegexPlayground";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./RegexPage.css";
 import "../../components/Snippets/SnippetsPage.css";
 
@@ -9,6 +10,7 @@ export function RegexPage() {
   const categories = getRegexCategories();
 
   useEffect(() => {
+    trackEvent("regex_index_view");
     return applySeo({
       title: "Regex Playground Online — Test Regular Expressions Instantly | TryJS",
       description:

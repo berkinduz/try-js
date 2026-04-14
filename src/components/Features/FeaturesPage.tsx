@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./FeaturesPage.css";
 
 type FeatureItem = {
@@ -160,6 +161,7 @@ export function FeaturesPage() {
 
   // Set page-specific meta for /features
   useEffect(() => {
+    trackEvent("features_view");
     return applySeo({
       title: "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export",
       description:

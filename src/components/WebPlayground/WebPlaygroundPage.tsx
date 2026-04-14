@@ -12,6 +12,7 @@ import { clearConsole } from "../../state/console";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./WebPlaygroundPage.css";
 
 type WebSubMode = "vanilla" | "react";
@@ -43,9 +44,10 @@ export function WebPlaygroundPage() {
     localStorage.setItem("jspark:webSubMode", m);
   };
 
-  // SEO meta tags
+  // SEO meta tags + analytics
   useEffect(() => {
     const isReact = subMode === "react";
+    trackEvent("web_playground_view", { mode: isReact ? "react" : "vanilla" });
     return applySeo({
       title: isReact
         ? "React Playground Online — Write & Run React JSX Instantly | TryJS"
