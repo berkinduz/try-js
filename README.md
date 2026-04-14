@@ -4,8 +4,6 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 **Live:** [tryjs.app](https://tryjs.app) · **Features:** [tryjs.app/features](https://tryjs.app/features)
 
-![TryJS playground preview](public/tryJS_JS_gif.gif)
-
 ## Features
 
 ### JavaScript & TypeScript Playground
@@ -85,14 +83,14 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 ## Tech Stack
 
-| Layer         | Choice                  |
-| ------------- | ----------------------- |
-| UI            | Preact + Preact Signals |
-| Editor        | CodeMirror 6            |
-| TS Transpiler | Sucrase                 |
+| Layer         | Choice                          |
+| ------------- | ------------------------------- |
+| UI            | Preact + Preact Signals         |
+| Editor        | CodeMirror 6                    |
+| TS Transpiler | Sucrase                         |
 | TS Compiler   | TypeScript 5 (CDN, lazy-loaded) |
-| Build         | Vite                    |
-| Hosting       | Vercel                  |
+| Build         | Vite                            |
+| Hosting       | Vercel                          |
 
 ## Development
 
