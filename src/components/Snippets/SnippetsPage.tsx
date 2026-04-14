@@ -1,10 +1,12 @@
 import { useEffect } from "preact/hooks";
 import { SNIPPET_CATEGORIES, getAllSnippets } from "../../data/snippets";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./SnippetsPage.css";
 
 export function SnippetsPage() {
   useEffect(() => {
+    trackEvent("snippets_index_view");
     const allSnippets = getAllSnippets();
     return applySeo({
       title: "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS",

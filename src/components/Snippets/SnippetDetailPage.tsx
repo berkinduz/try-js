@@ -6,6 +6,7 @@ import {
 } from "../../data/snippets";
 import { encodeToHash } from "../../utils/share";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./SnippetsPage.css";
 
 function getRelatedSnippets(current: Snippet): Snippet[] {
@@ -21,6 +22,11 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
   useEffect(() => {
     if (!result) return;
     const { snippet } = result;
+
+    trackEvent("snippet_detail_view", {
+      slug: snippet.slug,
+      language: snippet.language,
+    });
 
     const jsonLd: Record<string, unknown>[] = [
       {

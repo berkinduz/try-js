@@ -6,6 +6,7 @@ import {
 } from "../../data/regexPatterns";
 import { RegexPlayground } from "./RegexPlayground";
 import { applySeo } from "../../utils/seo";
+import { trackEvent } from "../../utils/analytics";
 import "./RegexPage.css";
 import "../../components/Snippets/SnippetsPage.css";
 
@@ -55,6 +56,11 @@ export function RegexDetailPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!pattern) return;
+
+    trackEvent("regex_detail_view", {
+      slug: pattern.slug,
+      category: pattern.category,
+    });
 
     return applySeo({
       title: `${pattern.seoTitle} | TryJS`,
