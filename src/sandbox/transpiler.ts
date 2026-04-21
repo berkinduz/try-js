@@ -59,7 +59,11 @@ const BARE_SPECIFIER_RE = /^[a-zA-Z@][a-zA-Z0-9._\-/]*$/;
  * Checks static imports, side-effect imports, and dynamic imports.
  */
 export function hasImports(code: string): boolean {
-  return /\bimport\s+/.test(code) || /\bimport\s*\(/.test(code);
+  // Remove single-line and multi-line comments before checking
+  const withoutComments = code
+    .replace(/\/\/.*$/gm, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  return /\bimport\s+/.test(withoutComments) || /\bimport\s*\(/.test(withoutComments);
 }
 
 /**

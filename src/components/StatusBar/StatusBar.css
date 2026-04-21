@@ -85,7 +85,8 @@
 }
 
 .statusbar__help-wrap:hover .statusbar__help-tooltip,
-.statusbar__help-btn:focus + .statusbar__help-tooltip {
+.statusbar__help-btn:focus + .statusbar__help-tooltip,
+.statusbar__help-tooltip.is-visible {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
@@ -254,7 +255,8 @@
   pointer-events: none;
 }
 
-.statusbar__shortcut-wrap:hover .statusbar__shortcut-tooltip {
+.statusbar__shortcut-wrap:hover .statusbar__shortcut-tooltip,
+.statusbar__shortcut-tooltip.is-visible {
   visibility: visible;
   opacity: 1;
 }

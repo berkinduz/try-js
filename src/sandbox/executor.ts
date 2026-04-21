@@ -244,6 +244,7 @@ export function executeCode(source: string, lang: Language) {
 
   if (result.error !== null) {
     addErrorEntry("error", `Transpilation Error: ${result.error}`);
+    clearOnNextOutput = false;
     executionDone = true;
     if (runningIndicatorId) {
       clearTimeout(runningIndicatorId);

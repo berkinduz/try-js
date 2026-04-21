@@ -23,6 +23,7 @@ export interface ErrorEntry {
 export type OutputEntry = ConsoleEntry | ErrorEntry;
 
 let nextId = 0;
+const MAX_ENTRIES = 500;
 
 export const consoleOutput = signal<OutputEntry[]>([]);
 export const isRunning = signal(false);
@@ -37,16 +38,18 @@ export function addConsoleEntry(
     consoleOutput.value = [];
     return;
   }
-  consoleOutput.value = [
-    ...consoleOutput.value,
-    {
-      id: nextId++,
-      kind: "console",
-      method,
-      args,
-      timestamp: Date.now(),
-    },
-  ];
+  const entry: ConsoleEntry = {
+    id: nextId++,
+    kind: "console",
+    method,
+    args,
+    timestamp: Date.now(),
+  };
+  const next: OutputEntry[] = [...consoleOutput.value, entry];
+  if (next.length > MAX_ENTRIES) {
+    next.splice(0, next.length - MAX_ENTRIES);
+  }
+  consoleOutput.value = next;
 }
 
 export function addErrorEntry(
@@ -56,19 +59,21 @@ export function addErrorEntry(
   lineno?: number,
   colno?: number
 ) {
-  consoleOutput.value = [
-    ...consoleOutput.value,
-    {
-      id: nextId++,
-      kind: "error",
-      errorType,
-      message,
-      stack,
-      lineno,
-      colno,
-      timestamp: Date.now(),
-    },
-  ];
+  const entry: ErrorEntry = {
+    id: nextId++,
+    kind: "error",
+    errorType,
+    message,
+    stack,
+    lineno,
+    colno,
+    timestamp: Date.now(),
+  };
+  const next: OutputEntry[] = [...consoleOutput.value, entry];
+  if (next.length > MAX_ENTRIES) {
+    next.splice(0, next.length - MAX_ENTRIES);
+  }
+  consoleOutput.value = next;
 }
 
 export function clearConsole() {
