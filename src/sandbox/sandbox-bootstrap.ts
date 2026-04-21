@@ -39,22 +39,28 @@ export const SANDBOX_BOOTSTRAP = `
           return {
             type: "array",
             value: JSON.stringify(val, null, 2),
-            length: val.length
+            length: val.length,
+            items: items
           };
         } catch(e) {
-          return { type: "array", value: "[Array]", length: val.length };
+          return { type: "array", value: "[Array]", length: val.length, items: [] };
         }
       }
 
       try {
-        var preview = Object.keys(val).slice(0, 5).join(", ");
+        var keys = Object.keys(val);
+        var preview = keys.slice(0, 5).join(", ");
+        var entries = keys.map(function(k) {
+          return { key: k, value: serialize(val[k], depth + 1, seen) };
+        });
         return {
           type: "object",
           value: JSON.stringify(val, null, 2),
-          preview: "{ " + preview + (Object.keys(val).length > 5 ? ", ..." : "") + " }"
+          preview: "{ " + preview + (keys.length > 5 ? ", ..." : "") + " }",
+          entries: entries
         };
       } catch(e) {
-        return { type: "object", value: "[Object]", preview: "[Object]" };
+        return { type: "object", value: "[Object]", preview: "[Object]", entries: [] };
       }
     }
 
@@ -203,25 +209,32 @@ export const SANDBOX_BOOTSTRAP_MODULE = `
 
       if (Array.isArray(val)) {
         try {
+          var items = val.map(function(item) { return serialize(item, depth + 1, seen); });
           return {
             type: "array",
             value: JSON.stringify(val, null, 2),
-            length: val.length
+            length: val.length,
+            items: items
           };
         } catch(e) {
-          return { type: "array", value: "[Array]", length: val.length };
+          return { type: "array", value: "[Array]", length: val.length, items: [] };
         }
       }
 
       try {
-        var preview = Object.keys(val).slice(0, 5).join(", ");
+        var keys = Object.keys(val);
+        var preview = keys.slice(0, 5).join(", ");
+        var entries = keys.map(function(k) {
+          return { key: k, value: serialize(val[k], depth + 1, seen) };
+        });
         return {
           type: "object",
           value: JSON.stringify(val, null, 2),
-          preview: "{ " + preview + (Object.keys(val).length > 5 ? ", ..." : "") + " }"
+          preview: "{ " + preview + (keys.length > 5 ? ", ..." : "") + " }",
+          entries: entries
         };
       } catch(e) {
-        return { type: "object", value: "[Object]", preview: "[Object]" };
+        return { type: "object", value: "[Object]", preview: "[Object]", entries: [] };
       }
     }
 
