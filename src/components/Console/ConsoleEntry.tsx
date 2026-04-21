@@ -1,6 +1,7 @@
 import type { OutputEntry } from "../../state/console";
 import { formatValue, getValueClass } from "../../utils/format";
 import type { SerializedValue } from "../../utils/format";
+import { ObjectInspector } from "./ObjectInspector";
 
 interface Props {
   entry: OutputEntry;
@@ -21,9 +22,9 @@ function renderValue(val: SerializedValue, index: number) {
 
   if (val.type === "object" || val.type === "array") {
     return (
-      <pre key={index} class={`console-value ${cls}`}>
-        {text}
-      </pre>
+      <span key={index} class={`console-value ${cls}`}>
+        <ObjectInspector value={val} />
+      </span>
     );
   }
 

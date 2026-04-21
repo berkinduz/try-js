@@ -220,3 +220,70 @@ pre.console-value {
 .console-table tr:hover td {
   background: var(--console-hover);
 }
+
+/* Object Inspector */
+.object-inspector {
+  display: inline;
+  vertical-align: top;
+}
+
+.oi-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  margin: 0 2px 0 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 9px;
+  line-height: 1;
+  vertical-align: middle;
+  transition: color 0.15s;
+}
+
+.oi-toggle:hover {
+  color: var(--text-primary);
+}
+
+.oi-preview {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.oi-bracket {
+  color: var(--text-muted);
+}
+
+.oi-children {
+  display: block;
+  padding-left: 14px;
+}
+
+.oi-node {
+  display: block;
+  line-height: 1.6;
+}
+
+.oi-key {
+  color: var(--syntax-string);
+}
+
+.oi-index {
+  color: var(--syntax-number);
+}
+
+.oi-colon {
+  color: var(--text-muted);
+}
+
+.oi-value.val-string { color: var(--syntax-string); }
+.oi-value.val-number { color: var(--syntax-number); }
+.oi-value.val-boolean { color: var(--syntax-keyword); }
+.oi-value.val-null { color: var(--syntax-comment); font-style: italic; }
+.oi-value.val-function { color: var(--syntax-function); font-style: italic; }
+.oi-value.val-error { color: var(--console-error-fg); }
+.oi-value.val-object { color: var(--text-primary); }

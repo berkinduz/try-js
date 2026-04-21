@@ -4,8 +4,18 @@ export type SerializedValue =
   | { type: "boolean"; value: boolean }
   | { type: "null" }
   | { type: "undefined" }
-  | { type: "object"; value: string; preview: string }
-  | { type: "array"; value: string; length: number }
+  | {
+      type: "object";
+      value: string;
+      preview: string;
+      entries?: { key: string; value: SerializedValue }[];
+    }
+  | {
+      type: "array";
+      value: string;
+      length: number;
+      items?: SerializedValue[];
+    }
   | { type: "function"; name: string }
   | { type: "symbol"; description: string }
   | { type: "error"; message: string; stack?: string }
