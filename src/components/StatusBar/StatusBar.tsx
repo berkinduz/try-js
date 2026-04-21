@@ -1,3 +1,4 @@
+import { useState, useEffect } from "preact/hooks";
 import {
   consoleOutput,
   executionTime,
@@ -13,6 +14,20 @@ import { openGallery } from "../Gallery/Gallery";
 import "./StatusBar.css";
 
 export function StatusBar() {
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!helpOpen && !shortcutsOpen) return;
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".statusbar__help-wrap")) setHelpOpen(false);
+      if (!target.closest(".statusbar__shortcut-wrap")) setShortcutsOpen(false);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [helpOpen, shortcutsOpen]);
+
   const isWeb = mode.value === "web";
   const entries = consoleOutput.value;
   const execTime = executionTime.value;
@@ -35,6 +50,7 @@ export function StatusBar() {
             class="statusbar__help-btn"
             aria-label="Help"
             title="TryJS help"
+            onClick={() => setHelpOpen((v) => !v)}
           >
             <svg
               width="11"
@@ -53,7 +69,7 @@ export function StatusBar() {
             </svg>
             <span class="statusbar__btn-text">Help</span>
           </button>
-          <div class="statusbar__help-tooltip" role="tooltip">
+          <div class={`statusbar__help-tooltip ${helpOpen ? "is-visible" : ""}`} role="tooltip">
             <div class="statusbar__help-heading">
               <span class="statusbar__help-eyebrow">TryJS</span>
               <strong>Quick Guide</strong>
@@ -183,12 +199,13 @@ export function StatusBar() {
               class="statusbar__shortcut-btn"
               title="Keyboard shortcuts"
               aria-label="Keyboard shortcuts"
+              onClick={() => setShortcutsOpen((v) => !v)}
             >
               <span class="statusbar__shortcut-icon" aria-hidden>
                 ⌘
               </span>
             </button>
-            <div class="statusbar__shortcut-tooltip" role="tooltip">
+            <div class={`statusbar__shortcut-tooltip ${shortcutsOpen ? "is-visible" : ""}`} role="tooltip">
               <div class="statusbar__shortcut-row">
                 <kbd>⌘</kbd>
                 <kbd>↵</kbd> Run
