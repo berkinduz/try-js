@@ -74,21 +74,6 @@ const FEATURES: FeatureItem[] = [
     imageAlt: "TryJS theme change demo",
   },
   {
-    id: "regex-playground",
-    tab: "Regex",
-    title: "Test and understand regular expressions visually",
-    summary:
-      "Write a regex pattern, paste your test string, and see matches highlighted in real-time. Toggle flags, inspect capture groups, and use Explain mode to break down any regex into human-readable steps.",
-    points: [
-      "Real-time match highlighting with flag toggles (g, i, m, s, u, d)",
-      "Capture group and match index inspection",
-      "Explain mode breaks regex into readable steps",
-      "Curated library of 15+ common patterns (email, URL, phone, etc.)",
-    ],
-    image: "/tryjs_web.png",
-    imageAlt: "TryJS Regex Playground with pattern matching",
-  },
-  {
     id: "share-embed",
     tab: "Share / Embed",
     title: "Send runnable context instead of static code blocks",
@@ -163,9 +148,9 @@ export function FeaturesPage() {
   useEffect(() => {
     trackEvent("features_view");
     return applySeo({
-      title: "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export",
+      title: "TryJS Features — Playgrounds, NPM Imports, Snippets & Export",
       description:
-        "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
+        "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
       canonical: "https://tryjs.app/features",
       jsonLd: [
         {
@@ -197,8 +182,7 @@ export function FeaturesPage() {
             <p>
               TryJS is a fast JavaScript and TypeScript playground for testing
               ideas, importing npm packages, building with HTML/CSS/JS or
-              React, testing regex patterns, sharing runnable examples, and
-              exporting code visuals.
+              React, sharing runnable examples, and exporting code visuals.
             </p>
           </div>
           <div class="features-head__actions">
@@ -207,7 +191,7 @@ export function FeaturesPage() {
             </a>
             <a
               class="features-btn"
-              href="https://github.com/berkinduz/js-park"
+              href="https://github.com/berkinduz/try-js"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -325,7 +309,7 @@ export function FeaturesPage() {
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>
-            <a href="/regex">Regex</a>
+            <a href="/react">React</a>
             <span class="features-footer__dot" aria-hidden>
               ·
             </span>

@@ -55,8 +55,8 @@ export function SnippetsPage() {
             <a class="snippets-btn" href="/web">
               Web Playground
             </a>
-            <a class="snippets-btn" href="/regex">
-              Regex Playground
+            <a class="snippets-btn" href="/react">
+              React Playground
             </a>
             <a class="snippets-btn" href="/features">
               Features
@@ -93,7 +93,7 @@ export function SnippetsPage() {
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
-            <a href="/regex">Regex</a>
+            <a href="/react">React</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
