@@ -1,11 +1,36 @@
-import { language, setLanguage } from "../../state/editor";
+import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import { ToolbarLinks } from "./ToolbarLinks";
 import "./Toolbar.css";
 
 export function Toolbar() {
   const currentLang = language.value;
-  const setLang = (lang: Language) => () => setLanguage(lang);
+  const currentMode = mode.value;
+
+  const isJsMode = currentMode === "js";
+  const isWebMode = currentMode === "web" || currentMode === "react";
+
+  const goto = (path: string) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, "", path);
+    }
+  };
+
+  const activateJs = (lang: Language) => {
+    setMode("js");
+    setLanguage(lang);
+    goto("/");
+  };
+
+  const activateWeb = () => {
+    // Preserve current sub-mode (vanilla vs react) if already in Web
+    if (isWebMode) return;
+    // Restore last chosen sub-mode, default vanilla
+    const stored = localStorage.getItem("jspark:webSubMode");
+    const target = stored === "react" ? "/react" : "/web";
+    setMode(stored === "react" ? "react" : "web");
+    goto(target);
+  };
 
   return (
     <div class="toolbar">
@@ -14,31 +39,39 @@ export function Toolbar() {
           <div class="toolbar__lang-toggle">
             <button
               type="button"
-              class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" ? "active" : ""}`}
-              onClick={setLang("javascript")}
+              class={`toolbar__logo toolbar__logo--js ${currentLang === "javascript" && isJsMode ? "active" : ""}`}
+              onClick={() => activateJs("javascript")}
               title="JavaScript"
               aria-label="JavaScript"
-              aria-pressed={currentLang === "javascript"}
+              aria-pressed={currentLang === "javascript" && isJsMode}
             >
-              <span class="toolbar__logo-short">JS</span>
-              <span class="toolbar__logo-full">JavaScript</span>
+              JS
             </button>
             <button
               type="button"
-              class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" ? "active" : ""}`}
-              onClick={setLang("typescript")}
+              class={`toolbar__logo toolbar__logo--ts ${currentLang === "typescript" && isJsMode ? "active" : ""}`}
+              onClick={() => activateJs("typescript")}
               title="TypeScript"
               aria-label="TypeScript"
-              aria-pressed={currentLang === "typescript"}
+              aria-pressed={currentLang === "typescript" && isJsMode}
             >
-              <span class="toolbar__logo-short">TS</span>
-              <span class="toolbar__logo-full">TypeScript</span>
+              TS
+            </button>
+            <button
+              type="button"
+              class={`toolbar__logo toolbar__logo--web ${isWebMode ? "active" : ""}`}
+              onClick={activateWeb}
+              title="Web"
+              aria-label="Web"
+              aria-pressed={isWebMode}
+            >
+              Web
             </button>
           </div>
         </div>
       </div>
 
-      <ToolbarLinks currentPath="/" />
+      <ToolbarLinks />
     </div>
   );
 }

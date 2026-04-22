@@ -21,6 +21,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const DIST = join(ROOT, "dist");
 const BASE_URL = "https://tryjs.app";
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-tryjs.png`;
 
 // ── Route-specific body SEO content (replaces <section class="seo-content">) ──
 
@@ -40,44 +41,49 @@ function makeSeoSection(ariaLabel, h1, paragraphs) {
 const MAIN_PAGES = [
   {
     route: "/web",
-    title: "Web & React Playground Online — HTML, CSS, JS & React JSX Editor | TryJS",
+    title: "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
     description:
-      "Free online web and React playground. Write HTML, CSS, and JavaScript with live preview, or switch to React mode for JSX with hooks and npm imports — all in your browser. No setup required.",
+      "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required.",
+    ogImage: "/tryjs_web.png",
+    ogImageAlt: "TryJS Web Playground — HTML, CSS and JavaScript editor with live preview",
     body: makeSeoSection(
       "About TryJS Web Playground",
       "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
       [
-        "Free online web and React playground. Write HTML, CSS, and JavaScript with live preview, or switch to React mode for JSX with hooks and npm imports — all in your browser. No setup required.",
-        "<h2>Vanilla HTML/CSS/JS Mode</h2>",
-        "Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in the browser — no local server or bundler needed.",
-        "<h2>React JSX Mode</h2>",
-        "Write React components with JSX, useState, useEffect, and import npm packages via esm.sh. See live component preview powered by React 19 with instant updates as you type.",
-        "<h2>Instant Preview & Console</h2>",
-        "The built-in console captures logs, warnings, and errors. Toggle between Vanilla and React modes with one click. All code runs locally in your browser.",
+        "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required.",
+        "<h2>HTML, CSS & JavaScript</h2>",
+        "Write HTML, CSS, and JavaScript in a tabbed editor with live preview. No local server or bundler needed.",
+        "<h2>Instant Preview</h2>",
+        "See changes as you type. The built-in console captures logs, warnings, and errors.",
+        "<h2>Looking for React?</h2>",
+        "Try the <a href=\"https://tryjs.app/react\">TryJS React Playground</a> for JSX, hooks, and npm imports with live component preview.",
         "<h2>Free & Open Source</h2>",
-        "TryJS is completely free under the MIT license. No signup, no ads, no server-side code execution.",
+        "TryJS is completely free under the MIT license. No signup, no ads.",
       ]
     ),
   },
   {
-    route: "/regex",
-    title:
-      "Regex Playground Online — Test Regular Expressions Instantly | TryJS",
+    route: "/react",
+    title: "React Playground Online — Write & Run React JSX Instantly | TryJS",
     description:
-      "Free online regex tester and playground. Write regular expressions, see matches highlighted in real-time, explore capture groups, and browse a library of common regex patterns — all in your browser.",
+      "Free online React playground. Write React components with JSX, use hooks, import npm packages, and see live preview — all in your browser. No setup required.",
+    ogImage: "/tryjs_web.png",
+    ogImageAlt: "TryJS React Playground — JSX, hooks and npm imports with live preview",
     body: makeSeoSection(
-      "About TryJS Regex Playground",
-      "Regex Playground Online — Test Regular Expressions Instantly | TryJS",
+      "About TryJS React Playground",
+      "React Playground Online — Write & Run React JSX Instantly | TryJS",
       [
-        "Free online regex tester and playground. Write regular expressions, see matches highlighted in real-time, explore capture groups, and browse a library of common regex patterns — all in your browser.",
-        "<h2>Real-Time Match Highlighting</h2>",
-        "Write a pattern, paste your test string, and see matches highlighted instantly. Toggle flags (g, i, m, s, u, d) and inspect capture groups and match indices.",
-        "<h2>Explain Mode</h2>",
-        "Break down any regex into human-readable steps. Understand how your pattern works without guessing. Perfect for learning and debugging complex regular expressions.",
-        "<h2>Common Patterns Library</h2>",
-        "Browse curated regex patterns for email validation, URL matching, phone numbers, IP addresses, password strength, date formats, HTML tags, credit cards, UUIDs, and more.",
+        "Free online React playground. Write React components with JSX, use hooks, import npm packages, and see live preview — all in your browser. No setup required.",
+        "<h2>React JSX & Hooks</h2>",
+        "Write React components with JSX, useState, useEffect, useRef, and more. Powered by React 19.",
+        "<h2>NPM Packages</h2>",
+        "Import npm packages via esm.sh. Try popular libraries instantly.",
+        "<h2>Instant Preview</h2>",
+        "See live component preview with instant updates as you type.",
+        "<h2>Prefer plain HTML, CSS & JS?</h2>",
+        "Use the <a href=\"https://tryjs.app/web\">TryJS Web Playground</a> for a tabbed HTML / CSS / JavaScript editor with live preview.",
         "<h2>Free & Open Source</h2>",
-        "TryJS is completely free under the MIT license. No signup, no ads, no server-side code execution.",
+        "TryJS is completely free under the MIT license. No signup, no ads.",
       ]
     ),
   },
@@ -106,20 +112,18 @@ const MAIN_PAGES = [
   {
     route: "/features",
     title:
-      "TryJS Features — NPM Imports, Snippets, Web & React Playground, Regex, Sharing & Export",
+      "TryJS Features — Playgrounds, NPM Imports, Snippets & Export",
     description:
-      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
+      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
     body: makeSeoSection(
       "About TryJS Features",
       "TryJS Features — Online JavaScript & TypeScript Playground",
       [
-        "Explore TryJS features: import npm packages, browse runnable code snippets, build with HTML/CSS/JS or React in Web Playground, test regex patterns, share runnable links, and export code as images.",
+        "Explore TryJS features: import npm packages, browse runnable code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
         "<h2>Start from Runnable Patterns</h2>",
         "Browse snippet cards for async flows, JS fundamentals, and TypeScript essentials. One click loads complete examples into the editor so you can experiment immediately.",
         "<h2>Web & React Playground</h2>",
         "Build vanilla HTML pages or React components with JSX, hooks, and npm imports — all with live preview in the browser. Toggle between modes with a single click.",
-        "<h2>Regex Tester</h2>",
-        "Write regular expressions, paste test strings, and see matches highlighted in real-time with capture group inspection and human-readable Explain mode.",
         "<h2>Share & Export</h2>",
         "Generate shareable URLs that preserve editor state, embed the playground as an iframe in blog posts, or export code as styled PNG images with gradient backgrounds.",
         "<h2>Free & Open Source</h2>",
@@ -160,39 +164,16 @@ function extractSnippetMeta() {
   return pages;
 }
 
-function extractRegexMeta() {
-  const src = readFileSync(join(ROOT, "src/data/regexPatterns.ts"), "utf-8");
-  const pages = [];
-  const slugRe = /slug:\s*"([^"]+)"/g;
-  const titleRe = /seoTitle:\s*"([^"]+)"/g;
-  const descRe = /seoDescription:\s*(?:"([^"]+)"|`([^`]+)`)/g;
-
-  const slugs = [...src.matchAll(slugRe)].map((m) => m[1]);
-  const titles = [...src.matchAll(titleRe)].map((m) => m[1]);
-  const descs = [...src.matchAll(descRe)].map((m) => m[1] || m[2]);
-
-  for (let i = 0; i < slugs.length; i++) {
-    pages.push({
-      route: `/regex/${slugs[i]}`,
-      title: `${titles[i]} | TryJS`,
-      description: descs[i],
-      body: makeSeoSection(
-        `About ${titles[i]}`,
-        `${titles[i]} | TryJS`,
-        [
-          descs[i],
-          "Test this pattern in the <a href=\"https://tryjs.app/regex\">TryJS Regex Playground</a> — write your own test string, toggle flags, and inspect matches in real time.",
-        ]
-      ),
-    });
-  }
-  return pages;
-}
-
 // ── Stamp meta tags into HTML <head> ─────────────────────────────────────
 
-function stampMeta(html, { route, title, description }) {
+function stampMeta(html, { route, title, description, ogImage, ogImageAlt }) {
   const url = `${BASE_URL}${route}`;
+  const imageUrl = ogImage
+    ? ogImage.startsWith("http")
+      ? ogImage
+      : `${BASE_URL}${ogImage}`
+    : DEFAULT_OG_IMAGE;
+  const imageAlt = ogImageAlt || title;
 
   return html
     .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
@@ -217,12 +198,28 @@ function stampMeta(html, { route, title, description }) {
       `$1${description}$2`
     )
     .replace(
+      /(<meta\s+property="og:image"\s+content=")[^"]*(")/,
+      `$1${imageUrl}$2`
+    )
+    .replace(
+      /(<meta\s+property="og:image:alt"\s+content=")[^"]*(")/,
+      `$1${imageAlt}$2`
+    )
+    .replace(
       /(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,
       `$1${title}$2`
     )
     .replace(
       /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/,
       `$1${description}$2`
+    )
+    .replace(
+      /(<meta\s+name="twitter:image"\s+content=")[^"]*(")/,
+      `$1${imageUrl}$2`
+    )
+    .replace(
+      /(<meta\s+name="twitter:image:alt"\s+content=")[^"]*(")/,
+      `$1${imageAlt}$2`
     );
 }
 
@@ -242,7 +239,6 @@ const baseHtml = readFileSync(join(DIST, "index.html"), "utf-8");
 const allPages = [
   ...MAIN_PAGES,
   ...extractSnippetMeta(),
-  ...extractRegexMeta(),
 ];
 
 let count = 0;
@@ -256,3 +252,19 @@ for (const page of allPages) {
 }
 
 console.log(`✓ Prerendered meta + body SEO content for ${count} routes`);
+
+// ── Refresh sitemap lastmod dates to build time ──────────────────────────
+
+const today = new Date().toISOString().slice(0, 10);
+const sitemapPath = join(DIST, "sitemap.xml");
+try {
+  const sitemapSrc = readFileSync(sitemapPath, "utf-8");
+  const refreshed = sitemapSrc.replace(
+    /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g,
+    `<lastmod>${today}</lastmod>`
+  );
+  writeFileSync(sitemapPath, refreshed);
+  console.log(`✓ Sitemap lastmod dates refreshed to ${today}`);
+} catch (err) {
+  console.warn(`⚠ Could not refresh sitemap: ${err.message}`);
+}

@@ -253,7 +253,7 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
-            <a href="/regex">Regex</a>
+            <a href="/react">React</a>
             <span class="snippets-footer__dot" aria-hidden>
               ·
             </span>
