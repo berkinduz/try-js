@@ -1,60 +1,10 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import type { JSX } from "preact";
 import "./Toolbar.css";
 
-const GITHUB_URL = "https://github.com/berkinduz/js-park";
+const GITHUB_URL = "https://github.com/berkinduz/try-js";
 const BMC_URL = "https://buymeacoffee.com/berkinduz";
 
-interface Playground {
-  path: string;
-  label: string;
-  title: string;
-  icon: JSX.Element;
-}
-
-const ALL_PLAYGROUNDS: Playground[] = [
-  {
-    path: "/",
-    label: "JS/TS",
-    title: "JavaScript & TypeScript Playground",
-    icon: (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 3H4a1 1 0 00-1 1v16a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1z" />
-        <path d="M9 17V10l-2 3" />
-        <path d="M15 10c-1.5 0-2 .5-2 1.5s.5 1.5 2 2 2 .5 2 1.5-.5 1.5-2 1.5" />
-      </svg>
-    ),
-  },
-  {
-    path: "/web",
-    label: "Web",
-    title: "Web & React Playground",
-    icon: (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="2" y1="12" x2="22" y2="12" />
-        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-      </svg>
-    ),
-  },
-  {
-    path: "/regex",
-    label: "Regex",
-    title: "Regex Playground",
-    icon: (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="16 18 22 12 16 6" />
-        <polyline points="8 6 2 12 8 18" />
-      </svg>
-    ),
-  },
-];
-
-interface ToolbarLinksProps {
-  currentPath: string;
-}
-
-export function ToolbarLinks({ currentPath }: ToolbarLinksProps) {
+export function ToolbarLinks(_: { currentPath?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -69,34 +19,8 @@ export function ToolbarLinks({ currentPath }: ToolbarLinksProps) {
     return () => document.removeEventListener("click", handleClick);
   }, [menuOpen]);
 
-  const otherPlaygrounds = ALL_PLAYGROUNDS.filter(
-    (pg) => pg.path !== currentPath
-  );
-
   return (
     <div class="toolbar__right toolbar__right--links">
-      {otherPlaygrounds.length > 0 && (
-        <>
-          <nav class="toolbar__playgrounds" aria-label="Other Playgrounds">
-            <span class="toolbar__playgrounds-label">Other Playgrounds</span>
-            <div class="toolbar__playgrounds-links">
-              {otherPlaygrounds.map((pg) => (
-                <a
-                  key={pg.path}
-                  href={pg.path}
-                  class="toolbar__pg-link"
-                  title={pg.title}
-                >
-                  {pg.icon}
-                  {pg.label}
-                </a>
-              ))}
-            </div>
-          </nav>
-          <div class="toolbar__separator" />
-        </>
-      )}
-
       <div class="toolbar__menu-wrapper" ref={menuRef}>
         <button
           type="button"

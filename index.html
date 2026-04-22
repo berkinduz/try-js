@@ -13,10 +13,12 @@
     />
     <meta
       name="keywords"
-      content="javascript playground, js playground, typescript playground, online javascript editor, run javascript online, run js online, js playground online, javascript sandbox, typescript online, npm import playground, html css js playground, web playground, code snippet gallery, code image export, js sandbox, javascript code runner, online code editor javascript, test javascript online, javascript compiler online, regex tester online, regular expression playground, regex email validation, regex pattern tester, react playground, react playground online, react jsx playground, react sandbox, react online editor, react hooks playground, react component playground"
+      content="javascript playground, js playground, typescript playground, online javascript editor, run javascript online, run js online, js playground online, javascript sandbox, typescript online, npm import playground, html css js playground, web playground, code snippet gallery, code image export, js sandbox, javascript code runner, online code editor javascript, test javascript online, javascript compiler online, react playground, react playground online, react jsx playground, react sandbox, react online editor, react hooks playground, react component playground"
     />
     <meta name="author" content="TryJS" />
     <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <!-- Use your production domain; canonical must match the URL users see -->
     <link rel="canonical" href="https://tryjs.app/" />
 
@@ -95,15 +97,18 @@
           "url": "https://github.com/berkinduz"
         },
         "featureList": [
-          "JavaScript and TypeScript toggle",
-          "In-browser TypeScript transpilation",
-          "NPM imports via esm.sh",
-          "Snippet gallery",
+          "JavaScript and TypeScript toggle with one click",
+          "In-browser TypeScript transpilation via Sucrase",
+          "NPM package imports via esm.sh — no node_modules",
+          "Curated runnable snippet gallery (JS, async, TypeScript)",
           "HTML, CSS and JS web playground with live preview",
-          "React JSX playground with live component preview",
-          "Shareable URL and embeddable iframe",
-          "Code to image export with gradient backgrounds",
-          "Sandboxed execution with timeout"
+          "React 19 JSX playground with hooks and live component preview",
+          "Shareable URLs that preserve editor state",
+          "Embeddable iframe for docs and blog posts",
+          "Code to image export with themes and gradient backgrounds",
+          "Sandboxed execution with 5-second timeout",
+          "Six syntax themes, three monospace fonts",
+          "Runs entirely client-side — no code sent to any server"
         ],
         "sameAs": ["https://github.com/berkinduz/try-js"]
       }
@@ -268,11 +273,12 @@
       <h2>Web &amp; React Playground</h2>
       <p>
         Open the <a href="/web">Web Playground</a> to write HTML, CSS, and
-        JavaScript in a tabbed editor with live preview. Switch to React mode
-        to build <strong>React components</strong> with JSX, use hooks like
-        useState and useEffect, and import npm packages — all with instant
-        live preview. Build and prototype web pages and React UIs directly in
-        the browser without any extra setup.
+        JavaScript in a tabbed editor with live preview. Or jump straight into
+        the <a href="/react">React Playground</a> to build
+        <strong>React components</strong> with JSX, use hooks like useState
+        and useEffect, and import npm packages — all with instant live
+        preview. Build and prototype web pages and React UIs directly in the
+        browser without any extra setup.
       </p>
 
       <h2>Snippets, Sharing & Export</h2>
@@ -285,18 +291,6 @@
         <a href="/features">export your code as a styled PNG image</a>
         with syntax-highlighted themes, window frames, adjustable padding, and
         gradient backgrounds — perfect for social media and presentations.
-      </p>
-
-      <h2>Regex Playground</h2>
-      <p>
-        Test <strong>regular expressions</strong> in real-time with the
-        <a href="/regex">Regex Playground</a>. Write a pattern, paste your test
-        string, and see matches highlighted instantly. Toggle flags (g, i, m, s,
-        u, d), inspect capture groups and match indices, and use "Explain" mode
-        to break down any regex into human-readable steps. Browse a curated
-        library of
-        <a href="/regex/email-validation">common regex patterns</a> including
-        email validation, URL matching, phone numbers, IP addresses, and more.
       </p>
 
       <h2>Customization & Themes</h2>

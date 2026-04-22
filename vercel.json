@@ -7,6 +7,16 @@
       "has": [{ "type": "host", "value": "www.tryjs.app" }],
       "destination": "https://tryjs.app/:path",
       "permanent": true
+    },
+    {
+      "source": "/regex",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/regex/:slug*",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "rewrites": [
