@@ -6,7 +6,7 @@ import { ReactPreview, reactConsoleOutput } from "../ReactPreview/ReactPreview";
 import { SplitPane } from "../SplitPane/SplitPane";
 import { StatusBar } from "../StatusBar/StatusBar";
 import { ToastContainer } from "../Toast/Toast";
-import { ToolbarLinks } from "../Toolbar/ToolbarLinks";
+import { Toolbar } from "../Toolbar/Toolbar";
 import { mode, webHtml, webCss, webJs, reactCode, reactCss } from "../../state/editor";
 import { clearConsole } from "../../state/console";
 import { useKeyboard } from "../../hooks/useKeyboard";
@@ -18,8 +18,10 @@ import "./WebPlaygroundPage.css";
 type WebSubMode = "vanilla" | "react";
 
 export function WebPlaygroundPage() {
-  const stored = localStorage.getItem("jspark:webSubMode");
-  const initial: WebSubMode = stored === "react" ? "react" : "vanilla";
+  // Determine subMode from URL path for SEO
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  const initial: WebSubMode = path === "/react" ? "react" : "vanilla";
+
   const [subMode, setSubMode] = useState<WebSubMode>(initial);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < MOBILE_BREAKPOINT
@@ -37,12 +39,26 @@ export function WebPlaygroundPage() {
     mode.value = subMode === "react" ? "react" : "web";
   }, [subMode]);
 
-  // Persist subMode choice
+  // Switch subMode and update URL for SEO
   const switchSubMode = (m: WebSubMode) => {
+    if (m === subMode) return;
+    trackEvent("web_submode_switch", { from: subMode, to: m });
     setSubMode(m);
     setMobileTab("editor");
     localStorage.setItem("jspark:webSubMode", m);
+    const newPath = m === "react" ? "/react" : "/web";
+    window.history.pushState(null, "", newPath);
   };
+
+  // React to browser back/forward so subMode stays in sync with URL
+  useEffect(() => {
+    const onPop = () => {
+      const p = window.location.pathname.replace(/\/+$/, "") || "/";
+      setSubMode(p === "/react" ? "react" : "vanilla");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // SEO meta tags + analytics
   useEffect(() => {
@@ -55,7 +71,8 @@ export function WebPlaygroundPage() {
       description: isReact
         ? "Free online React playground. Write React components with JSX, see live preview instantly, import npm packages, and use hooks — all in your browser. No setup required."
         : "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required.",
-      canonical: "https://tryjs.app/web",
+      canonical: isReact ? "https://tryjs.app/react" : "https://tryjs.app/web",
+      ogImage: "https://tryjs.app/tryjs_web.png",
       jsonLd: [
         {
           "@context": "https://schema.org",
@@ -66,7 +83,7 @@ export function WebPlaygroundPage() {
           description: isReact
             ? "Free online React playground with JSX, hooks, npm imports, and live preview."
             : "Free online web playground with HTML, CSS, and JavaScript tabbed editor and live preview.",
-          url: "https://tryjs.app/web",
+          url: isReact ? "https://tryjs.app/react" : "https://tryjs.app/web",
           applicationCategory: "DeveloperApplication",
           operatingSystem: "Any",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -150,52 +167,25 @@ export function WebPlaygroundPage() {
       class="app"
       style={{ display: "flex", flexDirection: "column", height: "100%" }}
     >
-      {/* Custom toolbar */}
-      <div class="toolbar">
-        <div class="toolbar__left">
-          <div class="toolbar__brand">
-            <a
-              href="/"
-              class="toolbar__back-btn"
-              title="Back to JS/TS playground"
-              aria-label="Back to JS/TS playground"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-            </a>
-            <div class="web-page-toggle">
-              <button
-                type="button"
-                class={`web-page-toggle__btn web-page-toggle__btn--vanilla ${subMode === "vanilla" ? "active" : ""}`}
-                onClick={() => switchSubMode("vanilla")}
-              >
-                <span class="web-page-toggle__short">HTML</span>
-                <span class="web-page-toggle__full">Vanilla</span>
-              </button>
-              <button
-                type="button"
-                class={`web-page-toggle__btn web-page-toggle__btn--react ${subMode === "react" ? "active" : ""}`}
-                onClick={() => switchSubMode("react")}
-              >
-                <span class="web-page-toggle__short">JSX</span>
-                <span class="web-page-toggle__full">React</span>
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Shared toolbar with JS/TS/Web buttons */}
+      <Toolbar />
 
-        <ToolbarLinks currentPath="/web" />
+      {/* Vanilla/React sub-toggle (only show when Web is active) */}
+      <div class="web-sub-toggle">
+        <button
+          type="button"
+          class={`web-sub-toggle__btn ${subMode === "vanilla" ? "active" : ""}`}
+          onClick={() => switchSubMode("vanilla")}
+        >
+          Vanilla
+        </button>
+        <button
+          type="button"
+          class={`web-sub-toggle__btn ${subMode === "react" ? "active" : ""}`}
+          onClick={() => switchSubMode("react")}
+        >
+          React
+        </button>
       </div>
 
       {/* Editor + Preview */}

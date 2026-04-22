@@ -19,9 +19,17 @@ import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
-import { RegexPage } from "./components/Regex/RegexPage";
-import { RegexDetailPage } from "./components/Regex/RegexDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
+
+// Sync global mode with URL on back/forward navigation so App re-renders
+if (typeof window !== "undefined") {
+  window.addEventListener("popstate", () => {
+    const p = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (p === "/react") mode.value = "react";
+    else if (p === "/web") mode.value = "web";
+    else mode.value = "js";
+  });
+}
 
 function EmbedOpenLink() {
   const hash = encodeToHash({ code: code.value, language: language.value });
@@ -54,17 +62,12 @@ export function App() {
     return <SnippetDetailPage slug={snippetMatch[1]} />;
   }
 
-  if (path === "/web") {
+  // Check mode from URL path
+  const currentMode = mode.value;
+
+  // Separate URLs for SEO
+  if (path === "/web" || path === "/react" || currentMode === "web" || currentMode === "react") {
     return <WebPlaygroundPage />;
-  }
-
-  if (path === "/regex") {
-    return <RegexPage />;
-  }
-
-  const regexMatch = path.match(/^\/regex\/(.+)$/);
-  if (regexMatch) {
-    return <RegexDetailPage slug={regexMatch[1]} />;
   }
 
   const isEmbed = embedMode.value;
