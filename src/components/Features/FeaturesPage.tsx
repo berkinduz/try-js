@@ -15,30 +15,31 @@ type FeatureItem = {
 
 const FEATURES: FeatureItem[] = [
   {
-    id: "snippets",
-    tab: "Snippets",
-    title: "Start from runnable patterns, not blank files",
+    id: "javascript-typescript",
+    tab: "JS / TS",
+    title: "Run JavaScript and TypeScript instantly",
     summary:
-      "Snippet cards load complete examples for async flows, JS fundamentals, and TypeScript essentials.",
+      "Write code, switch between JavaScript and TypeScript, and see console output directly in your browser.",
     points: [
-      "One click to load and run",
-      "Good defaults for teaching and demos",
-      "Quick path from idea to variation",
+      "No signup, install, or backend round-trip",
+      "TypeScript transpiles in-browser with Sucrase",
+      "Live console for logs, warnings, errors, tables, and timings",
+      "Sandboxed execution with a timeout for runaway code",
     ],
     image: "/tryJS_JS_gif.gif",
-    imageAlt: "TryJS JavaScript playground demo",
+    imageAlt: "TryJS JavaScript and TypeScript playground demo",
   },
   {
     id: "web-playground",
-    tab: "Web & React",
-    title: "Build vanilla HTML or React components in one place",
+    tab: "Web",
+    title: "Build HTML, CSS, and JavaScript with live preview",
     summary:
-      "The Web Playground gives you a tabbed HTML/CSS/JS editor with live preview. Switch to React mode for JSX with hooks, npm imports, and instant component rendering — all in the same workspace.",
+      "The Web Playground gives you a tabbed HTML/CSS/JS editor with instant browser preview and console feedback.",
     points: [
-      "Vanilla mode: HTML, CSS, and JS tabs with live preview",
-      "React mode: JSX editor with useState, useEffect, and npm imports",
-      "Toggle between Vanilla and React with one click",
-      "Built-in console captures logs, warnings, and errors",
+      "Separate HTML, CSS, and JS tabs",
+      "Live preview updates as you type",
+      "No local server or bundler required",
+      "Good for prototypes, demos, and quick UI experiments",
     ],
     image: "/tryjs_html_gif.gif",
     imageAlt: "TryJS Web Playground with HTML/CSS/JS live preview",
@@ -57,6 +58,20 @@ const FEATURES: FeatureItem[] = [
     ],
     image: "/tryjs_react_gif.gif",
     imageAlt: "TryJS React playground demo",
+  },
+  {
+    id: "npm-imports",
+    tab: "NPM Imports",
+    title: "Run package-based examples without setup churn",
+    summary:
+      "Bare specifiers are rewritten to esm.sh and executed inside the sandbox, so experiments stay fast.",
+    points: [
+      "Use imports directly in editor code",
+      "No local install, no node_modules",
+      "Good for trying APIs before committing",
+    ],
+    image: "/tryjs_import.png",
+    imageAlt: "TryJS NPM imports code example",
   },
   {
     id: "themes",
@@ -102,18 +117,18 @@ const FEATURES: FeatureItem[] = [
     imageAlt: "TryJS export code to image demo",
   },
   {
-    id: "npm-imports",
-    tab: "NPM Imports",
-    title: "Run package-based examples without setup churn",
+    id: "examples",
+    tab: "Examples",
+    title: "Start from runnable examples when useful",
     summary:
-      "Bare specifiers are rewritten to esm.sh and executed inside the sandbox, so experiments stay fast.",
+      "The examples library is a supporting entry point for loading working JavaScript, async, and TypeScript patterns into the playground.",
     points: [
-      "Use imports directly in editor code",
-      "No local install, no bundler config",
-      "Good for trying APIs before committing",
+      "One click to load and run",
+      "Good defaults for learning and demos",
+      "Quick path from working code to your own variation",
     ],
-    image: "/tryjs_import.png",
-    imageAlt: "TryJS NPM imports code example",
+    image: "/tryJS_JS_gif.gif",
+    imageAlt: "TryJS runnable examples loading into the playground",
   },
 ];
 
@@ -148,9 +163,9 @@ export function FeaturesPage() {
   useEffect(() => {
     trackEvent("features_view");
     return applySeo({
-      title: "TryJS Features — Playgrounds, NPM Imports, Snippets & Export",
+      title: "TryJS Features — JS, TypeScript, Web & React Playground",
       description:
-        "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
+        "Explore TryJS features: run JavaScript and TypeScript online, build HTML/CSS/JS and React previews, import npm packages, share links, and export code images.",
       canonical: "https://tryjs.app/features",
       jsonLd: [
         {
@@ -182,7 +197,7 @@ export function FeaturesPage() {
             <p>
               TryJS is a fast JavaScript and TypeScript playground for testing
               ideas, importing npm packages, building with HTML/CSS/JS or
-              React, sharing runnable examples, and exporting code visuals.
+              React, sharing runnable links, and exporting code visuals.
             </p>
           </div>
           <div class="features-head__actions">
