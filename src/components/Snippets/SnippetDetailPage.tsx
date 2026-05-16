@@ -63,7 +63,7 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
           {
             "@type": "ListItem",
             position: 2,
-            name: "Code Snippets",
+            name: "Runnable Examples",
             item: "https://tryjs.app/snippets",
           },
           {

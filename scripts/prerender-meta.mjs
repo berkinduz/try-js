@@ -215,44 +215,46 @@ const MAIN_PAGES = [
   {
     route: "/snippets",
     title:
-      "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS",
+      "Runnable JavaScript Examples for the TryJS Playground",
     description:
-      "Browse runnable JavaScript and TypeScript code snippets. Closures, async/await, promises, destructuring, generics, type guards, and more — all editable in TryJS playground.",
+      "Start from runnable JavaScript and TypeScript examples, then edit and run them in the TryJS playground. Covers JS fundamentals, async patterns, and TypeScript essentials.",
     body: makeSeoSection(
-      "About TryJS Code Snippets",
-      "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS",
+      "About TryJS Runnable Examples",
+      "Runnable JavaScript Examples for the TryJS Playground",
       [
-        "Browse runnable JavaScript and TypeScript code snippets. Closures, async/await, promises, destructuring, generics, type guards, and more — all editable in the TryJS playground.",
+        "Start from runnable JavaScript and TypeScript examples, then edit and run them in the TryJS playground. These examples are supporting material for the playground, not a separate snippet-sharing product.",
         "<h2>JS Fundamentals</h2>",
-        "Learn map, filter, reduce, destructuring, spread and rest operators, closures, hoisting, optional chaining, nullish coalescing, and memoization with runnable examples.",
+        "Load map, filter, reduce, destructuring, spread and rest operators, closures, hoisting, optional chaining, nullish coalescing, and memoization examples directly into the playground.",
         "<h2>Async Patterns</h2>",
-        "Master promises, async/await, Promise.all, Promise.race, Promise.allSettled, async iterators, and the JavaScript event loop with interactive code snippets.",
+        "Run promises, async/await, Promise.all, Promise.race, Promise.allSettled, async iterators, and JavaScript event loop examples without setting up a local project.",
         "<h2>TypeScript Essentials</h2>",
-        "Explore generics, type guards, utility types, and discriminated unions in runnable TypeScript examples that compile in the browser instantly.",
-        "<h2>Free & Open Source</h2>",
-        "TryJS is completely free under the MIT license. No signup, no ads, no server-side code execution.",
+        "Explore generics, type guards, utility types, and discriminated unions in runnable TypeScript examples that compile in the browser.",
+        "<h2>Open in the Playground</h2>",
+        "Every example is editable in TryJS, with the same live console, TypeScript support, npm imports, and shareable URLs as the main playground.",
       ]
     ),
   },
   {
     route: "/features",
     title:
-      "TryJS Features — Playgrounds, NPM Imports, Snippets & Export",
+      "TryJS Features — JS, TypeScript, Web & React Playground",
     description:
-      "Explore TryJS features: import npm packages, browse code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
+      "Explore TryJS features: run JavaScript and TypeScript online, build HTML/CSS/JS and React previews, import npm packages, share links, and export code images.",
     body: makeSeoSection(
       "About TryJS Features",
       "TryJS Features — Online JavaScript & TypeScript Playground",
       [
-        "Explore TryJS features: import npm packages, browse runnable code snippets, build with HTML/CSS/JS or React in Web Playground, share runnable links, and export code as images.",
-        "<h2>Start from Runnable Patterns</h2>",
-        "Browse snippet cards for async flows, JS fundamentals, and TypeScript essentials. One click loads complete examples into the editor so you can experiment immediately.",
+        "Explore TryJS features: run JavaScript and TypeScript online, import npm packages, build with HTML/CSS/JS or React, share runnable links, and export code as images.",
+        "<h2>JavaScript & TypeScript Playground</h2>",
+        "Write JavaScript or TypeScript and run it instantly in the browser with live console output, in-browser TypeScript transpilation, and sandboxed execution.",
         "<h2>Web & React Playground</h2>",
         "Build vanilla HTML pages or React components with JSX, hooks, and npm imports — all with live preview in the browser. Toggle between modes with a single click.",
+        "<h2>NPM Imports</h2>",
+        "Import packages through esm.sh without installing node_modules or configuring a bundler.",
         "<h2>Share & Export</h2>",
         "Generate shareable URLs that preserve editor state, embed the playground as an iframe in blog posts, or export code as styled PNG images with gradient backgrounds.",
-        "<h2>Free & Open Source</h2>",
-        "TryJS is completely free under the MIT license. No signup, no ads, no server-side code execution.",
+        "<h2>Runnable Examples</h2>",
+        "Use the examples library as a starting point when you want working JavaScript, async, or TypeScript patterns loaded into the playground.",
       ]
     ),
   },
@@ -315,7 +317,7 @@ async function extractSnippetMeta() {
               {
                 "@type": "ListItem",
                 position: 2,
-                name: "Code Snippets",
+                name: "Runnable Examples",
                 item: `${BASE_URL}/snippets`,
               },
               {

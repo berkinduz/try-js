@@ -9,17 +9,17 @@ export function SnippetsPage() {
     trackEvent("snippets_index_view");
     const allSnippets = getAllSnippets();
     return applySeo({
-      title: "JavaScript & TypeScript Code Snippets — Runnable Examples | TryJS",
+      title: "Runnable JavaScript Examples for the TryJS Playground",
       description:
-        "Browse runnable JavaScript and TypeScript code snippets. Closures, async/await, promises, destructuring, generics, type guards, and more — all editable in TryJS playground.",
+        "Start from runnable JavaScript and TypeScript examples, then edit and run them in the TryJS playground. Covers JS fundamentals, async patterns, and TypeScript essentials.",
       canonical: "https://tryjs.app/snippets",
       jsonLd: [
         {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "JavaScript & TypeScript Code Snippets",
+          name: "Runnable JavaScript Examples for the TryJS Playground",
           description:
-            "A curated collection of runnable JavaScript and TypeScript code snippets covering closures, async/await, promises, generics, type guards, and more.",
+            "A curated collection of runnable JavaScript and TypeScript examples that open in the TryJS playground.",
           url: "https://tryjs.app/snippets",
           mainEntity: {
             "@type": "ItemList",
@@ -42,11 +42,10 @@ export function SnippetsPage() {
       <div class="snippets-shell">
         <header class="snippets-head">
           <p class="snippets-eyebrow">tryjs.app</p>
-          <h1>JavaScript & TypeScript Snippets</h1>
+          <h1>Runnable JavaScript Examples</h1>
           <p>
-            Runnable code examples covering JS fundamentals, async patterns, and
-            TypeScript essentials. Click any snippet to see the code, then open
-            it in the playground to edit and run.
+            Start from working JavaScript, async, and TypeScript examples, then
+            open them in the TryJS playground to edit, run, share, or extend.
           </p>
           <nav class="snippets-nav">
             <a class="snippets-btn snippets-btn--primary" href="/">
