@@ -16,6 +16,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -36,6 +37,104 @@ function makeSeoSection(ariaLabel, h1, paragraphs) {
       <h1>${h1}</h1>
       ${body}
     </section>`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function makeSnippetSeoSection(snippet) {
+  const parts = [
+    `<p>${escapeHtml(snippet.seoDescription)}</p>`,
+  ];
+
+  if (snippet.longDescription) {
+    parts.push("<h2>Overview</h2>");
+    parts.push(`<p>${escapeHtml(snippet.longDescription)}</p>`);
+  }
+
+  if (snippet.howItWorks?.length) {
+    parts.push("<h2>How It Works</h2>");
+    for (const section of snippet.howItWorks) {
+      parts.push(`<h3>${escapeHtml(section.heading)}</h3>`);
+      parts.push(`<p>${escapeHtml(section.body)}</p>`);
+    }
+  }
+
+  if (snippet.commonMistakes?.length) {
+    parts.push("<h2>Common Mistakes</h2>");
+    parts.push(
+      `<ul>${snippet.commonMistakes
+        .map((mistake) => `<li>${escapeHtml(mistake)}</li>`)
+        .join("")}</ul>`
+    );
+  }
+
+  if (snippet.whenToUse) {
+    parts.push("<h2>When to Use It</h2>");
+    parts.push(`<p>${escapeHtml(snippet.whenToUse)}</p>`);
+  }
+
+  parts.push("<h2>Runnable Example</h2>");
+  parts.push(`<pre><code>${escapeHtml(snippet.code)}</code></pre>`);
+  parts.push(
+    `<p>Open this example in the <a href="https://tryjs.app/">TryJS playground</a> to edit and run the code instantly in your browser — no signup needed.</p>`
+  );
+
+  if (snippet.faq?.length) {
+    parts.push("<h2>Frequently Asked Questions</h2>");
+    for (const item of snippet.faq) {
+      parts.push(`<h3>${escapeHtml(item.question)}</h3>`);
+      parts.push(`<p>${escapeHtml(item.answer)}</p>`);
+    }
+  }
+
+  return `<section class="seo-content" id="about" aria-label="About ${escapeHtml(snippet.seoTitle)}">
+      <h1>${escapeHtml(snippet.seoTitle)} | TryJS</h1>
+      ${parts.join("\n      ")}
+    </section>`;
+}
+
+function schemaScript(data) {
+  return `<script type="application/ld+json">
+      ${JSON.stringify(data, null, 8)}
+    </script>`;
+}
+
+function buildStaticJsonLd(page) {
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "TryJS",
+      alternateName: "TryJS JavaScript Playground",
+      url: `${BASE_URL}/`,
+    },
+  ];
+
+  if (page.schema) {
+    schemas.push(...page.schema);
+  } else {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: page.title,
+      description: page.description,
+      url: `${BASE_URL}${page.route}`,
+      isPartOf: {
+        "@type": "WebSite",
+        name: "TryJS",
+        url: `${BASE_URL}/`,
+      },
+    });
+  }
+
+  return `<!-- Structured data: route-specific -->
+    ${schemas.map(schemaScript).join("\n\n    ")}`;
 }
 
 const MAIN_PAGES = [
@@ -61,6 +160,19 @@ const MAIN_PAGES = [
         "TryJS is completely free under the MIT license. No signup, no ads.",
       ]
     ),
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "TryJS Web Playground",
+        description:
+          "Free online web playground for writing HTML, CSS, and JavaScript with live preview.",
+        url: "https://tryjs.app/web",
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+    ],
   },
   {
     route: "/react",
@@ -86,6 +198,19 @@ const MAIN_PAGES = [
         "TryJS is completely free under the MIT license. No signup, no ads.",
       ]
     ),
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "TryJS React Playground",
+        description:
+          "Free online React playground for writing JSX components with hooks, npm imports, and live preview.",
+        url: "https://tryjs.app/react",
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+    ],
   },
   {
     route: "/snippets",
@@ -135,33 +260,92 @@ const MAIN_PAGES = [
 
 // ── Extract detail pages from source data files ──────────────────────────
 
-function extractSnippetMeta() {
+async function extractSnippetMeta() {
   const src = readFileSync(join(ROOT, "src/data/snippets.ts"), "utf-8");
-  const pages = [];
-  const slugRe = /slug:\s*"([^"]+)"/g;
-  const titleRe = /seoTitle:\s*"([^"]+)"/g;
-  const descRe = /seoDescription:\s*"([^"]+)"/g;
+  const transpiled = ts.transpileModule(src, {
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2022,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+    },
+  }).outputText;
+  const dataUrl = `data:text/javascript;base64,${Buffer.from(transpiled).toString("base64")}`;
+  const { SNIPPET_CATEGORIES } = await import(dataUrl);
 
-  const slugs = [...src.matchAll(slugRe)].map((m) => m[1]);
-  const titles = [...src.matchAll(titleRe)].map((m) => m[1]);
-  const descs = [...src.matchAll(descRe)].map((m) => m[1]);
-
-  for (let i = 0; i < slugs.length; i++) {
-    pages.push({
-      route: `/snippets/${slugs[i]}`,
-      title: `${titles[i]} | TryJS`,
-      description: descs[i],
-      body: makeSeoSection(
-        `About ${titles[i]}`,
-        `${titles[i]} | TryJS`,
-        [
-          descs[i],
-          "Open this example in the <a href=\"https://tryjs.app/\">TryJS playground</a> to edit and run the code instantly in your browser — no signup needed.",
-        ]
-      ),
-    });
-  }
-  return pages;
+  return SNIPPET_CATEGORIES.flatMap((category) =>
+    category.snippets.map((snippet) => {
+      const url = `${BASE_URL}/snippets/${snippet.slug}`;
+      return {
+        route: `/snippets/${snippet.slug}`,
+        title: `${snippet.seoTitle} | TryJS`,
+        description: snippet.seoDescription,
+        body: makeSnippetSeoSection(snippet),
+        schema: [
+          {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            headline: snippet.seoTitle,
+            description: snippet.seoDescription,
+            url,
+            mainEntityOfPage: url,
+            inLanguage: "en",
+            keywords: snippet.keywords?.join(", "),
+            author: {
+              "@type": "Person",
+              name: "berkinduz",
+              url: "https://github.com/berkinduz",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "TryJS",
+              url: BASE_URL,
+            },
+            proficiencyLevel: "Beginner",
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "TryJS",
+                item: `${BASE_URL}/`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Code Snippets",
+                item: `${BASE_URL}/snippets`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: snippet.title,
+                item: url,
+              },
+            ],
+          },
+          ...(snippet.faq?.length
+            ? [
+                {
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: snippet.faq.map((f) => ({
+                    "@type": "Question",
+                    name: f.question,
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: f.answer,
+                    },
+                  })),
+                },
+              ]
+            : []),
+        ],
+      };
+    })
+  );
 }
 
 // ── Stamp meta tags into HTML <head> ─────────────────────────────────────
@@ -232,18 +416,26 @@ function stampBody(html, bodyContent) {
   return html.replace(SEO_SECTION_RE, bodyContent);
 }
 
+function stampStaticJsonLd(html, page) {
+  return html.replace(
+    /<!-- Structured data: WebSite -->[\s\S]*?<!-- Umami analytics/,
+    `${buildStaticJsonLd(page)}\n\n    <!-- Umami analytics`
+  );
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────
 
 const baseHtml = readFileSync(join(DIST, "index.html"), "utf-8");
 
 const allPages = [
   ...MAIN_PAGES,
-  ...extractSnippetMeta(),
+  ...(await extractSnippetMeta()),
 ];
 
 let count = 0;
 for (const page of allPages) {
   let stamped = stampMeta(baseHtml, page);
+  stamped = stampStaticJsonLd(stamped, page);
   stamped = stampBody(stamped, page.body);
   const dir = join(DIST, page.route);
   mkdirSync(dir, { recursive: true });
