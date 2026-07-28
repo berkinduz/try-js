@@ -4,6 +4,10 @@ import { reactCode, reactCss } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
 import { transpileJsx } from "../../sandbox/transpiler";
 import { rewriteImports } from "../../sandbox/transpiler";
+import {
+  isSuccessfulRunEligible,
+  trackSuccessfulRun,
+} from "../../utils/analytics";
 import "./ReactPreview.css";
 
 interface ReactConsoleEntry {
@@ -23,6 +27,8 @@ let entryId = 0;
  */
 const CONSOLE_BOOTSTRAP = `
 (function() {
+  var generation = __TRYJS_GENERATION__;
+  var hadError = false;
   var methods = ["log", "warn", "error", "info"];
   methods.forEach(function(m) {
     var orig = console[m];
@@ -35,24 +41,41 @@ const CONSOLE_BOOTSTRAP = `
           args.push(String(arguments[i]));
         }
       }
-      parent.postMessage({ source: "tryjs-react", type: "console", method: m, args: args }, "*");
+      parent.postMessage({ source: "tryjs-react", generation: generation, type: "console", method: m, args: args }, "*");
       orig.apply(console, arguments);
     };
   });
   window.onerror = function(msg, src, line, col) {
-    parent.postMessage({ source: "tryjs-react", type: "console", method: "error", args: [String(msg)] }, "*");
+    hadError = true;
+    parent.postMessage({ source: "tryjs-react", generation: generation, type: "console", method: "error", args: [String(msg)] }, "*");
   };
   window.addEventListener("unhandledrejection", function(e) {
-    parent.postMessage({ source: "tryjs-react", type: "console", method: "error", args: ["Unhandled rejection: " + String(e.reason)] }, "*");
+    hadError = true;
+    parent.postMessage({ source: "tryjs-react", generation: generation, type: "console", method: "error", args: ["Unhandled rejection: " + String(e.reason)] }, "*");
   });
+  window.__tryjsReportReactSuccess = function() {
+    setTimeout(function() {
+      if (!hadError) {
+        parent.postMessage({ source: "tryjs-react", generation: generation, type: "preview-success" }, "*");
+      }
+    }, 0);
+  };
 })();
 `;
 
-function buildSrcdoc(userCode: string, userCss: string): string {
+function buildSrcdoc(
+  userCode: string,
+  userCss: string,
+  generation: number,
+): string {
+  const bootstrap = CONSOLE_BOOTSTRAP.replace(
+    /__TRYJS_GENERATION__/g,
+    String(generation),
+  );
   // Transpile JSX → JS
   const transpiled = transpileJsx(userCode);
   if (transpiled.error !== null) {
-    const safeBootstrap = CONSOLE_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
+    const safeBootstrap = bootstrap.replace(/<\/script/gi, "<\\/script");
     const errorMsg = transpiled.error.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n");
     return `<!DOCTYPE html>
 <html>
@@ -78,7 +101,7 @@ function buildSrcdoc(userCode: string, userCss: string): string {
   // Since we used transforms: ["imports"], all imports become require() calls.
   // We'll convert them back to dynamic imports in a wrapper.
 
-  const safeBootstrap = CONSOLE_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
+  const safeBootstrap = bootstrap.replace(/<\/script/gi, "<\\/script");
   const safeJs = jsCode.replace(/<\/script/gi, "<\\/script");
   const safeCss = userCss.replace(/<\/style/gi, "<\\/style");
 
@@ -130,6 +153,9 @@ try {
     const ReactDOM = __modules["react-dom/client"];
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(React.createElement(Component));
+    window.__tryjsReportReactSuccess();
+  } else {
+    throw new Error("Default export must be a React component.");
   }
 } catch(e) {
   console.error(e.message || String(e));
@@ -146,6 +172,8 @@ export function ReactPreview() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const consoleEndRef = useRef<HTMLDivElement>(null);
+  const generationRef = useRef(0);
+  const eligibleGenerationRef = useRef<number | null>(null);
 
   const code = reactCode.value;
   const css = reactCss.value;
@@ -156,7 +184,18 @@ export function ReactPreview() {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       const data = event.data;
-      if (!data || data.source !== "tryjs-react" || data.type !== "console") return;
+      if (!data || data.source !== "tryjs-react") return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
+      if (data.generation !== generationRef.current) return;
+      if (data.type === "preview-success") {
+        trackSuccessfulRun(
+          "react",
+          "auto",
+          eligibleGenerationRef.current === data.generation,
+        );
+        return;
+      }
+      if (data.type !== "console") return;
       reactConsoleOutput.value = [
         ...reactConsoleOutput.value,
         { id: ++entryId, method: data.method, args: data.args || [] },
@@ -177,8 +216,12 @@ export function ReactPreview() {
     debounceRef.current = setTimeout(() => {
       const iframe = iframeRef.current;
       if (!iframe) return;
+      const generation = ++generationRef.current;
+      eligibleGenerationRef.current = isSuccessfulRunEligible("auto")
+        ? generation
+        : null;
       reactConsoleOutput.value = [];
-      iframe.srcdoc = buildSrcdoc(code, css);
+      iframe.srcdoc = buildSrcdoc(code, css, generation);
     }, autoRunDelay.value);
 
     return () => clearTimeout(debounceRef.current);

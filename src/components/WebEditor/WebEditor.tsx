@@ -21,6 +21,7 @@ import {
   getWebCode,
 } from "../../state/editor";
 import type { WebTab } from "../../state/editor";
+import { trackFirstMeaningfulEdit } from "../../utils/analytics";
 import "./WebEditor.css";
 
 const TAB_LANGUAGE_MAP: Record<WebTab, EditorLanguage> = {
@@ -74,6 +75,8 @@ export function WebEditor() {
           theme.value,
           syntaxTheme.value,
           (newCode) => setWebCode(activeTabRef.current, newCode),
+          undefined,
+          (before, after) => trackFirstMeaningfulEdit("web", before, after),
         ),
       }),
       parent: containerRef.current,

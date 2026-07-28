@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "node --test tests/**/*.test.ts",
     "build": "tsc --noEmit && vite build && node scripts/prerender-meta.mjs",
     "preview": "vite preview"
   },
