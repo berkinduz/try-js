@@ -48,6 +48,7 @@ function EmbedOpenLink() {
 
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  const isEmbed = embedMode.value;
 
   if (path === "/features") {
     return <FeaturesPage />;
@@ -66,11 +67,16 @@ export function App() {
   const currentMode = mode.value;
 
   // Separate URLs for SEO
-  if (path === "/web" || path === "/react" || currentMode === "web" || currentMode === "react") {
+  if (
+    !isEmbed &&
+    (path === "/web" ||
+      path === "/react" ||
+      currentMode === "web" ||
+      currentMode === "react")
+  ) {
     return <WebPlaygroundPage />;
   }
 
-  const isEmbed = embedMode.value;
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
