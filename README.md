@@ -71,7 +71,7 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 ### Share & Export
 
 - **Share as URL** — copy a link that preserves full editor state via lz-string compression in the URL hash
-- **Embed code** — generate an iframe embed snippet for docs and blog posts (`?embed=1` hides UI chrome)
+- **Embed code** — generate a sandboxed iframe for docs and blog posts (the dedicated `/embed` route hides UI chrome)
 
 ### General
 

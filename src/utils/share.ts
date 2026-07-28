@@ -1,8 +1,10 @@
-import {
+import LZString from "lz-string";
+import type { Language } from "../state/editor";
+
+const {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
-} from "lz-string";
-import type { Language } from "../state/editor";
+} = LZString;
 
 const MAX_URL_LENGTH = 4000;
 
@@ -96,6 +98,6 @@ export async function shareToClipboard(state: SharedState): Promise<{
  */
 export function generateEmbedCode(state: SharedState): string {
   const hash = encodeToHash(state);
-  const url = `https://tryjs.app/?embed=1${hash}`;
-  return `<iframe src="${url}" width="100%" height="400" style="border:0;border-radius:8px;" loading="lazy"></iframe>`;
+  const url = `https://tryjs.app/embed${hash}`;
+  return `<iframe src="${url}" width="100%" height="400" style="border:0;border-radius:8px;" loading="lazy" title="TryJS code playground" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
 }

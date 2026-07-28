@@ -173,7 +173,7 @@
 
     <!-- Set embed attribute early to prevent layout flash -->
     <script>
-      if (new URLSearchParams(location.search).get("embed") === "1")
+      if ((location.pathname.replace(/\/+$/, "") || "/") === "/embed")
         document.documentElement.setAttribute("data-embed", "");
     </script>
 
