@@ -62,6 +62,20 @@ export function claimSessionEvent(storage: AnalyticsStorage, key: string): boole
   }
 }
 
+/** Claim one Pro-interest signal per source and intent in a tab session. */
+export function claimProInterest(
+  storage: AnalyticsStorage,
+  source: string,
+  intent: string,
+): boolean {
+  return claimSessionEvent(storage, `pro_interest:${source}:${intent}`);
+}
+
+/** Claim the teacher/author landing denominator once per tab session. */
+export function claimProLandingView(storage: AnalyticsStorage): boolean {
+  return claimSessionEvent(storage, "pro_landing_view:teachers_authors");
+}
+
 /** Check whether a tab-session event was already claimed. */
 export function hasSessionEvent(storage: AnalyticsStorage, key: string): boolean {
   const storageKey = `${ANALYTICS_STORAGE_KEYS.sessionEventPrefix}${key}`;
