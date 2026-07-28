@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
+import { trackSupportClick } from "../../utils/analytics";
 import "./Toolbar.css";
 
 const GITHUB_URL = "https://github.com/berkinduz/try-js";
@@ -71,6 +72,7 @@ export function ToolbarLinks(_: { currentPath?: string }) {
         class="toolbar__link toolbar__bmc"
         title="Buy Me a Coffee"
         aria-label="Buy Me a Coffee"
+        onClick={() => trackSupportClick("toolbar")}
       >
         <span class="toolbar__bmc-text">Buy Me a Coffee</span>
         <span class="toolbar__bmc-icon">

@@ -94,14 +94,14 @@ export function App() {
 
   const run = useCallback(() => {
     trackEvent("code_run", { language: language.value, trigger: "manual" });
-    executeCode(code.value, language.value);
+    executeCode(code.value, language.value, "manual");
   }, []);
 
   // Auto-run on code change
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      executeCode(code.value, language.value);
+      executeCode(code.value, language.value, "auto");
     }, autoRunDelay.value);
 
     return () => clearTimeout(debounceRef.current);

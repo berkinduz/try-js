@@ -10,6 +10,7 @@ import {
 } from "../Editor/extensions";
 import { theme, syntaxTheme, reactCode, reactCss, setReactCode, setReactCss } from "../../state/editor";
 import { DEFAULT_REACT_CODE, DEFAULT_REACT_CSS } from "../../utils/constants";
+import { trackFirstMeaningfulEdit } from "../../utils/analytics";
 import "./ReactEditor.css";
 
 type ReactTab = "jsx" | "css";
@@ -34,6 +35,8 @@ export function ReactEditor() {
           theme.value,
           syntaxTheme.value,
           (newCode) => setReactCode(newCode),
+          undefined,
+          (before, after) => trackFirstMeaningfulEdit("react", before, after),
         ),
       }),
       parent: jsxContainerRef.current,
@@ -66,6 +69,8 @@ export function ReactEditor() {
           theme.value,
           syntaxTheme.value,
           (newCode) => setReactCss(newCode),
+          undefined,
+          (before, after) => trackFirstMeaningfulEdit("react", before, after),
         ),
       }),
       parent: cssContainerRef.current,

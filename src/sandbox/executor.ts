@@ -12,6 +12,11 @@ import {
   isLoadingModules,
 } from "../state/console";
 import { EXECUTION_TIMEOUT, MODULE_EXECUTION_TIMEOUT } from "../utils/constants";
+import {
+  isSuccessfulRunEligible,
+  trackSuccessfulRun,
+  type RunTrigger,
+} from "../utils/analytics";
 
 /**
  * REPL-style last expression evaluation.
@@ -89,6 +94,12 @@ let currentIframe: HTMLIFrameElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
 let runningIndicatorId: ReturnType<typeof setTimeout> | null = null;
 let executionDone = false;
+let executionHadError = false;
+let activeRun: {
+  surface: Language;
+  trigger: RunTrigger;
+  eligibleAtStart: boolean;
+} | null = null;
 
 // Line number mapping: iframe reports line numbers in the generated HTML.
 let userCodeStartLine = 0;
@@ -100,22 +111,27 @@ let clearOnNextOutput = false;
 
 // Type-checking state: run id prevents stale results from a previous run.
 let typeCheckRunId = 0;
-let typeCheckPromise: Promise<import("./type-checker").TypeDiagnostic[]> | null = null;
+let typeCheckPromise: Promise<
+  import("./type-checker").TypeDiagnostic[] | null
+> | null = null;
 
-/** Append pending type diagnostics to the console (called after execution finishes). */
-function flushTypeErrors() {
-  if (!typeCheckPromise) return;
+/** Append pending type diagnostics and report whether the completed run type-checked. */
+async function flushTypeErrors(): Promise<boolean> {
+  if (!typeCheckPromise) return true;
   const capturedRunId = typeCheckRunId;
   const promise = typeCheckPromise;
   typeCheckPromise = null;
-  promise.then((diagnostics) => {
-    if (typeCheckRunId !== capturedRunId) return; // stale
-    for (const d of diagnostics) {
-      if (d.category === "error" || d.category === "warning") {
-        addErrorEntry("error", `Type Error: ${d.message}`, undefined, d.line, d.col);
-      }
+  const diagnostics = await promise;
+  if (typeCheckRunId !== capturedRunId) return false; // stale
+  if (diagnostics === null) return false; // checker unavailable; do not claim success
+  let passed = true;
+  for (const d of diagnostics) {
+    if (d.category === "error" || d.category === "warning") {
+      passed = false;
+      addErrorEntry("error", `Type Error: ${d.message}`, undefined, d.line, d.col);
     }
-  });
+  }
+  return passed;
 }
 
 // Delay before showing the "Running..." indicator.
@@ -142,6 +158,9 @@ function cleanup() {
 function handleMessage(event: MessageEvent) {
   const data = event.data;
   if (!data || data.source !== "jspark") return;
+  if (currentIframe?.contentWindow && event.source !== currentIframe.contentWindow) {
+    return;
+  }
 
   if (data.type === "console") {
     if (clearOnNextOutput) {
@@ -156,6 +175,7 @@ function handleMessage(event: MessageEvent) {
     }
     addConsoleEntry("result", [data.value]);
   } else if (data.type === "error") {
+    executionHadError = true;
     if (clearOnNextOutput) {
       clearConsole();
       clearOnNextOutput = false;
@@ -204,27 +224,51 @@ function handleMessage(event: MessageEvent) {
     }
     isRunning.value = false;
     isLoadingModules.value = false;
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
     if (typeof data.executionTime === "number") {
       executionTime.value = data.executionTime;
     }
-    // Show type errors (if any) after execution output
-    flushTypeErrors();
+    const completedRun = activeRun;
+    const runtimeSucceeded = !executionHadError;
+    activeRun = null;
+    void flushTypeErrors().then((typeCheckSucceeded) => {
+      if (runtimeSucceeded && typeCheckSucceeded && completedRun) {
+        trackSuccessfulRun(
+          completedRun.surface,
+          completedRun.trigger,
+          completedRun.eligibleAtStart,
+        );
+      }
+    });
   }
 }
 
 // Set up global listener once
 window.addEventListener("message", handleMessage);
 
-export function executeCode(source: string, lang: Language) {
+export function executeCode(
+  source: string,
+  lang: Language,
+  trigger: RunTrigger = "auto",
+) {
   cleanup();
   clearOnNextOutput = true; // clear on first output (avoids empty-console flicker)
   executionDone = false;
+  executionHadError = false;
+  activeRun = {
+    surface: lang,
+    trigger,
+    eligibleAtStart: isSuccessfulRunEligible(trigger),
+  };
   executionTime.value = null;
 
   // Start type checking for TypeScript (non-blocking, results shown after execution)
   ++typeCheckRunId;
   if (lang === "typescript") {
-    typeCheckPromise = checkTypes(source).catch(() => []);
+    typeCheckPromise = checkTypes(source).catch(() => null);
   } else {
     typeCheckPromise = null;
   }
@@ -243,6 +287,8 @@ export function executeCode(source: string, lang: Language) {
   const result = transpile(source, lang);
 
   if (result.error !== null) {
+    executionHadError = true;
+    activeRun = null;
     addErrorEntry("error", `Transpilation Error: ${result.error}`);
     clearOnNextOutput = false;
     executionDone = true;
@@ -251,7 +297,7 @@ export function executeCode(source: string, lang: Language) {
       runningIndicatorId = null;
     }
     isRunning.value = false;
-    flushTypeErrors();
+    void flushTypeErrors();
     return;
   }
 
@@ -313,25 +359,16 @@ if (typeof __jspark_result !== "undefined") {
   // Execution timeout
   timeoutId = setTimeout(() => {
     cleanup();
+    executionHadError = true;
+    activeRun = null;
     addErrorEntry(
       "error",
       `Execution timed out after ${EXECUTION_TIMEOUT / 1000}s. Possible infinite loop?`
     );
     executionDone = true;
     isRunning.value = false;
-    flushTypeErrors();
+    void flushTypeErrors();
   }, EXECUTION_TIMEOUT);
-
-  const onDone = (event: MessageEvent) => {
-    if (event.data?.source === "jspark" && event.data?.type === "done") {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-      window.removeEventListener("message", onDone);
-    }
-  };
-  window.addEventListener("message", onDone);
 }
 
 /** Module-based execution path (code has imports, uses esm.sh). */
@@ -401,29 +438,21 @@ parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - 
   // Longer timeout for module execution (network fetches)
   timeoutId = setTimeout(() => {
     cleanup();
+    executionHadError = true;
+    activeRun = null;
     addErrorEntry(
       "error",
       `Execution timed out after ${MODULE_EXECUTION_TIMEOUT / 1000}s. Check your imports or network connection.`
     );
     executionDone = true;
     isRunning.value = false;
-    flushTypeErrors();
+    void flushTypeErrors();
   }, MODULE_EXECUTION_TIMEOUT);
-
-  const onDone = (event: MessageEvent) => {
-    if (event.data?.source === "jspark" && event.data?.type === "done") {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-      window.removeEventListener("message", onDone);
-    }
-  };
-  window.addEventListener("message", onDone);
 }
 
 export function stopExecution() {
   cleanup();
   executionDone = true;
+  activeRun = null;
   isRunning.value = false;
 }
