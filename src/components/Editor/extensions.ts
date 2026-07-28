@@ -75,7 +75,8 @@ export function createExtensions(
   uiTheme: UiTheme,
   syntaxThemeId: SyntaxThemeId,
   onChange: (code: string) => void,
-  onSelectionChange?: (update: ViewUpdate) => void
+  onSelectionChange?: (update: ViewUpdate) => void,
+  onUserEdit?: (before: string, after: string) => void,
 ): Extension[] {
   const completionMode = getCompletionMode(lang);
 
@@ -146,7 +147,18 @@ export function createExtensions(
     // Update listener
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
-        onChange(update.state.doc.toString());
+        const before = update.startState.doc.toString();
+        const after = update.state.doc.toString();
+        onChange(after);
+        if (
+          onUserEdit &&
+          update.transactions.some((transaction) =>
+            transaction.isUserEvent("input") ||
+            transaction.isUserEvent("delete"),
+          )
+        ) {
+          onUserEdit(before, after);
+        }
       }
       if (onSelectionChange && (update.selectionSet || update.docChanged)) {
         onSelectionChange(update);

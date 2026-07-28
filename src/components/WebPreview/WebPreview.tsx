@@ -2,6 +2,10 @@ import { useEffect, useRef } from "preact/hooks";
 import { signal } from "@preact/signals";
 import { webHtml, webCss, webJs } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
+import {
+  isSuccessfulRunEligible,
+  trackSuccessfulRun,
+} from "../../utils/analytics";
 import "./WebPreview.css";
 
 interface WebConsoleEntry {
@@ -21,6 +25,8 @@ let entryId = 0;
  */
 const CONSOLE_BOOTSTRAP = `
 (function() {
+  var generation = __TRYJS_GENERATION__;
+  var hadError = false;
   var methods = ["log", "warn", "error", "info"];
   methods.forEach(function(m) {
     var orig = console[m];
@@ -33,21 +39,38 @@ const CONSOLE_BOOTSTRAP = `
           args.push(String(arguments[i]));
         }
       }
-      parent.postMessage({ source: "tryjs-web", type: "console", method: m, args: args }, "*");
+      parent.postMessage({ source: "tryjs-web", generation: generation, type: "console", method: m, args: args }, "*");
       orig.apply(console, arguments);
     };
   });
   window.onerror = function(msg, src, line, col) {
-    parent.postMessage({ source: "tryjs-web", type: "console", method: "error", args: [String(msg)] }, "*");
+    hadError = true;
+    parent.postMessage({ source: "tryjs-web", generation: generation, type: "console", method: "error", args: [String(msg)] }, "*");
   };
   window.addEventListener("unhandledrejection", function(e) {
-    parent.postMessage({ source: "tryjs-web", type: "console", method: "error", args: ["Unhandled rejection: " + String(e.reason)] }, "*");
+    hadError = true;
+    parent.postMessage({ source: "tryjs-web", generation: generation, type: "console", method: "error", args: ["Unhandled rejection: " + String(e.reason)] }, "*");
+  });
+  window.addEventListener("load", function() {
+    setTimeout(function() {
+      if (!hadError) {
+        parent.postMessage({ source: "tryjs-web", generation: generation, type: "preview-success" }, "*");
+      }
+    }, 0);
   });
 })();
 `;
 
-function buildSrcdoc(htmlCode: string, cssCode: string, jsCode: string): string {
-  const safeBootstrap = CONSOLE_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
+function buildSrcdoc(
+  htmlCode: string,
+  cssCode: string,
+  jsCode: string,
+  generation: number,
+): string {
+  const safeBootstrap = CONSOLE_BOOTSTRAP.replace(
+    /__TRYJS_GENERATION__/g,
+    String(generation),
+  ).replace(/<\/script/gi, "<\\/script");
   const safeJs = jsCode.replace(/<\/script/gi, "<\\/script");
   return `<!DOCTYPE html>
 <html>
@@ -68,6 +91,8 @@ export function WebPreview() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const consoleEndRef = useRef<HTMLDivElement>(null);
+  const generationRef = useRef(0);
+  const eligibleGenerationRef = useRef<number | null>(null);
 
   const htmlCode = webHtml.value;
   const cssCode = webCss.value;
@@ -79,7 +104,18 @@ export function WebPreview() {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       const data = event.data;
-      if (!data || data.source !== "tryjs-web" || data.type !== "console") return;
+      if (!data || data.source !== "tryjs-web") return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
+      if (data.generation !== generationRef.current) return;
+      if (data.type === "preview-success") {
+        trackSuccessfulRun(
+          "web",
+          "auto",
+          eligibleGenerationRef.current === data.generation,
+        );
+        return;
+      }
+      if (data.type !== "console") return;
       webConsoleOutput.value = [
         ...webConsoleOutput.value,
         { id: ++entryId, method: data.method, args: data.args || [] },
@@ -100,8 +136,12 @@ export function WebPreview() {
     debounceRef.current = setTimeout(() => {
       const iframe = iframeRef.current;
       if (!iframe) return;
+      const generation = ++generationRef.current;
+      eligibleGenerationRef.current = isSuccessfulRunEligible("auto")
+        ? generation
+        : null;
       webConsoleOutput.value = [];
-      iframe.srcdoc = buildSrcdoc(htmlCode, cssCode, jsCode);
+      iframe.srcdoc = buildSrcdoc(htmlCode, cssCode, jsCode, generation);
     }, autoRunDelay.value);
 
     return () => clearTimeout(debounceRef.current);

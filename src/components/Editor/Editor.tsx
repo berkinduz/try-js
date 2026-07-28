@@ -20,7 +20,12 @@ import {
 import { shareToClipboard, generateEmbedCode } from "../../utils/share";
 import { showToast } from "../Toast/Toast";
 import { openScreenshotModal } from "../Screenshot/ScreenshotModal";
-import { trackEvent } from "../../utils/analytics";
+import {
+  trackEmbedCopied,
+  trackEvent,
+  trackFirstMeaningfulEdit,
+  trackShareCreated,
+} from "../../utils/analytics";
 import { selectedText } from "../../state/selection";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
@@ -91,16 +96,23 @@ export function Editor() {
     trackEvent("code_share", { method: "url" });
     setShareOpen(false);
     try {
-      const codeToShare = selectedText.value || code.value;
+      const surface = language.value;
+      const scope = selectedText.value ? "selection" : "document";
+      const codeToShare = scope === "selection" ? selectedText.value : code.value;
       const result = await shareToClipboard({
         code: codeToShare,
-        language: language.value,
+        language: surface,
       });
+      trackShareCreated(
+        surface,
+        scope,
+        Boolean(result.warning),
+      );
       if (result.warning) {
         showToast(result.warning, "warning", 4000);
       } else {
         showToast(
-          selectedText.value
+          scope === "selection"
             ? "Selection link copied!"
             : "Link copied to clipboard!",
         );
@@ -114,11 +126,13 @@ export function Editor() {
     trackEvent("code_share", { method: "embed" });
     setShareOpen(false);
     try {
+      const surface = language.value;
       const embedCode = generateEmbedCode({
         code: code.value,
-        language: language.value,
+        language: surface,
       });
       await navigator.clipboard.writeText(embedCode);
+      trackEmbedCopied(surface);
       showToast("Embed code copied!");
     } catch {
       showToast("Failed to copy embed code", "error");
@@ -174,6 +188,8 @@ export function Editor() {
           syntaxTheme.value,
           (newCode) => setCode(newCode),
           handleSelectionChange,
+          (before, after) =>
+            trackFirstMeaningfulEdit(language.value, before, after),
         ),
       }),
       parent: containerRef.current,
