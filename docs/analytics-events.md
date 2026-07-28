@@ -12,7 +12,8 @@ TryJS sends custom events to the existing Vercel Analytics and Umami integration
 | `share_created` | A share URL is successfully written to the clipboard | `surface`; `scope`: `document` or `selection`; `length_warning`: boolean | Every completed share action. Failed clipboard writes are excluded. |
 | `embed_copied` | Embed markup is successfully written to the clipboard | `surface` | Every completed embed copy. Failed clipboard writes are excluded. |
 | `support_clicked` | Buy Me a Coffee link is clicked | `provider`: `buy_me_a_coffee`; `placement`: `toolbar` | Every explicit click. |
-| `pro_interest` | An explicit pricing or early-access CTA calls `trackProInterest` | `source`; `intent`: `pricing` or `early_access` | Every explicit CTA interaction. There is no current Pro surface, so this helper intentionally emits nothing on page view; the demand-validation surface must call it at the actual interaction point. |
+| `pro_landing_view` | The `/for-teachers` concept page loads | `audience`: `teachers_authors` | First page render per tab session. This is the conversion denominator. |
+| `pro_interest` | An explicit pricing or early-access CTA calls `trackProInterest` | `source`; `intent`: `pricing` or `early_access` | First interaction per source, intent, and tab session. The `/web` and `/react` concept link uses `source=web_preview`; the public GitHub early-access link uses `source=for_teachers_page`. |
 
 Existing diagnostic events such as `playground_view`, `code_run`, `code_share`, and `language_switch` remain unchanged. `code_run` and `code_share` describe attempts; `successful_run`, `share_created`, and `embed_copied` are the corresponding outcome events to use for activation measurement.
 
@@ -41,4 +42,4 @@ A basic activation funnel is:
 3. `successful_run`
 4. `share_created` or `embed_copied`
 
-Segment each step by `visitor_type` at the reporting layer and use `surface` to compare JS, TypeScript, Web, and React. Monetization signals are `support_clicked` and, once a transparent Pro demand surface exists, `pro_interest`.
+Segment each step by `visitor_type` at the reporting layer and use `surface` to compare JS, TypeScript, Web, and React. Monetization signals are `support_clicked` and `pro_interest`. The fixed decision window and success/stop thresholds for the current Pro test are documented in `docs/pro-demand-validation.md`.

@@ -139,6 +139,23 @@ function buildStaticJsonLd(page) {
 
 const MAIN_PAGES = [
   {
+    route: "/for-teachers",
+    title: "TryJS for Teachers & Technical Authors — Pro Concept",
+    description:
+      "Help shape a possible TryJS Pro for teachers and technical authors who share runnable frontend examples.",
+    body: makeSeoSection(
+      "About TryJS for Teachers and Technical Authors",
+      "Make Runnable Frontend Examples Easier to Teach and Publish",
+      [
+        "TryJS is exploring whether teachers and technical authors need a more durable way to organize and present runnable frontend examples.",
+        "<h2>What We Are Testing</h2>",
+        "Possible TryJS Pro capabilities include saved examples, private examples, and custom branding. These capabilities are not available yet and are not product promises.",
+        "<h2>Request Early Access</h2>",
+        "The early-access link opens a public, editable GitHub issue. No payment, subscription, private form, or unavailable product flow is involved.",
+      ]
+    ),
+  },
+  {
     route: "/web",
     title: "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
     description:

@@ -20,6 +20,7 @@ import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
+import { ForTeachersPage } from "./components/ForTeachers/ForTeachersPage";
 
 // Sync global mode with URL on back/forward navigation so App re-renders
 if (typeof window !== "undefined") {
@@ -52,6 +53,10 @@ export function App() {
 
   if (path === "/features") {
     return <FeaturesPage />;
+  }
+
+  if (path === "/for-teachers") {
+    return <ForTeachersPage />;
   }
 
   if (path === "/snippets") {
