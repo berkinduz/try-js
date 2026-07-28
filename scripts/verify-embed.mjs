@@ -40,9 +40,8 @@ assert.equal(
   "frame-ancestors *",
   "the dedicated embed route must explicitly allow third-party framing",
 );
-assert.match(
-  embed.html,
-  /location\.pathname\.replace\(\/\\\/+\$\/, ""\)/,
+assert.ok(
+  embed.html.includes('location.pathname.replace(/\\/+$/, "")'),
   "the embed document must detect embed mode from its dedicated path",
 );
 
