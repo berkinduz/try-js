@@ -12,7 +12,11 @@ type EventProps = Record<string, string | number | boolean>;
 
 export type AnalyticsSurface = "javascript" | "typescript" | "web" | "react";
 export type RunTrigger = "auto" | "manual";
-export type ProInterestIntent = "pricing" | "early_access";
+export type ProInterestIntent =
+  | "pricing"
+  | "early_access"
+  | "educator_workflow"
+  | "willingness_to_pay";
 export type ProInterestSource =
   | "toolbar"
   | "web_preview"

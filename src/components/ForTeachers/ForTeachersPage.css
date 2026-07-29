@@ -24,7 +24,6 @@
 .teachers-nav,
 .teachers-brand,
 .teachers-actions,
-.teachers-preview__bar,
 .teachers-close {
   display: flex;
   align-items: center;
@@ -154,88 +153,111 @@
   line-height: 1.55;
 }
 
-.teachers-preview {
-  overflow: hidden;
+.teachers-flow {
+  padding: 22px;
   border: 1px solid var(--border);
   border-radius: 16px;
   background: color-mix(in srgb, var(--bg-secondary) 90%, transparent);
   box-shadow:
     0 24px 64px -36px rgba(0, 0, 0, 0.5),
     0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent);
-  transform: rotate(1.2deg);
 }
 
-.teachers-preview__bar {
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 13px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-tertiary);
-}
-
-.teachers-preview__bar span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  opacity: 0.55;
-}
-
-.teachers-preview__bar code {
-  margin-left: auto;
+.teachers-flow__label,
+.teachers-example__label {
+  margin: 0 0 18px;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-.teachers-preview__body {
-  padding: 18px;
-}
-
-.teachers-preview__label {
-  margin: 0 0 12px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.teachers-preview pre {
-  overflow-x: auto;
-  min-height: 176px;
+.teachers-flow ol {
+  display: grid;
+  gap: 0;
   margin: 0;
-  padding: 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.teachers-flow li {
+  display: flex;
+  gap: 14px;
+  padding: 17px 0;
+  border-top: 1px solid var(--border);
+}
+
+.teachers-flow li > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #111;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.teachers-flow strong {
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.teachers-flow li p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.teachers-free,
+.teachers-proposal {
+  padding: 54px 0;
+  border-top: 1px solid var(--border);
+}
+
+.teachers-example {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(340px, 1.2fr);
+  gap: 24px;
+  align-items: center;
+  margin-top: 30px;
+  padding: 24px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-secondary));
+}
+
+.teachers-example h3 {
+  margin: 0 0 10px;
+  color: var(--text-primary);
+  font-size: 24px;
+}
+
+.teachers-example > div > p:not(.teachers-example__label) {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.teachers-example code {
+  font-family: var(--font-mono);
+}
+
+.teachers-example pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 20px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font: 13px/1.65 var(--font-mono);
-}
-
-.teachers-preview__result {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding: 13px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-primary);
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.teachers-preview__button {
-  padding: 7px 14px;
-  border-radius: 7px;
-  background: var(--accent);
-  color: #111;
-  font-weight: 750;
-}
-
-.teachers-proposal {
-  padding: 54px 0;
-  border-top: 1px solid var(--border);
+  font: 13px/1.7 var(--font-mono);
 }
 
 .teachers-section-head {
@@ -343,13 +365,13 @@
     grid-template-columns: 1fr;
   }
 
-  .teachers-preview {
+  .teachers-flow {
     max-width: 620px;
-    transform: none;
   }
 
   .teachers-grid,
-  .teachers-section-head {
+  .teachers-section-head,
+  .teachers-example {
     grid-template-columns: 1fr;
   }
 
@@ -360,7 +382,7 @@
 
 @media (max-width: 620px) {
   .teachers-shell {
-    width: min(100% - 24px, 1120px);
+    width: min(1120px, calc(100% - 24px));
     padding-top: 12px;
   }
 
@@ -381,11 +403,18 @@
     width: 100%;
   }
 
-  .teachers-preview__bar code {
-    max-width: 72%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .teachers-actions .teachers-btn,
+  .teachers-close .teachers-btn {
+    padding-block: 10px;
+    text-align: center;
+  }
+
+  .teachers-example {
+    padding: 18px;
+  }
+
+  .teachers-example .teachers-btn {
+    width: 100%;
   }
 
   .teachers-close {

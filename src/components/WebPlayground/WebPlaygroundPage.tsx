@@ -189,12 +189,17 @@ export function WebPlaygroundPage() {
         <a
           class="web-sub-toggle__pro"
           href="/for-teachers"
-          onClick={() => trackProInterest("web_preview", "pricing")}
+          onClick={() => trackProInterest("web_preview", "educator_workflow")}
         >
           <span class="web-sub-toggle__pro-context">
-            Teach or publish runnable examples?{" "}
+            Build lessons with runnable examples.{" "}
           </span>
-          <strong>Explore Pro →</strong>
+          <strong class="web-sub-toggle__pro-desktop">
+            See the educator workflow →
+          </strong>
+          <strong class="web-sub-toggle__pro-mobile">
+            Educator workflow →
+          </strong>
         </a>
       </div>
 

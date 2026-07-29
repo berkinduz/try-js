@@ -1,13 +1,17 @@
 const issueParams = new URLSearchParams({
-  title: "Request TryJS Pro early access",
+  title: "Share educator workflow and Pro interest",
   body: [
-    "I'm a teacher or technical author interested in TryJS Pro early access.",
+    "I'm a teacher or technical author who uses runnable examples.",
     "",
     "What I teach or publish:",
     "",
-    "The capability I need most (saved examples, private examples, custom branding, or something else):",
+    "How I share examples with learners or readers today:",
     "",
-    "Anything else that would make runnable examples easier to share:",
+    "The proposed capability I need most (organized library, private examples, branding, or something else):",
+    "",
+    "Would you pay for it? If yes, what would make it worth paying for?",
+    "",
+    "Anything else that gets in the way:",
   ].join("\n"),
 });
 
@@ -15,5 +19,5 @@ const issueParams = new URLSearchParams({
  * Public, inspectable intent collection with no hidden form or data capture.
  * People can review and edit the issue before choosing whether to submit it.
  */
-export const EARLY_ACCESS_URL =
+export const EDUCATOR_FEEDBACK_URL =
   `https://github.com/berkinduz/try-js/issues/new?${issueParams.toString()}`;

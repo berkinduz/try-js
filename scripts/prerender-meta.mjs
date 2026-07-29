@@ -142,16 +142,18 @@ const MAIN_PAGES = [
     route: "/for-teachers",
     title: "TryJS for Teachers & Technical Authors — Pro Concept",
     description:
-      "Help shape a possible TryJS Pro for teachers and technical authors who share runnable frontend examples.",
+      "Create a shareable JavaScript or TypeScript example, place it in a lesson or article, and let learners edit and run it without setup.",
     body: makeSeoSection(
       "About TryJS for Teachers and Technical Authors",
-      "Make Runnable Frontend Examples Easier to Teach and Publish",
+      "Turn One Code Example into a Runnable Lesson",
       [
-        "TryJS is exploring whether teachers and technical authors need a more durable way to organize and present runnable frontend examples.",
-        "<h2>What We Are Testing</h2>",
-        "Possible TryJS Pro capabilities include saved examples, private examples, and custom branding. These capabilities are not available yet and are not product promises.",
-        "<h2>Request Early Access</h2>",
-        "The early-access link opens a public, editable GitHub issue. No payment, subscription, private form, or unavailable product flow is involved.",
+        "Create a JavaScript or TypeScript example once, then share a link or embed it in a lesson, LMS, article, or docs. Learners can edit and run it in the browser without an account or local setup.",
+        "<h2>Works Free Today</h2>",
+        "Sharing and embedding are available in JavaScript and TypeScript. Web and React remain free for editing and live preview, but do not have share or embed controls yet.",
+        "<h2>Pro Ideas We Are Testing</h2>",
+        "Possible organized libraries, private examples, and custom branding are not available yet and are not product promises.",
+        "<h2>Share Feedback on GitHub</h2>",
+        "The feedback link opens a public, editable GitHub issue. No payment, subscription, private form, or unavailable product flow is involved.",
       ]
     ),
   },
