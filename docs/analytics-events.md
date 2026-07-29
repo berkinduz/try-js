@@ -13,7 +13,7 @@ TryJS sends custom events to the existing Vercel Analytics and Umami integration
 | `embed_copied` | Embed markup is successfully written to the clipboard | `surface` | Every completed embed copy. Failed clipboard writes are excluded. |
 | `support_clicked` | Buy Me a Coffee link is clicked | `provider`: `buy_me_a_coffee`; `placement`: `toolbar` | Every explicit click. |
 | `pro_landing_view` | The `/for-teachers` concept page loads | `audience`: `teachers_authors` | First page render per tab session. This is the conversion denominator. |
-| `pro_interest` | An explicit pricing or early-access CTA calls `trackProInterest` | `source`; `intent`: `pricing` or `early_access` | First interaction per source, intent, and tab session. The `/web` and `/react` concept link uses `source=web_preview`; the public GitHub early-access link uses `source=for_teachers_page`. |
+| `pro_interest` | An explicit Pro or educator CTA calls `trackProInterest` | `source`; `intent`: `pricing`, `early_access`, `educator_workflow`, or `willingness_to_pay` | First interaction per source, intent, and tab session. The shared educator entry on JS, TypeScript, Web, and React uses `source=toolbar`, `intent=educator_workflow`; the extra `/web` and `/react` workflow link uses `source=web_preview`, `intent=educator_workflow`; the public GitHub feedback link uses `source=for_teachers_page`, `intent=willingness_to_pay`. |
 
 Existing diagnostic events such as `playground_view`, `code_run`, `code_share`, and `language_switch` remain unchanged. `code_run` and `code_share` describe attempts; `successful_run`, `share_created`, and `embed_copied` are the corresponding outcome events to use for activation measurement.
 
