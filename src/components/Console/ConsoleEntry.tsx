@@ -20,7 +20,12 @@ function renderValue(val: SerializedValue, index: number) {
   const text = formatValue(val);
   const cls = getValueClass(val);
 
-  if (val.type === "object" || val.type === "array") {
+  if (
+    val.type === "object" ||
+    val.type === "array" ||
+    val.type === "map" ||
+    val.type === "set"
+  ) {
     return (
       <span key={index} class={`console-value ${cls}`}>
         <ObjectInspector value={val} />
