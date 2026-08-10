@@ -2,6 +2,7 @@ import { useEffect, useRef } from "preact/hooks";
 import { signal } from "@preact/signals";
 import { reactCode, reactCss } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
+import { PREVIEW_CONSOLE_FORMATTER } from "../../sandbox/preview-console-formatter";
 import { transpileJsx } from "../../sandbox/transpiler";
 import { rewriteImports } from "../../sandbox/transpiler";
 import {
@@ -29,17 +30,14 @@ const CONSOLE_BOOTSTRAP = `
 (function() {
   var generation = __TRYJS_GENERATION__;
   var hadError = false;
+${PREVIEW_CONSOLE_FORMATTER}
   var methods = ["log", "warn", "error", "info"];
   methods.forEach(function(m) {
     var orig = console[m];
     console[m] = function() {
       var args = [];
       for (var i = 0; i < arguments.length; i++) {
-        try {
-          args.push(typeof arguments[i] === "object" ? JSON.stringify(arguments[i], null, 2) : String(arguments[i]));
-        } catch(e) {
-          args.push(String(arguments[i]));
-        }
+        args.push(formatConsoleArg(arguments[i]));
       }
       parent.postMessage({ source: "tryjs-react", generation: generation, type: "console", method: m, args: args }, "*");
       orig.apply(console, arguments);
