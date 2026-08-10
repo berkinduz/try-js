@@ -47,6 +47,33 @@ export const SANDBOX_BOOTSTRAP = `
         }
       }
 
+      if (val instanceof Map) {
+        try {
+          var mapEntries = [];
+          val.forEach(function(mapValue, mapKey) {
+            mapEntries.push({
+              key: serialize(mapKey, depth + 1, seen),
+              value: serialize(mapValue, depth + 1, seen)
+            });
+          });
+          return { type: "map", size: val.size, entries: mapEntries };
+        } catch(e) {
+          return { type: "map", size: val.size, entries: [] };
+        }
+      }
+
+      if (val instanceof Set) {
+        try {
+          var setItems = [];
+          val.forEach(function(item) {
+            setItems.push(serialize(item, depth + 1, seen));
+          });
+          return { type: "set", size: val.size, items: setItems };
+        } catch(e) {
+          return { type: "set", size: val.size, items: [] };
+        }
+      }
+
       try {
         var keys = Object.keys(val);
         var preview = keys.slice(0, 5).join(", ");
@@ -218,6 +245,33 @@ export const SANDBOX_BOOTSTRAP_MODULE = `
           };
         } catch(e) {
           return { type: "array", value: "[Array]", length: val.length, items: [] };
+        }
+      }
+
+      if (val instanceof Map) {
+        try {
+          var mapEntries = [];
+          val.forEach(function(mapValue, mapKey) {
+            mapEntries.push({
+              key: serialize(mapKey, depth + 1, seen),
+              value: serialize(mapValue, depth + 1, seen)
+            });
+          });
+          return { type: "map", size: val.size, entries: mapEntries };
+        } catch(e) {
+          return { type: "map", size: val.size, entries: [] };
+        }
+      }
+
+      if (val instanceof Set) {
+        try {
+          var setItems = [];
+          val.forEach(function(item) {
+            setItems.push(serialize(item, depth + 1, seen));
+          });
+          return { type: "set", size: val.size, items: setItems };
+        } catch(e) {
+          return { type: "set", size: val.size, items: [] };
         }
       }
 
