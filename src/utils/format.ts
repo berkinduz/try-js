@@ -16,6 +16,16 @@ export type SerializedValue =
       length: number;
       items?: SerializedValue[];
     }
+  | {
+      type: "map";
+      size: number;
+      entries?: { key: SerializedValue; value: SerializedValue }[];
+    }
+  | {
+      type: "set";
+      size: number;
+      items?: SerializedValue[];
+    }
   | { type: "function"; name: string }
   | { type: "symbol"; description: string }
   | { type: "error"; message: string; stack?: string }
@@ -37,6 +47,10 @@ export function formatValue(val: SerializedValue): string {
       return val.value;
     case "array":
       return val.value;
+    case "map":
+      return `Map(${val.size})`;
+    case "set":
+      return `Set(${val.size})`;
     case "function":
       return `[Function: ${val.name || "anonymous"}]`;
     case "symbol":

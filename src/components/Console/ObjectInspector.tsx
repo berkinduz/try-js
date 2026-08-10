@@ -111,5 +111,93 @@ export function ObjectInspector({ value }: Props) {
     );
   }
 
+  if (value.type === "map") {
+    const entries = value.entries || [];
+
+    if (!expanded) {
+      return (
+        <span class="object-inspector">
+          <button
+            type="button"
+            class="oi-toggle"
+            onClick={() => setExpanded(true)}
+            aria-label="Expand map"
+          >
+            ▶
+          </button>
+          <span class="oi-preview">Map({value.size})</span>
+        </span>
+      );
+    }
+
+    return (
+      <span class="object-inspector">
+        <button
+          type="button"
+          class="oi-toggle"
+          onClick={() => setExpanded(false)}
+          aria-label="Collapse map"
+        >
+          ▼
+        </button>
+        <span class="oi-preview">Map({value.size}) </span>
+        <span class="oi-bracket">{"{"}</span>
+        <div class="oi-children">
+          {entries.map((entry, index) => (
+            <div class="oi-node" key={String(index)}>
+              <ObjectInspector value={entry.key} />
+              <span class="oi-colon"> =&gt; </span>
+              <ObjectInspector value={entry.value} />
+            </div>
+          ))}
+        </div>
+        <span class="oi-bracket">{"}"}</span>
+      </span>
+    );
+  }
+
+  if (value.type === "set") {
+    const items = value.items || [];
+
+    if (!expanded) {
+      return (
+        <span class="object-inspector">
+          <button
+            type="button"
+            class="oi-toggle"
+            onClick={() => setExpanded(true)}
+            aria-label="Expand set"
+          >
+            ▶
+          </button>
+          <span class="oi-preview">Set({value.size})</span>
+        </span>
+      );
+    }
+
+    return (
+      <span class="object-inspector">
+        <button
+          type="button"
+          class="oi-toggle"
+          onClick={() => setExpanded(false)}
+          aria-label="Collapse set"
+        >
+          ▼
+        </button>
+        <span class="oi-preview">Set({value.size}) </span>
+        <span class="oi-bracket">{"{"}</span>
+        <div class="oi-children">
+          {items.map((item, index) => (
+            <div class="oi-node" key={String(index)}>
+              <ObjectInspector value={item} />
+            </div>
+          ))}
+        </div>
+        <span class="oi-bracket">{"}"}</span>
+      </span>
+    );
+  }
+
   return <Primitive val={value} />;
 }
