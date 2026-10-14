@@ -12,7 +12,7 @@ import { clearConsole } from "../../state/console";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
 import { applySeo } from "../../utils/seo";
-import { trackEvent, trackProInterest } from "../../utils/analytics";
+import { trackEvent } from "../../utils/analytics";
 import "./WebPlaygroundPage.css";
 
 type WebSubMode = "vanilla" | "react";
@@ -186,21 +186,6 @@ export function WebPlaygroundPage() {
         >
           React
         </button>
-        <a
-          class="web-sub-toggle__pro"
-          href="/for-teachers"
-          onClick={() => trackProInterest("web_preview", "educator_workflow")}
-        >
-          <span class="web-sub-toggle__pro-context">
-            Build lessons with runnable examples.{" "}
-          </span>
-          <strong class="web-sub-toggle__pro-desktop">
-            See the educator workflow →
-          </strong>
-          <strong class="web-sub-toggle__pro-mobile">
-            Educator workflow →
-          </strong>
-        </a>
       </div>
 
       {/* Editor + Preview */}

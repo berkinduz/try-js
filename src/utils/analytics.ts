@@ -1,8 +1,6 @@
 import { track } from "@vercel/analytics";
 import {
   claimSessionEvent,
-  claimProInterest,
-  claimProLandingView,
   classifyVisitor,
   hasSessionEvent,
   isMeaningfulEdit,
@@ -12,18 +10,6 @@ type EventProps = Record<string, string | number | boolean>;
 
 export type AnalyticsSurface = "javascript" | "typescript" | "web" | "react";
 export type RunTrigger = "auto" | "manual";
-export type ProInterestIntent =
-  | "pricing"
-  | "early_access"
-  | "educator_workflow"
-  | "willingness_to_pay";
-export type ProInterestSource =
-  | "toolbar"
-  | "web_preview"
-  | "features"
-  | "pricing_page"
-  | "embed_pro_page"
-  | "for_teachers_page";
 
 const FIRST_MEANINGFUL_EDIT_KEY = "first_meaningful_edit";
 
@@ -141,19 +127,4 @@ export function trackEmbedCopied(surface: AnalyticsSurface) {
 
 export function trackSupportClick(placement: "toolbar") {
   trackEvent("support_clicked", { provider: "buy_me_a_coffee", placement });
-}
-
-/** Track the teacher/author concept-page denominator once per tab session. */
-export function trackProLandingView() {
-  if (!claimProLandingView(getStorage("sessionStorage"))) return;
-  trackEvent("pro_landing_view", { audience: "teachers_authors" });
-}
-
-/** Track one demand signal per placement, intent, and tab session. */
-export function trackProInterest(
-  source: ProInterestSource,
-  intent: ProInterestIntent,
-) {
-  if (!claimProInterest(getStorage("sessionStorage"), source, intent)) return;
-  trackEvent("pro_interest", { source, intent });
 }

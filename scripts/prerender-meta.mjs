@@ -139,25 +139,6 @@ function buildStaticJsonLd(page) {
 
 const MAIN_PAGES = [
   {
-    route: "/for-teachers",
-    title: "TryJS for Teachers & Technical Authors — Pro Concept",
-    description:
-      "Create a shareable JavaScript or TypeScript example, place it in a lesson or article, and let learners edit and run it without setup.",
-    body: makeSeoSection(
-      "About TryJS for Teachers and Technical Authors",
-      "Turn One Code Example into a Runnable Lesson",
-      [
-        "Create a JavaScript or TypeScript example once, then share a link or embed it in a lesson, LMS, article, or docs. Learners can edit and run it in the browser without an account or local setup.",
-        "<h2>Works Free Today</h2>",
-        "Sharing and embedding are available in JavaScript and TypeScript. Web and React remain free for editing and live preview, but do not have share or embed controls yet.",
-        "<h2>Pro Ideas We Are Testing</h2>",
-        "Possible organized libraries, private examples, and custom branding are not available yet and are not product promises.",
-        "<h2>Share Feedback on GitHub</h2>",
-        "The feedback link opens a public, editable GitHub issue. No payment, subscription, private form, or unavailable product flow is involved.",
-      ]
-    ),
-  },
-  {
     route: "/web",
     title: "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
     description:

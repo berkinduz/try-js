@@ -9,6 +9,11 @@
       "permanent": true
     },
     {
+      "source": "/for-teachers",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/regex",
       "destination": "/",
       "permanent": true

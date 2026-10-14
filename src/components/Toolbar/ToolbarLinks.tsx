@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import { trackProInterest, trackSupportClick } from "../../utils/analytics";
+import { trackSupportClick } from "../../utils/analytics";
 import "./Toolbar.css";
 
 const GITHUB_URL = "https://github.com/berkinduz/try-js";
@@ -22,34 +22,6 @@ export function ToolbarLinks(_: { currentPath?: string }) {
 
   return (
     <div class="toolbar__right toolbar__right--links">
-      <a
-        href="/for-teachers"
-        class="toolbar__educator"
-        title="Create runnable lessons and article examples"
-        onClick={() => trackProInterest("toolbar", "educator_workflow")}
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-        </svg>
-        <span class="toolbar__educator-label toolbar__educator-label--desktop">
-          Teach with TryJS
-        </span>
-        <span class="toolbar__educator-label toolbar__educator-label--mobile">
-          Teach
-        </span>
-      </a>
-
       <div class="toolbar__menu-wrapper" ref={menuRef}>
         <button
           type="button"

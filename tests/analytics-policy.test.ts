@@ -5,8 +5,6 @@ import {
   classifyVisitor,
   isMeaningfulEdit,
   claimSessionEvent,
-  claimProInterest,
-  claimProLandingView,
   hasSessionEvent,
 } from "../src/utils/analytics-policy.ts";
 
@@ -104,25 +102,4 @@ test("session claims remain visible when storage writes are blocked", () => {
   assert.equal(claimSessionEvent(readOnlyStorage, "write_blocked"), true);
   assert.equal(hasSessionEvent(readOnlyStorage, "write_blocked"), true);
   assert.equal(claimSessionEvent(readOnlyStorage, "write_blocked"), false);
-});
-
-test("claimProInterest deduplicates each demand signal per tab session", () => {
-  const storage = new MemoryStorage();
-
-  assert.equal(
-    claimProInterest(storage, "for_teachers_page", "early_access"),
-    true,
-  );
-  assert.equal(
-    claimProInterest(storage, "for_teachers_page", "early_access"),
-    false,
-  );
-  assert.equal(claimProInterest(storage, "web_preview", "pricing"), true);
-});
-
-test("claimProLandingView provides a session-level conversion denominator", () => {
-  const storage = new MemoryStorage();
-
-  assert.equal(claimProLandingView(storage), true);
-  assert.equal(claimProLandingView(storage), false);
 });
