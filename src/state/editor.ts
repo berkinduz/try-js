@@ -57,10 +57,9 @@ export const code = signal<string>(
 export const draftStorageUnavailable = signal(false);
 export const syntaxTheme = signal<SyntaxThemeId>(getStoredSyntaxTheme());
 
-// Clean URL hash after loading shared code
-if (sharedState) {
-  const path = isEmbed ? "/embed" : playgroundPath(sharedState);
-  history.replaceState(null, "", path + window.location.search);
+// Keep embed hashes so reload and back/forward can reopen the selected example.
+if (sharedState && !isEmbed) {
+  history.replaceState(null, "", playgroundPath(sharedState) + window.location.search);
 }
 
 /** Site UI theme (light/dark) derived from syntax theme so they stay in sync. */
@@ -156,6 +155,7 @@ const getStoredReactCss = (): string => {
 
 export const reactCode = signal<string>(getStoredReactCode());
 export const reactCss = signal<string>(getStoredReactCss());
+export const embedVersion = signal(0);
 
 export function setReactCode(newCode: string) {
   reactCode.value = newCode;
@@ -228,6 +228,24 @@ function samePlayground(first: PlaygroundState, second: PlaygroundState): boolea
   return JSON.stringify(parsePlayground(first, Infinity)) === JSON.stringify(parsePlayground(second, Infinity));
 }
 
+/** Assign a validated playground inside the caller's batch, without navigation or storage writes. */
+function setPlaygroundState(next: PlaygroundState): void {
+  if (next.mode === "web") {
+    webHtml.value = next.html;
+    webCss.value = next.css;
+    webJs.value = next.webJs;
+    webActiveTab.value = "html";
+  } else if (next.mode === "react") {
+    reactCode.value = next.code;
+    reactCss.value = next.css;
+  } else {
+    language.value = next.language;
+    code.value = next.code;
+    if (next.language === "typescript") preloadTypeScript();
+  }
+  mode.value = next.mode ?? "js";
+}
+
 export function applyPlayground(value: PlaygroundState, allowLargeRecovery = false): void {
   const next = allowLargeRecovery ? parsePlayground(value, Infinity) : parsePlayground(value);
   if (!next) throw new Error("This file does not contain a supported playground.");
@@ -240,22 +258,9 @@ export function applyPlayground(value: PlaygroundState, allowLargeRecovery = fal
   }
   saveDraft();
   batch(() => {
-    if (next.mode === "web") {
-      webHtml.value = next.html;
-      webCss.value = next.css;
-      webJs.value = next.webJs;
-      webActiveTab.value = "html";
-    } else if (next.mode === "react") {
-      reactCode.value = next.code;
-      reactCss.value = next.css;
-    } else {
-      language.value = next.language;
-      code.value = next.code;
-      writeLocal("jspark:language", next.language);
-      if (next.language === "typescript") preloadTypeScript();
-    }
+    setPlaygroundState(next);
+    if (next.mode === "js") writeLocal("jspark:language", next.language);
     history.pushState(null, "", playgroundPath(next));
-    mode.value = next.mode ?? "js";
   });
   saveDraft();
 }
@@ -277,4 +282,24 @@ if (sharedState && !isEmbed) {
   if (playgroundText(oldDraft).trim() && !samePlayground(oldDraft, sharedState)) {
     writeLocal(PREVIOUS_PLAYGROUND_KEY, JSON.stringify(oldDraft));
   }
+}
+
+window.addEventListener("pagehide", saveDraft);
+window.addEventListener("popstate", () => {
+  // Embedded examples follow hashchange; the /embed path does not identify their mode.
+  if (isEmbed) return;
+  saveDraft();
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  mode.value = path === "/react" ? "react" : path === "/web" ? "web" : "js";
+});
+
+if (isEmbed) {
+  window.addEventListener("hashchange", () => {
+    const next = decodeFromHash(window.location.hash);
+    if (!next) return;
+    batch(() => {
+      setPlaygroundState(next);
+      ++embedVersion.value;
+    });
+  });
 }
