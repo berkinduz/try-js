@@ -4,7 +4,7 @@ import { Console } from "./components/Console/Console";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { StatusBar } from "./components/StatusBar/StatusBar";
 import { SplitPane } from "./components/SplitPane/SplitPane";
-import { code, language, mode, saveDraft, draftStorageUnavailable } from "./state/editor";
+import { code, language, mode, saveDraft, draftStorageUnavailable, embedVersion } from "./state/editor";
 import { clearConsole, consoleOutput } from "./state/console";
 import { autoRunDelay } from "./state/settings";
 import { executeCode, stopExecution } from "./sandbox/executor";
@@ -21,18 +21,6 @@ import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
-
-// Sync global mode with URL on back/forward navigation so App re-renders
-if (typeof window !== "undefined") {
-  window.addEventListener("pagehide", saveDraft);
-  window.addEventListener("popstate", () => {
-    saveDraft();
-    const p = window.location.pathname.replace(/\/+$/, "") || "/";
-    if (p === "/react") mode.value = "react";
-    else if (p === "/web") mode.value = "web";
-    else mode.value = "js";
-  });
-}
 
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -52,8 +40,10 @@ export function App() {
   }
 
   const currentMode = mode.value;
+  // A new embedded example cancels pending runs and removes the previous sandbox on unmount.
+  const playgroundKey = embedVersion.value;
   return <>
-    {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage /> : <JsPlayground />}
+    {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage key={playgroundKey} /> : <JsPlayground key={playgroundKey} />}
     {!isEmbed && <PlaygroundLibrary />}
     <Gallery />
     <ScreenshotModal />

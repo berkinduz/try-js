@@ -23,6 +23,7 @@ Run `npm ci`, `npm run check`, and `npm audit`. Test the built preview in a brow
 - Save, reopen, update, copy, remove/undo, and JSON import/export.
 - Opening a shared link and a saved playground, followed by draft recovery.
 - JS/TS/Web/React embeds and small-screen editor/output visibility.
+- Switching examples within one embed, including reload/back/forward, without changing local drafts or retaining an old sandbox.
 - Vim insert/normal modes, motions, deletion, undo, persistence, and standard-mode restoration.
 - Mobile and light/dark layouts, keyboard focus, and dialog escape behavior.
 
