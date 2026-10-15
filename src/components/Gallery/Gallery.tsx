@@ -2,9 +2,10 @@ import { useEffect } from "preact/hooks";
 import { signal } from "@preact/signals";
 import { SNIPPET_CATEGORIES } from "../../data/snippets";
 import type { Snippet } from "../../data/snippets";
-import { setCode, setLanguage, language } from "../../state/editor";
+import { applyPlayground } from "../../state/editor";
 import { clearConsole } from "../../state/console";
 import { trackEvent } from "../../utils/analytics";
+import { showToast } from "../Toast/Toast";
 import "./Gallery.css";
 
 export const galleryOpen = signal(false);
@@ -20,10 +21,8 @@ function closeGallery() {
 function loadSnippet(snippet: Snippet) {
   trackEvent("snippet_load", { title: snippet.title, language: snippet.language });
   clearConsole();
-  if (snippet.language !== language.value) {
-    setLanguage(snippet.language);
-  }
-  setCode(snippet.code);
+  try { applyPlayground({ mode: "js", language: snippet.language, code: snippet.code }); }
+  catch (cause) { showToast(cause instanceof Error ? cause.message : "This snippet could not be opened.", "error"); return; }
   closeGallery();
 }
 

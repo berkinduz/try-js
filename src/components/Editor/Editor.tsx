@@ -17,16 +17,8 @@ import {
   setLanguage,
   setMode,
 } from "../../state/editor";
-import { shareToClipboard, generateEmbedCode } from "../../utils/share";
-import { showToast } from "../Toast/Toast";
-import { openScreenshotModal } from "../Screenshot/ScreenshotModal";
-import {
-  trackEmbedCopied,
-  trackEvent,
-  trackFirstMeaningfulEdit,
-  trackShareCreated,
-} from "../../utils/analytics";
-import { selectedText } from "../../state/selection";
+import { trackFirstMeaningfulEdit } from "../../utils/analytics";
+import { ShareMenu } from "../Playgrounds/ShareMenu";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
 import "./Editor.css";
@@ -35,7 +27,7 @@ const PLACEHOLDER_EXAMPLES = [
   {
     label: "NPM Imports",
     icon: "package",
-    desc: "Use any npm package directly",
+    desc: "Try browser-ready npm packages",
     code: `import dayjs from "dayjs";
 import _ from "lodash";
 
@@ -54,7 +46,7 @@ console.log("Shuffled:", nums);`,
   {
     label: "TypeScript",
     icon: "type",
-    desc: "Full TS support, zero config",
+    desc: "Run TypeScript with type checking",
     code: `type Result<T> =
   | { ok: true; value: T }
   | { ok: false; error: string };
@@ -81,8 +73,6 @@ export function Editor() {
   const viewRef = useRef<EditorView | null>(null);
   const [copied, setCopied] = useState(false);
   const [editorFocused, setEditorFocused] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-  const shareRef = useRef<HTMLDivElement>(null);
 
   const copyCode = async () => {
     try {
@@ -91,79 +81,6 @@ export function Editor() {
       setTimeout(() => setCopied(false), 1500);
     } catch (_) {}
   };
-
-  const handleShareLink = async () => {
-    trackEvent("code_share", { method: "url" });
-    setShareOpen(false);
-    try {
-      const surface = language.value;
-      const scope = selectedText.value ? "selection" : "document";
-      const codeToShare = scope === "selection" ? selectedText.value : code.value;
-      const result = await shareToClipboard({
-        code: codeToShare,
-        language: surface,
-      });
-      trackShareCreated(
-        surface,
-        scope,
-        Boolean(result.warning),
-      );
-      if (result.warning) {
-        showToast(result.warning, "warning", 4000);
-      } else {
-        showToast(
-          scope === "selection"
-            ? "Selection link copied!"
-            : "Link copied to clipboard!",
-        );
-      }
-    } catch {
-      showToast("Failed to copy link", "error");
-    }
-  };
-
-  const handleCopyEmbed = async () => {
-    trackEvent("code_share", { method: "embed" });
-    setShareOpen(false);
-    try {
-      const surface = language.value;
-      const embedCode = generateEmbedCode({
-        code: code.value,
-        language: surface,
-      });
-      await navigator.clipboard.writeText(embedCode);
-      trackEmbedCopied(surface);
-      showToast("Embed code copied!");
-    } catch {
-      showToast("Failed to copy embed code", "error");
-    }
-  };
-
-  const handleExportImage = () => {
-    trackEvent("screenshot_export");
-    setShareOpen(false);
-    const codeToExport = selectedText.value || code.value;
-    openScreenshotModal(codeToExport);
-  };
-
-  // Close share dropdown on click-outside or Escape
-  useEffect(() => {
-    if (!shareOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShareOpen(false);
-    };
-    const onClick = (e: MouseEvent) => {
-      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
-        setShareOpen(false);
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onClick);
-    };
-  }, [shareOpen]);
 
   const handleSelectionChange = (update: { state: EditorState }) => {
     const { from, to } = update.state.selection.main;
@@ -207,6 +124,7 @@ export function Editor() {
       view.contentDOM.removeEventListener("blur", onBlur);
       view.destroy();
       viewRef.current = null;
+      clearSelection();
     };
   }, []);
 
@@ -240,13 +158,12 @@ export function Editor() {
 
     const currentDoc = view.state.doc.toString();
     if (currentDoc !== code.value) {
-      view.dispatch({
-        changes: {
-          from: 0,
-          to: currentDoc.length,
-          insert: code.value,
-        },
-      });
+      clearSelection();
+      view.setState(EditorState.create({
+        doc: code.value,
+        extensions: createExtensions(language.value, theme.value, syntaxTheme.value, setCode,
+          handleSelectionChange, (before, after) => trackFirstMeaningfulEdit(language.value, before, after)),
+      }));
     }
   }, [code.value]);
 
@@ -260,6 +177,7 @@ export function Editor() {
       return;
     }
     if ("action" in example && example.action === "web") {
+      history.pushState(null, "", "/web");
       setMode("web");
       return;
     }
@@ -389,98 +307,7 @@ export function Editor() {
             </svg>
           )}
         </button>
-        <div class="editor-share-wrap" ref={shareRef}>
-          <button
-            type="button"
-            class={`editor-action-btn ${shareOpen ? "active" : ""}`}
-            onClick={() => setShareOpen(!shareOpen)}
-            title="Share"
-            aria-label="Share"
-            aria-expanded={shareOpen}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-            </svg>
-          </button>
-          {shareOpen && (
-            <div class="editor-dropdown">
-              <button
-                type="button"
-                class="editor-dropdown__item"
-                onClick={handleShareLink}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-                </svg>
-                Share as URL
-              </button>
-              <button
-                type="button"
-                class="editor-dropdown__item"
-                onClick={handleExportImage}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="M21 15l-5-5L5 21" />
-                </svg>
-                Export as Image
-              </button>
-              <button
-                type="button"
-                class="editor-dropdown__item"
-                onClick={handleCopyEmbed}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="16 18 22 12 16 6" />
-                  <polyline points="8 6 2 12 8 18" />
-                </svg>
-                Copy Embed Code
-              </button>
-            </div>
-          )}
-        </div>
+        <ShareMenu />
       </div>
       <div ref={containerRef} class="editor-container" />
     </div>

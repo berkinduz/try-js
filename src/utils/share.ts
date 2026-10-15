@@ -1,103 +1,75 @@
 import LZString from "lz-string";
-import type { Language } from "../state/editor";
+import { parsePlayground, playgroundPath } from "./playground.ts";
+import type { PlaygroundState } from "./playground.ts";
 
-const {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} = LZString;
-
+const { compressToEncodedURIComponent: compress, decompressFromEncodedURIComponent: decompress } = LZString;
 const MAX_URL_LENGTH = 4000;
+const MAX_HASH_LENGTH = 100_000;
+export type SharedState = PlaygroundState;
 
-export interface SharedState {
-  code: string;
-  language: Language;
-  mode?: "js" | "web";
-  html?: string;
-  css?: string;
-  webJs?: string;
-}
-
-/**
- * Encode code + language into a URL-safe hash fragment.
- * Format: #code=<lz-compressed>&lang=js|ts
- * Web mode: #mode=web&html=<lz>&css=<lz>&js=<lz>
- */
-export function encodeToHash(state: SharedState): string {
+/** Versioned URLs remain compatible with existing JS/TS and Web links. */
+export function encodeToHash(value: SharedState): string {
+  const state = parsePlayground(value);
+  if (!state) throw new Error("This playground is too large to share. Copy the code or split it into smaller examples.");
+  const params = new URLSearchParams({ v: "2" });
   if (state.mode === "web") {
-    const parts = [`mode=web`];
-    if (state.html) parts.push(`html=${compressToEncodedURIComponent(state.html)}`);
-    if (state.css) parts.push(`css=${compressToEncodedURIComponent(state.css)}`);
-    if (state.webJs) parts.push(`wjs=${compressToEncodedURIComponent(state.webJs)}`);
-    return `#${parts.join("&")}`;
+    params.set("mode", "web");
+    params.set("html", compress(state.html));
+    params.set("css", compress(state.css));
+    params.set("wjs", compress(state.webJs));
+  } else {
+    if (state.mode === "react") {
+      params.set("mode", "react");
+      params.set("css", compress(state.css));
+    }
+    params.set("code", compress(state.code));
+    params.set("lang", state.language === "typescript" ? "ts" : "js");
   }
-  const compressed = compressToEncodedURIComponent(state.code);
-  const lang = state.language === "typescript" ? "ts" : "js";
-  return `#code=${compressed}&lang=${lang}`;
+  const hash = `#${params}`;
+  if (hash.length > MAX_HASH_LENGTH) {
+    throw new Error("This playground is too large for a link. Export a JSON backup instead.");
+  }
+  return hash;
 }
 
-/**
- * Decode a hash fragment back into code + language.
- * Returns null if hash is empty or malformed.
- */
 export function decodeFromHash(hash: string): SharedState | null {
-  if (!hash || hash.length < 2) return null;
-  const params = new URLSearchParams(hash.slice(1));
-
-  // Web mode
-  if (params.get("mode") === "web") {
-    const htmlCompressed = params.get("html");
-    const cssCompressed = params.get("css");
-    const wjsCompressed = params.get("wjs");
-    return {
-      code: "",
-      language: "javascript",
-      mode: "web",
-      html: htmlCompressed ? (decompressFromEncodedURIComponent(htmlCompressed) ?? "") : "",
-      css: cssCompressed ? (decompressFromEncodedURIComponent(cssCompressed) ?? "") : "",
-      webJs: wjsCompressed ? (decompressFromEncodedURIComponent(wjsCompressed) ?? "") : "",
+  if (!hash || hash.length < 2 || hash.length > MAX_HASH_LENGTH) return null;
+  try {
+    const params = new URLSearchParams(hash.slice(1));
+    if (params.has("v") && params.get("v") !== "2") return null;
+    const read = (key: string): string | null => {
+      const compressed = params.get(key);
+      return compressed ? decompress(compressed) : "";
     };
+    const mode = params.get("mode");
+    if (mode === "web") {
+      return parsePlayground({ mode, html: read("html"), css: read("css"), webJs: read("wjs") });
+    }
+    if (mode !== null && mode !== "js" && mode !== "react") return null;
+    if (!params.has("code")) return null;
+    return parsePlayground({
+      mode: mode ?? "js", code: read("code"),
+      language: params.get("lang") === "ts" ? "typescript" : "javascript",
+      ...(mode === "react" ? { css: read("css") } : {}),
+    });
+  } catch {
+    return null;
   }
-
-  // JS/TS mode
-  const compressed = params.get("code");
-  const lang = params.get("lang");
-  if (!compressed) return null;
-
-  const code = decompressFromEncodedURIComponent(compressed);
-  if (code === null || code === "") return null;
-
-  const language: Language = lang === "ts" ? "typescript" : "javascript";
-  return { code, language };
 }
 
-/**
- * Build a shareable URL and copy it to the clipboard.
- * Returns { ok, warning? } where warning is set if URL is too long.
- */
-export async function shareToClipboard(state: SharedState): Promise<{
-  ok: boolean;
-  warning?: string;
-}> {
-  const hash = encodeToHash(state);
-  const url = `${window.location.origin}${window.location.pathname}${hash}`;
+export function shareUrl(state: SharedState, origin: string): string {
+  return `${origin}${playgroundPath(state)}${encodeToHash(state)}`;
+}
 
+export async function shareToClipboard(state: SharedState): Promise<{ ok: boolean; warning?: string }> {
+  const url = shareUrl(state, window.location.origin);
   await navigator.clipboard.writeText(url);
-
-  if (url.length > MAX_URL_LENGTH) {
-    return {
-      ok: true,
-      warning: `URL is ${url.length} chars. Some services may truncate long URLs.`,
-    };
-  }
-
-  return { ok: true };
+  return url.length > MAX_URL_LENGTH
+    ? { ok: true, warning: `Link copied (${url.length} characters). Some services may shorten long links; a JSON backup keeps the full playground.` }
+    : { ok: true };
 }
 
-/**
- * Generate an embeddable iframe snippet for the given code.
- */
-export function generateEmbedCode(state: SharedState): string {
-  const hash = encodeToHash(state);
-  const url = `https://tryjs.app/embed${hash}`;
+export function generateEmbedCode(state: SharedState, origin = "https://tryjs.app"): string {
+  const url = `${origin}/embed${encodeToHash(state)}`;
   return `<iframe src="${url}" width="100%" height="400" style="border:0;border-radius:8px;" loading="lazy" title="TryJS code playground" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
 }

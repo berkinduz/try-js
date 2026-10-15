@@ -5,10 +5,12 @@ import { ReactEditor } from "../ReactEditor/ReactEditor";
 import { ReactPreview, reactConsoleOutput } from "../ReactPreview/ReactPreview";
 import { SplitPane } from "../SplitPane/SplitPane";
 import { StatusBar } from "../StatusBar/StatusBar";
-import { ToastContainer } from "../Toast/Toast";
 import { Toolbar } from "../Toolbar/Toolbar";
-import { mode, webHtml, webCss, webJs, reactCode, reactCss } from "../../state/editor";
-import { clearConsole } from "../../state/console";
+import { mode, setMode, saveDraft, webHtml, webCss, webJs, reactCode, reactCss } from "../../state/editor";
+import { embedMode } from "../../state/ui";
+import { writeLocal } from "../../utils/storage";
+import { ShareMenu } from "../Playgrounds/ShareMenu";
+import { EmbedOpenLink } from "../Playgrounds/EmbedOpenLink";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
 import { applySeo } from "../../utils/seo";
@@ -18,11 +20,8 @@ import "./WebPlaygroundPage.css";
 type WebSubMode = "vanilla" | "react";
 
 export function WebPlaygroundPage() {
-  // Determine subMode from URL path for SEO
-  const path = window.location.pathname.replace(/\/+$/, "") || "/";
-  const initial: WebSubMode = path === "/react" ? "react" : "vanilla";
-
-  const [subMode, setSubMode] = useState<WebSubMode>(initial);
+  const isEmbed = embedMode.value;
+  const subMode: WebSubMode = mode.value === "react" ? "react" : "vanilla";
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < MOBILE_BREAKPOINT
   );
@@ -34,31 +33,16 @@ export function WebPlaygroundPage() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Sync global mode with subMode
-  useEffect(() => {
-    mode.value = subMode === "react" ? "react" : "web";
-  }, [subMode]);
-
   // Switch subMode and update URL for SEO
   const switchSubMode = (m: WebSubMode) => {
     if (m === subMode) return;
     trackEvent("web_submode_switch", { from: subMode, to: m });
-    setSubMode(m);
+    setMode(m === "react" ? "react" : "web");
     setMobileTab("editor");
-    localStorage.setItem("jspark:webSubMode", m);
+    writeLocal("jspark:webSubMode", m);
     const newPath = m === "react" ? "/react" : "/web";
     window.history.pushState(null, "", newPath);
   };
-
-  // React to browser back/forward so subMode stays in sync with URL
-  useEffect(() => {
-    const onPop = () => {
-      const p = window.location.pathname.replace(/\/+$/, "") || "/";
-      setSubMode(p === "/react" ? "react" : "vanilla");
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
 
   // SEO meta tags + analytics
   useEffect(() => {
@@ -124,21 +108,16 @@ export function WebPlaygroundPage() {
   const reactCssVal = reactCss.value;
 
   useEffect(() => {
-    if (subMode !== "vanilla") return;
-    const timer = setTimeout(() => {
-      localStorage.setItem("jspark:web:html", webHtmlVal);
-      localStorage.setItem("jspark:web:css", webCssVal);
-      localStorage.setItem("jspark:web:js", webJsVal);
+    if (isEmbed || subMode !== "vanilla") return;
+    const timer = setTimeout(() => { saveDraft();
     }, 1000);
     return () => clearTimeout(timer);
   }, [webHtmlVal, webCssVal, webJsVal, subMode]);
 
   // Save react code to localStorage (debounced)
   useEffect(() => {
-    if (subMode !== "react") return;
-    const timer = setTimeout(() => {
-      localStorage.setItem("jspark:react:code", reactCodeVal);
-      localStorage.setItem("jspark:react:css", reactCssVal);
+    if (isEmbed || subMode !== "react") return;
+    const timer = setTimeout(() => { saveDraft();
     }, 1000);
     return () => clearTimeout(timer);
   }, [reactCodeVal, reactCssVal, subMode]);
@@ -148,18 +127,12 @@ export function WebPlaygroundPage() {
     {
       key: "s",
       mod: true,
-      handler: () => {
-        if (subMode === "vanilla") {
-          localStorage.setItem("jspark:web:html", webHtml.value);
-          localStorage.setItem("jspark:web:css", webCss.value);
-          localStorage.setItem("jspark:web:js", webJs.value);
-        } else {
-          localStorage.setItem("jspark:react:code", reactCode.value);
-          localStorage.setItem("jspark:react:css", reactCss.value);
-        }
-      },
+      handler: saveDraft,
     },
-    { key: "l", mod: true, handler: clearConsole },
+    { key: "l", mod: true, handler: () => {
+      if (subMode === "react") reactConsoleOutput.value = [];
+      else webConsoleOutput.value = [];
+    } },
   ]);
 
   return (
@@ -168,10 +141,10 @@ export function WebPlaygroundPage() {
       style={{ display: "flex", flexDirection: "column", height: "100%" }}
     >
       {/* Shared toolbar with JS/TS/Web buttons */}
-      <Toolbar />
+      {!isEmbed && <Toolbar />}
 
       {/* Vanilla/React sub-toggle (only show when Web is active) */}
-      <div class="web-sub-toggle">
+      {!isEmbed && <div class="web-sub-toggle">
         <button
           type="button"
           class={`web-sub-toggle__btn ${subMode === "vanilla" ? "active" : ""}`}
@@ -186,10 +159,16 @@ export function WebPlaygroundPage() {
         >
           React
         </button>
-      </div>
+        <ShareMenu label />
+      </div>}
 
       {/* Editor + Preview */}
-      {isMobile ? (
+      {isMobile && isEmbed ? (
+        <div class="embed-mobile-layout">
+          {subMode === "react" ? <ReactEditor /> : <WebEditor />}
+          {subMode === "react" ? <ReactPreview /> : <WebPreview />}
+        </div>
+      ) : isMobile ? (
         <>
           <div class="mobile-tabs">
             <button
@@ -231,8 +210,8 @@ export function WebPlaygroundPage() {
         />
       )}
 
-      <StatusBar />
-      <ToastContainer />
+      {!isEmbed && <StatusBar />}
+      {isEmbed && <EmbedOpenLink />}
     </div>
   );
 }

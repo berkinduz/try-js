@@ -49,6 +49,8 @@
   --radius-sm: 4px;
 }
 
+.embed-mobile-layout { display: grid; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; flex: 1; }
+
 /* ============================================
    LIGHT THEME
    ============================================ */

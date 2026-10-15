@@ -6,7 +6,7 @@ import {
   isLoadingModules,
 } from "../../state/console";
 import { syntaxTheme, setSyntaxTheme, mode } from "../../state/editor";
-import { editorFont, setEditorFont, EDITOR_FONTS } from "../../state/settings";
+import { editorFont, setEditorFont, EDITOR_FONTS, vimEnabled, setVimEnabled } from "../../state/settings";
 import type { EditorFontId } from "../../state/settings";
 import { SYNTAX_THEMES } from "../Editor/themes";
 import type { SyntaxThemeId } from "../Editor/themes";
@@ -28,7 +28,7 @@ export function StatusBar() {
     return () => document.removeEventListener("click", onClick);
   }, [helpOpen, shortcutsOpen]);
 
-  const isWeb = mode.value === "web";
+  const isWeb = mode.value === "web" || mode.value === "react";
   const entries = consoleOutput.value;
   const execTime = executionTime.value;
   const running = isRunning.value;
@@ -193,6 +193,10 @@ export function StatusBar() {
         )}
 
         <div class="statusbar__appearance">
+          <button type="button" class={`statusbar__vim-btn ${vimEnabled.value ? "active" : ""}`}
+            aria-label="Vim mode" aria-pressed={vimEnabled.value}
+            title={`Vim keybindings ${vimEnabled.value ? "on" : "off"}. Press i to edit, Escape for normal mode.`}
+            onClick={() => setVimEnabled(!vimEnabled.value)}>Vim</button>
           <div class="statusbar__shortcut-wrap">
             <button
               type="button"

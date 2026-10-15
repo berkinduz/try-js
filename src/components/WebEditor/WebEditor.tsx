@@ -3,9 +3,7 @@ import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import {
   createExtensions,
-  languageCompartment,
   themeCompartment,
-  getLanguageExtension,
   getThemeExtension,
 } from "../Editor/extensions";
 import type { EditorLanguage } from "../Editor/extensions";
@@ -57,6 +55,8 @@ export function WebEditor() {
   const viewRef = useRef<EditorView | null>(null);
   const activeTabRef = useRef<WebTab>(webActiveTab.value);
   const activeTab = webActiveTab.value;
+  const activeContent = getWebCode(activeTab);
+  const mountedTabRef = useRef<WebTab>(activeTab);
   const [editorFocused, setEditorFocused] = useState(false);
 
   // Keep ref in sync so the onChange callback always targets the correct tab
@@ -106,18 +106,16 @@ export function WebEditor() {
     const newContent = getWebCode(activeTab);
     const currentDoc = view.state.doc.toString();
 
-    // Reconfigure language
-    view.dispatch({
-      effects: languageCompartment.reconfigure(getLanguageExtension(lang)),
-    });
-
-    // Update content if different
-    if (currentDoc !== newContent) {
-      view.dispatch({
-        changes: { from: 0, to: currentDoc.length, insert: newContent },
-      });
+    if (mountedTabRef.current !== activeTab || currentDoc !== newContent) {
+      view.setState(EditorState.create({
+        doc: newContent,
+        extensions: createExtensions(lang, theme.value, syntaxTheme.value,
+          (newCode) => setWebCode(activeTabRef.current, newCode), undefined,
+          (before, after) => trackFirstMeaningfulEdit("web", before, after)),
+      }));
+      mountedTabRef.current = activeTab;
     }
-  }, [activeTab]);
+  }, [activeTab, activeContent]);
 
   // Sync theme
   useEffect(() => {
@@ -138,19 +136,6 @@ export function WebEditor() {
     setWebCode("css", STARTER_CSS);
     setWebCode("js", STARTER_JS);
     setWebActiveTab("html");
-    // Update editor content
-    const view = viewRef.current;
-    if (view) {
-      const currentDoc = view.state.doc.toString();
-      if (currentDoc !== STARTER_HTML) {
-        view.dispatch({
-          effects: languageCompartment.reconfigure(getLanguageExtension("html")),
-        });
-        view.dispatch({
-          changes: { from: 0, to: currentDoc.length, insert: STARTER_HTML },
-        });
-      }
-    }
   };
 
   const handleTabClick = (tab: WebTab) => {

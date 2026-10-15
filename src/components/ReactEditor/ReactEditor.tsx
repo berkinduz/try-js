@@ -3,9 +3,7 @@ import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import {
   createExtensions,
-  languageCompartment,
   themeCompartment,
-  getLanguageExtension,
   getThemeExtension,
 } from "../Editor/extensions";
 import { theme, syntaxTheme, reactCode, reactCss, setReactCode, setReactCss } from "../../state/editor";
@@ -21,6 +19,8 @@ export function ReactEditor() {
   const jsxViewRef = useRef<EditorView | null>(null);
   const cssViewRef = useRef<EditorView | null>(null);
   const [editorFocused, setEditorFocused] = useState(false);
+  const currentJsx = reactCode.value;
+  const currentCss = reactCss.value;
   const [activeTab, setActiveTab] = useState<ReactTab>("jsx");
 
   // Create JSX editor on mount
@@ -84,6 +84,28 @@ export function ReactEditor() {
     };
   }, []);
 
+  useEffect(() => {
+    const view = jsxViewRef.current;
+    if (view && view.state.doc.toString() !== currentJsx) {
+      view.setState(EditorState.create({
+        doc: currentJsx,
+        extensions: createExtensions("jsx", theme.value, syntaxTheme.value, setReactCode, undefined,
+          (before, after) => trackFirstMeaningfulEdit("react", before, after)),
+      }));
+    }
+  }, [currentJsx]);
+
+  useEffect(() => {
+    const view = cssViewRef.current;
+    if (view && view.state.doc.toString() !== currentCss) {
+      view.setState(EditorState.create({
+        doc: currentCss,
+        extensions: createExtensions("css", theme.value, syntaxTheme.value, setReactCss, undefined,
+          (before, after) => trackFirstMeaningfulEdit("react", before, after)),
+      }));
+    }
+  }, [currentCss]);
+
   // Sync theme for both editors
   useEffect(() => {
     const effects = themeCompartment.reconfigure(
@@ -98,24 +120,6 @@ export function ReactEditor() {
   const loadStarter = () => {
     setReactCode(DEFAULT_REACT_CODE);
     setReactCss(DEFAULT_REACT_CSS);
-    const jsxView = jsxViewRef.current;
-    if (jsxView) {
-      const currentDoc = jsxView.state.doc.toString();
-      if (currentDoc !== DEFAULT_REACT_CODE) {
-        jsxView.dispatch({
-          changes: { from: 0, to: currentDoc.length, insert: DEFAULT_REACT_CODE },
-        });
-      }
-    }
-    const cssView = cssViewRef.current;
-    if (cssView) {
-      const currentDoc = cssView.state.doc.toString();
-      if (currentDoc !== DEFAULT_REACT_CSS) {
-        cssView.dispatch({
-          changes: { from: 0, to: currentDoc.length, insert: DEFAULT_REACT_CSS },
-        });
-      }
-    }
   };
 
   return (

@@ -11,15 +11,13 @@ import { getHoverInfo } from "../../sandbox/ts-completions";
 
 /**
  * CodeMirror extension that displays type info on hover.
- * Only activates when the TypeScript compiler has been loaded.
+ * Identifier hovers request the lazy type worker; empty editor space does not load it.
  */
-export const tsHoverTooltip = hoverTooltip(
+export const tsHoverTooltip = (jsx = false) => hoverTooltip(
   async (view: EditorView, pos: number): Promise<Tooltip | null> => {
-    // Don't attempt if TS isn't loaded yet
-    if (!(window as any).ts) return null;
-
+    if (!view.state.wordAt(pos)) return null;
     const source = view.state.doc.toString();
-    const info = await getHoverInfo(source, pos);
+    const info = await getHoverInfo(source, pos, jsx);
 
     if (!info) return null;
 

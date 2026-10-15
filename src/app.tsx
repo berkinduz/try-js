@@ -4,16 +4,17 @@ import { Console } from "./components/Console/Console";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { StatusBar } from "./components/StatusBar/StatusBar";
 import { SplitPane } from "./components/SplitPane/SplitPane";
-import { code, language, mode } from "./state/editor";
+import { code, language, mode, saveDraft, draftStorageUnavailable } from "./state/editor";
 import { clearConsole, consoleOutput } from "./state/console";
 import { autoRunDelay } from "./state/settings";
-import { executeCode } from "./sandbox/executor";
+import { executeCode, stopExecution } from "./sandbox/executor";
 import { useKeyboard } from "./hooks/useKeyboard";
-import { ToastContainer } from "./components/Toast/Toast";
+import { ToastContainer, showToast } from "./components/Toast/Toast";
 import { Gallery } from "./components/Gallery/Gallery";
 import { ScreenshotModal } from "./components/Screenshot/ScreenshotModal";
 import { embedMode } from "./state/ui";
-import { encodeToHash } from "./utils/share";
+import { EmbedOpenLink } from "./components/Playgrounds/EmbedOpenLink";
+import { PlaygroundLibrary } from "./components/Playgrounds/PlaygroundLibrary";
 import { trackEvent } from "./utils/analytics";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { FeaturesPage } from "./components/Features/FeaturesPage";
@@ -23,27 +24,14 @@ import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage"
 
 // Sync global mode with URL on back/forward navigation so App re-renders
 if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", saveDraft);
   window.addEventListener("popstate", () => {
+    saveDraft();
     const p = window.location.pathname.replace(/\/+$/, "") || "/";
     if (p === "/react") mode.value = "react";
     else if (p === "/web") mode.value = "web";
     else mode.value = "js";
   });
-}
-
-function EmbedOpenLink() {
-  const hash = encodeToHash({ code: code.value, language: language.value });
-  const url = `https://tryjs.app/${hash}`;
-  return (
-    <a
-      class="embed-open-link"
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Open in TryJS
-    </a>
-  );
 }
 
 export function App() {
@@ -63,28 +51,32 @@ export function App() {
     return <SnippetDetailPage slug={snippetMatch[1]} />;
   }
 
-  // Check mode from URL path
   const currentMode = mode.value;
+  return <>
+    {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage /> : <JsPlayground />}
+    {!isEmbed && <PlaygroundLibrary />}
+    <Gallery />
+    <ScreenshotModal />
+    <ToastContainer />
+    <DraftStorageNotice />
+  </>;
+}
 
-  // Separate URLs for SEO
-  if (
-    !isEmbed &&
-    (path === "/web" ||
-      path === "/react" ||
-      currentMode === "web" ||
-      currentMode === "react")
-  ) {
-    return <WebPlaygroundPage />;
-  }
+function DraftStorageNotice() {
+  const unavailable = draftStorageUnavailable.value;
+  useEffect(() => {
+    if (unavailable) showToast("Autosave is unavailable in this browser. Export a JSON backup to keep your work.", "warning", 7000);
+  }, [unavailable]);
+  return null;
+}
 
+function JsPlayground() {
+  const isEmbed = embedMode.value;
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Ensure JS mode on root page (web/react now live at /web)
-  useEffect(() => {
-    if (mode.value !== "js") mode.value = "js";
-  }, []);
+  useEffect(() => () => stopExecution(), []);
 
   // Track main playground view
   useEffect(() => {
@@ -115,8 +107,9 @@ export function App() {
 
   // Save code to localStorage on change (debounced)
   useEffect(() => {
+    if (isEmbed) return;
     const timer = setTimeout(() => {
-      localStorage.setItem(`jspark:code:${language.value}`, code.value);
+      saveDraft();
     }, 1000);
     return () => clearTimeout(timer);
   }, [code.value, language.value]);
@@ -128,7 +121,7 @@ export function App() {
       key: "s",
       mod: true,
       handler: () => {
-        localStorage.setItem(`jspark:code:${language.value}`, code.value);
+        saveDraft();
       },
     },
     { key: "l", mod: true, handler: clearConsole },
@@ -138,6 +131,13 @@ export function App() {
   const errorCount = consoleOutput.value.filter(
     (e) => e.kind === "error" || (e.kind === "console" && e.method === "error")
   ).length;
+
+  if (isMobile && isEmbed) {
+    return <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div class="embed-mobile-layout"><Editor /><Console /></div>
+      <EmbedOpenLink />
+    </div>;
+  }
 
   if (isMobile) {
     return (
@@ -172,9 +172,6 @@ export function App() {
         </div>
         {!isEmbed && <StatusBar />}
         {isEmbed && <EmbedOpenLink />}
-        <Gallery />
-        <ScreenshotModal />
-        <ToastContainer />
       </div>
     );
   }
@@ -188,9 +185,6 @@ export function App() {
       />
       {!isEmbed && <StatusBar />}
       {isEmbed && <EmbedOpenLink />}
-      <Gallery />
-      <ScreenshotModal />
-      <ToastContainer />
     </div>
   );
 }

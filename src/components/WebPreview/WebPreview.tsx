@@ -3,6 +3,7 @@ import { signal } from "@preact/signals";
 import { webHtml, webCss, webJs } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
 import { PREVIEW_CONSOLE_FORMATTER } from "../../sandbox/preview-console-formatter";
+import { buildWebDocument } from "../../sandbox/web-document";
 import {
   isSuccessfulRunEligible,
   trackSuccessfulRun,
@@ -33,6 +34,7 @@ ${PREVIEW_CONSOLE_FORMATTER}
   methods.forEach(function(m) {
     var orig = console[m];
     console[m] = function() {
+      if (m === "error") hadError = true;
       var args = [];
       for (var i = 0; i < arguments.length; i++) {
         args.push(formatConsoleArg(arguments[i]));
@@ -59,30 +61,8 @@ ${PREVIEW_CONSOLE_FORMATTER}
 })();
 `;
 
-function buildSrcdoc(
-  htmlCode: string,
-  cssCode: string,
-  jsCode: string,
-  generation: number,
-): string {
-  const safeBootstrap = CONSOLE_BOOTSTRAP.replace(
-    /__TRYJS_GENERATION__/g,
-    String(generation),
-  ).replace(/<\/script/gi, "<\\/script");
-  const safeJs = jsCode.replace(/<\/script/gi, "<\\/script");
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${cssCode}</style>
-<script>${safeBootstrap}<\/script>
-</head>
-<body>
-${htmlCode}
-<script>${safeJs}<\/script>
-</body>
-</html>`;
+function buildSrcdoc(html: string, css: string, js: string, generation: number): string {
+  return buildWebDocument(html, css, js, generation, CONSOLE_BOOTSTRAP);
 }
 
 export function WebPreview() {
@@ -117,7 +97,7 @@ export function WebPreview() {
       webConsoleOutput.value = [
         ...webConsoleOutput.value,
         { id: ++entryId, method: data.method, args: data.args || [] },
-      ];
+      ].slice(-500);
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);

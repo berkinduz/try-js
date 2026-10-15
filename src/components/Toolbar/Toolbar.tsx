@@ -1,6 +1,8 @@
 import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import { ToolbarLinks } from "./ToolbarLinks";
+import { openLibrary } from "../Playgrounds/PlaygroundLibrary";
+import { readLocal } from "../../utils/storage";
 import "./Toolbar.css";
 
 export function Toolbar() {
@@ -26,7 +28,7 @@ export function Toolbar() {
     // Preserve current sub-mode (vanilla vs react) if already in Web
     if (isWebMode) return;
     // Restore last chosen sub-mode, default vanilla
-    const stored = localStorage.getItem("jspark:webSubMode");
+    const stored = readLocal("jspark:webSubMode");
     const target = stored === "react" ? "/react" : "/web";
     setMode(stored === "react" ? "react" : "web");
     goto(target);
@@ -71,7 +73,10 @@ export function Toolbar() {
         </div>
       </div>
 
-      <ToolbarLinks />
+      <div class="toolbar__saved-actions">
+        <button type="button" class="playgrounds-trigger" onClick={openLibrary} aria-haspopup="dialog">My playgrounds</button>
+        <ToolbarLinks />
+      </div>
     </div>
   );
 }

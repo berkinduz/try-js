@@ -26,7 +26,7 @@ export function ToastContainer() {
   if (toasts.value.length === 0) return null;
 
   return (
-    <div class="toast-container">
+    <div class="toast-container" role="status" aria-live="polite">
       {toasts.value.map((t) => (
         <div key={t.id} class={`toast toast--${t.type}`}>
           {t.message}

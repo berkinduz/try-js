@@ -3,8 +3,7 @@ import { signal } from "@preact/signals";
 import { reactCode, reactCss } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
 import { PREVIEW_CONSOLE_FORMATTER } from "../../sandbox/preview-console-formatter";
-import { transpileJsx } from "../../sandbox/transpiler";
-import { rewriteImports } from "../../sandbox/transpiler";
+import { buildReactDocument } from "../../sandbox/react-document";
 import {
   isSuccessfulRunEligible,
   trackSuccessfulRun,
@@ -35,6 +34,7 @@ ${PREVIEW_CONSOLE_FORMATTER}
   methods.forEach(function(m) {
     var orig = console[m];
     console[m] = function() {
+      if (m === "error") hadError = true;
       var args = [];
       for (var i = 0; i < arguments.length; i++) {
         args.push(formatConsoleArg(arguments[i]));
@@ -61,109 +61,8 @@ ${PREVIEW_CONSOLE_FORMATTER}
 })();
 `;
 
-function buildSrcdoc(
-  userCode: string,
-  userCss: string,
-  generation: number,
-): string {
-  const bootstrap = CONSOLE_BOOTSTRAP.replace(
-    /__TRYJS_GENERATION__/g,
-    String(generation),
-  );
-  // Transpile JSX → JS
-  const transpiled = transpileJsx(userCode);
-  if (transpiled.error !== null) {
-    const safeBootstrap = bootstrap.replace(/<\/script/gi, "<\\/script");
-    const errorMsg = transpiled.error.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n");
-    return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<script>${safeBootstrap}<\/script>
-</head>
-<body>
-<pre style="color: #e74c3c; font-family: monospace; padding: 1rem; white-space: pre-wrap;">${transpiled.error.replace(/</g, "&lt;")}</pre>
-<script>console.error('${errorMsg}');<\/script>
-</body>
-</html>`;
-  }
-
-  let jsCode = transpiled.code;
-
-  // Rewrite bare import specifiers (e.g., "react" → "https://esm.sh/react")
-  jsCode = rewriteImports(jsCode);
-
-  // Sucrase with jsxRuntime: "automatic" produces:
-  //   var _jsxRuntime = require("react/jsx-runtime");
-  // We need to replace the require() calls with esm.sh imports at the top.
-  // Since we used transforms: ["imports"], all imports become require() calls.
-  // We'll convert them back to dynamic imports in a wrapper.
-
-  const safeBootstrap = bootstrap.replace(/<\/script/gi, "<\\/script");
-  const safeJs = jsCode.replace(/<\/script/gi, "<\\/script");
-  const safeCss = userCss.replace(/<\/style/gi, "<\\/style");
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${safeCss}</style>
-<script>${safeBootstrap}<\/script>
-</head>
-<body>
-<div id="root"></div>
-<script type="module">
-// Provide require() shim for Sucrase CJS output
-const __modules = {};
-
-async function __loadModules() {
-  const React = await import("https://esm.sh/react@18");
-  const ReactDOM = await import("https://esm.sh/react-dom@18/client");
-  const jsxRuntime = await import("https://esm.sh/react@18/jsx-runtime");
-
-  __modules["react"] = React;
-  __modules["react-dom"] = ReactDOM;
-  __modules["react-dom/client"] = ReactDOM;
-  __modules["react/jsx-runtime"] = jsxRuntime;
-}
-
-function require(id) {
-  // Strip esm.sh base URL if present
-  const clean = id.replace("https://esm.sh/", "");
-  const mod = __modules[clean];
-  if (mod) return mod;
-  throw new Error("Module not found: " + id);
-}
-
-try {
-  await __loadModules();
-
-  // Execute user code
-  const exports = {};
-  const module = { exports };
-  ${safeJs}
-
-  // Find the default export (the root component)
-  const Component = module.exports.default || module.exports;
-  if (typeof Component === "function") {
-    const React = __modules["react"];
-    const ReactDOM = __modules["react-dom/client"];
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(React.createElement(Component));
-    window.__tryjsReportReactSuccess();
-  } else {
-    throw new Error("Default export must be a React component.");
-  }
-} catch(e) {
-  console.error(e.message || String(e));
-  document.getElementById("root").innerHTML =
-    '<pre style="color:#e74c3c;font-family:monospace;padding:1rem;white-space:pre-wrap;">' +
-    String(e.message || e).replace(/</g, "&lt;") + '</pre>';
-}
-<\/script>
-</body>
-</html>`;
+function buildSrcdoc(userCode: string, userCss: string, generation: number): string {
+  return buildReactDocument(userCode, userCss, generation, CONSOLE_BOOTSTRAP);
 }
 
 export function ReactPreview() {
@@ -197,7 +96,7 @@ export function ReactPreview() {
       reactConsoleOutput.value = [
         ...reactConsoleOutput.value,
         { id: ++entryId, method: data.method, args: data.args || [] },
-      ];
+      ].slice(-500);
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);

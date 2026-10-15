@@ -44,6 +44,7 @@ import type { CompletionMode } from "./completions";
 import { tsCompletionSource } from "../../sandbox/ts-completions";
 import { tsHoverTooltip } from "./hover";
 import { importQuickFixLinter } from "./import-quick-fixes";
+import { optionalVim } from "./vim";
 
 /** All language modes the editor can handle. */
 export type EditorLanguage = Language | "html" | "css" | "jsx";
@@ -54,8 +55,15 @@ export const themeCompartment = new Compartment();
 export function getLanguageExtension(lang: EditorLanguage): Extension {
   if (lang === "html") return html();
   if (lang === "css") return css();
-  if (lang === "jsx") return javascript({ typescript: false, jsx: true });
-  return javascript({ typescript: lang === "typescript", jsx: false });
+  const completionMode = getCompletionMode(lang)!;
+  const sources = [...getCompletionSources(completionMode),
+    (context: Parameters<typeof tsCompletionSource>[0]) => tsCompletionSource(context, lang === "jsx"),
+  ];
+  return [
+    javascript({ typescript: lang === "typescript", jsx: lang === "jsx" }),
+    ...sources.map((source) => EditorState.languageData.of(() => [{ autocomplete: source }])),
+    tsHoverTooltip(lang === "jsx"), importQuickFixLinter, lintGutter(),
+  ];
 }
 
 export function getThemeExtension(uiTheme: UiTheme, syntaxThemeId: SyntaxThemeId): Extension[] {
@@ -78,25 +86,13 @@ export function createExtensions(
   onSelectionChange?: (update: ViewUpdate) => void,
   onUserEdit?: (before: string, after: string) => void,
 ): Extension[] {
-  const completionMode = getCompletionMode(lang);
-
-  // Additional completion sources — injected via languageData so they
-  // work alongside (not replacing) the built-in lang-javascript completions.
-  const extraSources = completionMode
-    ? [...getCompletionSources(completionMode), tsCompletionSource]
-    : [];
-
   return [
+    // Vim must precede the normal keymaps; disabled mode adds no downloaded code.
+    ...optionalVim(),
     // Language
     languageCompartment.of(getLanguageExtension(lang)),
     // Theme (UI + syntax)
     themeCompartment.of(getThemeExtension(uiTheme, syntaxThemeId)),
-    // Register extra completion sources via languageData so they merge
-    // with the built-in sources from @codemirror/lang-javascript.
-    // Each source must be a separate { autocomplete: fn } entry.
-    ...extraSources.map((source) =>
-      EditorState.languageData.of(() => [{ autocomplete: source }]),
-    ),
     // Core
     lineNumbers(),
     highlightActiveLineGutter(),
@@ -128,10 +124,6 @@ export function createExtensions(
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
-    // Hover tooltips (only for JS/TS/JSX)
-    ...(completionMode ? [tsHoverTooltip] : []),
-    // Import quick-fix linter with lightbulb actions (only for JS/TS/JSX)
-    ...(completionMode ? [importQuickFixLinter, lintGutter()] : []),
     // Keymaps
     keymap.of([
       // Accept completion on Tab (before indentWithTab so it takes priority)

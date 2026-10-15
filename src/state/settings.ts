@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals";
 import { AUTO_RUN_DELAY, DEFAULT_SPLIT_RATIO } from "../utils/constants";
 import { trackEvent } from "../utils/analytics";
+import { readLocal, writeLocal } from "../utils/storage";
 
 export type EditorFontId = "geist-mono" | "fira-code" | "jetbrains-mono";
 
@@ -12,7 +13,7 @@ export const EDITOR_FONTS: { id: EditorFontId; label: string; fontFamily: string
 
 function loadSetting<T>(key: string, fallback: T): T {
   try {
-    const stored = localStorage.getItem(`jspark:${key}`);
+    const stored = readLocal(`jspark:${key}`);
     if (stored === null) return fallback;
     return JSON.parse(stored) as T;
   } catch {
@@ -21,12 +22,13 @@ function loadSetting<T>(key: string, fallback: T): T {
 }
 
 function saveSetting(key: string, value: unknown) {
-  localStorage.setItem(`jspark:${key}`, JSON.stringify(value));
+  writeLocal(`jspark:${key}`, JSON.stringify(value));
 }
 
 const validEditorFontIds = new Set(EDITOR_FONTS.map((f) => f.id));
 function loadEditorFont(): EditorFontId {
-  const stored = localStorage.getItem("jspark:editorFont");
+  let stored = readLocal("jspark:editorFont");
+  try { stored = JSON.parse(stored ?? "null") ?? stored; } catch { /* Legacy unquoted font IDs. */ }
   if (stored && validEditorFontIds.has(stored as EditorFontId)) return stored as EditorFontId;
   return "geist-mono";
 }
@@ -37,6 +39,13 @@ export const tabSize = signal<number>(loadSetting("tabSize", 2));
 export const wordWrap = signal<boolean>(loadSetting("wordWrap", false));
 export const splitRatio = signal<number>(loadSetting("splitRatio", DEFAULT_SPLIT_RATIO));
 export const editorFont = signal<EditorFontId>(loadEditorFont());
+export const vimEnabled = signal(loadSetting<boolean>("vimEnabled", false) === true);
+
+export function setVimEnabled(enabled: boolean) {
+  vimEnabled.value = enabled;
+  saveSetting("vimEnabled", enabled);
+  trackEvent("editor_keymap_change", { keymap: enabled ? "vim" : "standard" });
+}
 
 function applyEditorFontToDocument() {
   const font = EDITOR_FONTS.find((f) => f.id === editorFont.value);
@@ -57,7 +66,7 @@ export function setSplitRatio(val: number) {
 export function setEditorFont(id: EditorFontId) {
   trackEvent("font_change", { font: id });
   editorFont.value = id;
-  saveSetting("editorFont", id);
+  writeLocal("jspark:editorFont", id);
   const font = EDITOR_FONTS.find((f) => f.id === id);
   if (font) document.documentElement.style.setProperty("--editor-font", font.fontFamily);
 }

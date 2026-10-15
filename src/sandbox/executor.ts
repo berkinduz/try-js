@@ -158,7 +158,7 @@ function cleanup() {
 function handleMessage(event: MessageEvent) {
   const data = event.data;
   if (!data || data.source !== "jspark") return;
-  if (currentIframe?.contentWindow && event.source !== currentIframe.contentWindow) {
+  if (!currentIframe?.contentWindow || event.source !== currentIframe.contentWindow) {
     return;
   }
 
@@ -452,6 +452,8 @@ parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - 
 
 export function stopExecution() {
   cleanup();
+  ++typeCheckRunId;
+  typeCheckPromise = null;
   executionDone = true;
   activeRun = null;
   isRunning.value = false;
