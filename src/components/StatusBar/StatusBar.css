@@ -363,38 +363,38 @@
 
 @media (max-width: 768px) {
   .statusbar {
-    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "links metrics"
+      "appearance appearance";
     height: auto;
     padding: 8px 10px;
-    flex-direction: column;
     align-items: stretch;
+    gap: 6px 8px;
+  }
+
+  .statusbar__left {
+    grid-area: links;
+    min-width: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: 6px;
   }
 
-  .statusbar__left,
   .statusbar__right {
-    width: 100%;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .statusbar__right {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
+    display: contents;
   }
 
   .statusbar__metrics {
-    position: absolute;
-    left: 50%;
-    top: 12px;
-    transform: translateX(-50%);
-    justify-content: center;
+    grid-area: metrics;
+    justify-content: flex-end;
+    align-self: center;
     align-items: center;
     gap: 8px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    max-width: 160px;
     min-height: 24px;
-    pointer-events: none;
   }
 
   .statusbar__item {
@@ -420,7 +420,9 @@
   }
 
   .statusbar__appearance {
+    grid-area: appearance;
     width: 100%;
+    min-width: 0;
     margin-left: 0;
     padding-left: 0;
     border-left: none;
