@@ -49,6 +49,8 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 ### Editor & IntelliSense
 
+- **Format code on request** — choose **More options → Format code**, or press **Shift+Alt+F** (**⇧⌥F** on Mac) while editing. It formats the active JS, TS, HTML, CSS, or React tab, including with Vim enabled; one Undo restores the original code. Selection and scroll position are preserved where possible. Formatting is never automatic and does not save a named playground: it follows the usual draft and unsaved-change behavior.
+- **Local, lazy formatter** — [Prettier standalone](https://prettier.io/docs/browser) and the needed language parsers load on the first formatting request. Source code stays in the browser. Invalid syntax leaves the document unchanged with an error message; edits, selection changes, or switching documents/tabs while loading discard the pending result.
 - **Smart code completions** — 60+ snippet templates (`fn`, `cl`, `map`, `tc`, `imp`, `ust`, `uef`, `rfc`…), global API dot-access (`console.`, `Math.`, `JSON.`, `Object.`, `Array.`, `Promise.`, `document.`), and heuristic type inference for string/array/promise instance methods
 - **TypeScript Language Service** — real type-aware IntelliSense powered by `ts.createLanguageService()` with `getCompletionsAtPosition()` for semantic completions
 - **Hover type info** — hover over any identifier to see its type signature and documentation via `getQuickInfoAtPosition()`

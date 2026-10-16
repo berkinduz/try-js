@@ -230,6 +230,7 @@ const getStoredReactCss = (): string => {
 
 export const reactCode = signal<string>(getStoredReactCode());
 export const reactCss = signal<string>(getStoredReactCss());
+export const reactActiveTab = signal<"jsx" | "css">("jsx");
 export const playgroundVersion = signal(0);
 
 export const currentSurface = computed<PlaygroundSurface>(() => mode.value === "js" ? language.value : mode.value);

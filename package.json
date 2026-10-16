@@ -34,6 +34,7 @@
     "@vercel/analytics": "^1.6.1",
     "lz-string": "^1.5.0",
     "preact": "^10.25.0",
+    "prettier": "3.9.10",
     "sucrase": "^3.35.0"
   },
   "devDependencies": {

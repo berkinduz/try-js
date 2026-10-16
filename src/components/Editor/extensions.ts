@@ -45,6 +45,7 @@ import { tsCompletionSource } from "../../sandbox/ts-completions";
 import { tsHoverTooltip } from "./hover";
 import { importQuickFixLinter } from "./import-quick-fixes";
 import { optionalVim } from "./vim";
+import { formatLanguage, formattingExtensions } from "./formatting";
 
 /** All language modes the editor can handle. */
 export type EditorLanguage = Language | "html" | "css" | "jsx";
@@ -53,13 +54,14 @@ export const languageCompartment = new Compartment();
 export const themeCompartment = new Compartment();
 
 export function getLanguageExtension(lang: EditorLanguage): Extension {
-  if (lang === "html") return html();
-  if (lang === "css") return css();
+  if (lang === "html") return [formatLanguage.of(lang), html()];
+  if (lang === "css") return [formatLanguage.of(lang), css()];
   const completionMode = getCompletionMode(lang)!;
   const sources = [...getCompletionSources(completionMode),
     (context: Parameters<typeof tsCompletionSource>[0]) => tsCompletionSource(context, lang === "jsx"),
   ];
   return [
+    formatLanguage.of(lang),
     javascript({ typescript: lang === "typescript", jsx: lang === "jsx" }),
     ...sources.map((source) => EditorState.languageData.of(() => [{ autocomplete: source }])),
     tsHoverTooltip(lang === "jsx"), importQuickFixLinter, lintGutter(),
@@ -87,6 +89,7 @@ export function createExtensions(
   onUserEdit?: (before: string, after: string) => void,
 ): Extension[] {
   return [
+    ...formattingExtensions,
     // Vim must precede the normal keymaps; disabled mode adds no downloaded code.
     ...optionalVim(),
     // Language

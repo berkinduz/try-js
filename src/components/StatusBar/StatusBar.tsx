@@ -11,6 +11,7 @@ import type { EditorFontId } from "../../state/settings";
 import { SYNTAX_THEMES } from "../Editor/themes";
 import type { SyntaxThemeId } from "../Editor/themes";
 import { openGallery } from "../Gallery/Gallery";
+import { formatShortcutLabel } from "../Editor/formatting";
 import "./StatusBar.css";
 
 export function StatusBar() {
@@ -96,6 +97,9 @@ export function StatusBar() {
               </li>
               <li>
                 <strong>Themes</strong> pick syntax theme and editor font
+              </li>
+              <li>
+                <strong>Format code</strong> in More options formats the active tab; Undo restores your code
               </li>
             </ul>
             <div class="statusbar__help-shortcuts">
@@ -223,6 +227,9 @@ export function StatusBar() {
               <div class="statusbar__shortcut-row">
                 <kbd>⌘</kbd>
                 <kbd>L</kbd> Clear console
+              </div>
+              <div class="statusbar__shortcut-row">
+                <kbd>{formatShortcutLabel}</kbd> Format code
               </div>
             </div>
           </div>

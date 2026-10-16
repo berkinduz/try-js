@@ -189,6 +189,22 @@
   color: var(--text-primary);
 }
 
+button.toolbar__dropdown-item {
+  width: 100%;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.toolbar__dropdown-item:disabled { opacity: 0.5; cursor: wait; }
+.toolbar__dropdown-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.toolbar__dropdown-item kbd {
+  margin-left: auto;
+  padding-left: 12px;
+  font: 11px var(--font-mono);
+  color: var(--text-muted);
+}
+
 .toolbar__dropdown-item svg {
   opacity: 0.5;
   flex-shrink: 0;

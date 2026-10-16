@@ -6,12 +6,10 @@ import {
   themeCompartment,
   getThemeExtension,
 } from "../Editor/extensions";
-import { theme, syntaxTheme, reactCode, reactCss, setReactCode, setReactCss } from "../../state/editor";
+import { theme, syntaxTheme, reactCode, reactCss, reactActiveTab, setReactCode, setReactCss } from "../../state/editor";
 import { DEFAULT_REACT_CODE, DEFAULT_REACT_CSS } from "../../utils/constants";
 import { trackFirstMeaningfulEdit } from "../../utils/analytics";
 import "./ReactEditor.css";
-
-type ReactTab = "jsx" | "css";
 
 export function ReactEditor() {
   const jsxContainerRef = useRef<HTMLDivElement>(null);
@@ -21,7 +19,7 @@ export function ReactEditor() {
   const [editorFocused, setEditorFocused] = useState(false);
   const currentJsx = reactCode.value;
   const currentCss = reactCss.value;
-  const [activeTab, setActiveTab] = useState<ReactTab>("jsx");
+  const activeTab = reactActiveTab.value;
 
   // Create JSX editor on mount
   useEffect(() => {
@@ -128,14 +126,14 @@ export function ReactEditor() {
         <button
           type="button"
           class={`react-editor__tab ${activeTab === "jsx" ? "active" : ""}`}
-          onClick={() => setActiveTab("jsx")}
+          onClick={() => { reactActiveTab.value = "jsx"; }}
         >
           App.jsx
         </button>
         <button
           type="button"
           class={`react-editor__tab ${activeTab === "css" ? "active" : ""}`}
-          onClick={() => setActiveTab("css")}
+          onClick={() => { reactActiveTab.value = "css"; }}
         >
           App.css
         </button>
