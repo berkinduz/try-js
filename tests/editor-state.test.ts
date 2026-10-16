@@ -3,7 +3,14 @@ import assert from "node:assert/strict";
 import * as sharing from "../src/utils/share.ts";
 import type * as playground from "../src/utils/playground.ts";
 import * as constants from "../src/utils/constants.ts";
+import * as library from "../src/utils/library.ts";
 import { editorState } from "./helpers/editor-state.ts";
+
+function savedEntry(id: string, surface: "javascript" | "typescript" | "react" = "javascript") {
+  return { id, name: id, updatedAt: 1, state: surface === "react"
+    ? { mode: "react" as const, language: "javascript" as const, code: constants.DEFAULT_REACT_CODE, css: constants.DEFAULT_REACT_CSS }
+    : { mode: "js" as const, language: surface, code: "" } };
+}
 
 test("switching language after opening a shared link preserves edits and the other language draft", () => {
   const hash = sharing.encodeToHash({ code: 'console.log("shared")', language: "javascript" });
@@ -148,7 +155,7 @@ test("New resets only the current surface, preserves named saves and offers reco
     ["jspark:web:html", "<h1>Other draft</h1>"],
   ]);
   editor.setCode("console.log('fresh edit')");
-  editor.setActiveSavedPlayground({ id: "named", updatedAt: 1 });
+  editor.setActiveSavedPlayground(savedEntry("named"));
   editor.startNewPlayground();
   assert.equal(editor.code.value, constants.DEFAULT_JS_CODE);
   assert.equal(editor.activeSavedPlayground.value, null);
@@ -174,25 +181,28 @@ test("New uses TypeScript, Web and React defaults in their respective surfaces",
   assert.equal(editor.reactCss.value, constants.DEFAULT_REACT_CSS);
 });
 
-test("saved identity survives reload, follows each surface, and is cleared for external code", () => {
+test("a saved editor survives reload and language switches without replacing normal drafts", () => {
   const state = editorState();
-  state.editor.setActiveSavedPlayground({ id: "javascript-save", updatedAt: 1 });
+  state.editor.setCode("// saved work");
+  state.editor.setActiveSavedPlayground(savedEntry("javascript-save"));
   state.editor.setLanguage("typescript");
   assert.equal(state.editor.activeSavedPlayground.value, null);
-  state.editor.setActiveSavedPlayground({ id: "typescript-save", updatedAt: 2 });
+  state.editor.setCode("const scratch: number = 2;");
   state.editor.setMode("react");
-  state.editor.setActiveSavedPlayground({ id: "react-save", updatedAt: 3 });
   const reloaded = editorState("", "/react", [...state.values], [...state.sessions]);
-  assert.equal(reloaded.editor.activeSavedPlayground.value.id, "react-save");
+  assert.equal(reloaded.editor.activeSavedPlayground.value, null);
   reloaded.editor.setMode("js"); reloaded.editor.setLanguage("javascript");
   assert.equal(reloaded.editor.activeSavedPlayground.value.id, "javascript-save");
+  assert.equal(reloaded.editor.code.value, "// saved work");
+  assert.equal(reloaded.values.has("jspark:code:javascript"), false);
+  assert.equal(reloaded.values.get("jspark:code:typescript"), "const scratch: number = 2;");
   reloaded.editor.applyPlayground({ mode: "js", language: "javascript", code: "// snippet" });
   assert.equal(reloaded.editor.activeSavedPlayground.value, null);
   const shared = editorState(sharing.encodeToHash({ code: "// shared", language: "javascript" }), "/", [...state.values], [...state.sessions]);
   assert.equal(shared.editor.activeSavedPlayground.value, null);
-  shared.editor.setMode("react"); assert.equal(shared.editor.activeSavedPlayground.value.id, "react-save");
+  assert.equal(JSON.parse(shared.values.get(shared.editor.PREVIOUS_PLAYGROUND_KEY)!).code, "// saved work");
   const embedded = editorState("", "/embed", [...state.values], [...state.sessions]);
-  embedded.editor.setActiveSavedPlayground({ id: "embed", updatedAt: 10 });
+  embedded.editor.setActiveSavedPlayground(savedEntry("embed"));
   embedded.editor.startNewPlayground();
   assert.deepEqual([...embedded.sessions], [...state.sessions]);
 });
@@ -200,8 +210,21 @@ test("saved identity survives reload, follows each surface, and is cleared for e
 test("New refuses to discard a draft beyond the recovery limit", () => {
   const { editor } = editorState();
   editor.setCode("x".repeat(500_001));
-  editor.setActiveSavedPlayground({ id: "large", updatedAt: 1 });
+  editor.setActiveSavedPlayground(savedEntry("large"));
   assert.throws(() => editor.startNewPlayground(), /Copy its code/);
   assert.equal(editor.code.value.length, 500_001);
   assert.equal(editor.activeSavedPlayground.value.id, "large");
+});
+
+test("upgrading old saved metadata retains the edited code and cannot revive after closing", () => {
+  const entry = savedEntry("old");
+  const state = editorState("", "/", [
+    [library.LIBRARY_KEY, library.exportBackup([entry])], ["jspark:code:javascript", "// pending edit"],
+  ], [["tryjs:active-playgrounds:v1", JSON.stringify({ javascript: { id: entry.id, updatedAt: 1 } })]]);
+  assert.equal(state.editor.activeSavedPlayground.value.id, entry.id);
+  assert.equal(state.editor.code.value, "// pending edit");
+  state.editor.closeNamedPlayground();
+  const reloaded = editorState("", "/", [...state.values], [...state.sessions]);
+  assert.equal(reloaded.editor.activeSavedPlayground.value, null);
+  assert.equal(reloaded.editor.code.value, "// pending edit");
 });

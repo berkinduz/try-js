@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readLocal, writeLocal } from "../src/utils/storage.ts";
+import { readLocal, writeLocal, readSession, writeSession } from "../src/utils/storage.ts";
 
 test("blocked storage keeps fresh drafts available in this session without claiming persistence", () => {
   const previous = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
@@ -14,6 +14,26 @@ test("blocked storage keeps fresh drafts available in this session without claim
   } finally {
     if (previous) Object.defineProperty(globalThis, "localStorage", previous);
     else Reflect.deleteProperty(globalThis, "localStorage");
+  }
+});
+
+test("blocked tab storage keeps the open saved editor readable and reports failed persistence", () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
+  let blocked = true;
+  const values = new Map<string, string>();
+  Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem(key: string, value: string) { if (blocked) throw new Error("blocked"); values.set(key, value); },
+  } });
+  try {
+    assert.equal(writeSession("test:saved-editor", "fresh working copy"), false);
+    assert.equal(readSession("test:saved-editor"), "fresh working copy");
+    blocked = false;
+    assert.equal(writeSession("test:saved-editor", "persisted working copy"), true);
+    assert.equal(readSession("test:saved-editor"), "persisted working copy");
+  } finally {
+    if (previous) Object.defineProperty(globalThis, "sessionStorage", previous);
+    else Reflect.deleteProperty(globalThis, "sessionStorage");
   }
 });
 

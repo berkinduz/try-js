@@ -1,7 +1,7 @@
 import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import { ToolbarLinks } from "./ToolbarLinks";
-import { PlaygroundActions } from "../Playgrounds/PlaygroundActions";
+import { PlaygroundActions, PlaygroundContext } from "../Playgrounds/PlaygroundActions";
 import { readLocal } from "../../utils/storage";
 import "./Toolbar.css";
 
@@ -35,7 +35,7 @@ export function Toolbar() {
   };
 
   return (
-    <div class="toolbar">
+    <><div class="toolbar">
       <div class="toolbar__left">
         <div class="toolbar__brand">
           <div class="toolbar__lang-toggle">
@@ -73,8 +73,8 @@ export function Toolbar() {
         </div>
       </div>
 
-      <PlaygroundActions />
-      <ToolbarLinks />
+      <div class="toolbar__utilities"><PlaygroundActions /><ToolbarLinks /></div>
     </div>
+    <PlaygroundContext /></>
   );
 }

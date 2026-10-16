@@ -52,7 +52,7 @@ export function ShareMenu({ label = false }: { label?: boolean }) {
         showToast(result.warning ?? (selection ? "Selection link copied!" : "Link copied to clipboard!"), result.warning ? "warning" : "success", result.warning ? 5000 : 2500);
       }
     } catch (cause) {
-      showToast(cause instanceof Error && cause.message.includes("too large") ? cause.message : "Could not copy. Export a JSON backup to share this playground.", "error", 4500);
+      showToast(cause instanceof Error && cause.message.includes("too large") ? cause.message : "Could not copy. Download the playground (.json) to share it as a file.", "error", 4500);
     }
   };
 
@@ -73,7 +73,7 @@ export function ShareMenu({ label = false }: { label?: boolean }) {
           downloadText(exportBackup([newSavedPlayground("Untitled playground", capturePlayground())]), "tryjs-playground.json");
           trackEvent("playground_backup_exported", { scope: "current" });
         } catch (cause) { showToast(cause instanceof Error ? cause.message : "Could not export this playground.", "error"); }
-      }}>Export JSON</button>
+      }}>Download playground (.json)</button>
       {isScript && <button type="button" onClick={() => {
         setOpen(false); trackEvent("screenshot_export");
         openScreenshotModal(selectedText.value || capturePlayground().code);

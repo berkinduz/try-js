@@ -55,7 +55,7 @@ export function App() {
 function DraftStorageNotice() {
   const unavailable = draftStorageUnavailable.value;
   useEffect(() => {
-    if (unavailable) showToast("Autosave is unavailable in this browser. Export a JSON backup to keep your work.", "warning", 7000);
+    if (unavailable) showToast("Autosave is unavailable in this browser. Download the playground (.json) to keep your work.", "warning", 7000);
   }, [unavailable]);
   return null;
 }
@@ -66,7 +66,10 @@ function JsPlayground() {
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => () => stopExecution(), []);
+  useEffect(() => {
+    clearConsole();
+    return () => stopExecution();
+  }, []);
 
   // Track main playground view
   useEffect(() => {

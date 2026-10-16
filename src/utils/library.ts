@@ -22,7 +22,7 @@ export function newSavedPlayground(name: string, state: PlaygroundState): SavedP
   };
 }
 
-function validateEntry(value: unknown): SavedPlayground | null {
+export function parseSavedPlayground(value: unknown): SavedPlayground | null {
   if (!value || typeof value !== "object") return null;
   const entry = value as Record<string, unknown>;
   const state = parsePlayground(entry.state);
@@ -41,7 +41,7 @@ export function parseBackup(text: string): SavedPlayground[] {
     throw new Error("Choose a TryJS playground backup (.json).");
   }
   if (value.playgrounds.length > MAX_SAVED_PLAYGROUNDS) throw new Error("A backup can contain up to 50 playgrounds.");
-  const entries = value.playgrounds.map(validateEntry);
+  const entries = value.playgrounds.map(parseSavedPlayground);
   if (entries.some((entry) => !entry)) throw new Error("This backup contains an invalid playground. Nothing was imported.");
   const valid = entries as SavedPlayground[];
   if (new Set(valid.map((entry) => entry.id)).size !== valid.length) throw new Error("This backup contains duplicate playground IDs.");

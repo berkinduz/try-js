@@ -6,6 +6,7 @@ import { signal, computed, batch } from "@preact/signals";
 import * as constants from "../../src/utils/constants.ts";
 import * as sharing from "../../src/utils/share.ts";
 import * as playground from "../../src/utils/playground.ts";
+import * as library from "../../src/utils/library.ts";
 
 /** Run the real state module with only browser APIs and unrelated visual services substituted. */
 export function editorState(hash = "", pathname = "/", initial: [string, string][] = [], sessionInitial: [string, string][] = []) {
@@ -20,8 +21,15 @@ export function editorState(hash = "", pathname = "/", initial: [string, string]
     "@preact/signals": { signal, computed, batch }, "../utils/constants": constants,
     "../sandbox/type-checker": { preloadTypeScript() {} },
     "../components/Editor/themes": { SYNTAX_THEMES: [{ id: "one-dark" }], getUiModeForSyntax: () => "dark" },
-    "../utils/share": sharing, "../utils/playground": playground,
-    "../utils/storage": { readSession: sessionStorage.getItem, writeSession: sessionStorage.setItem, readLocal: storage.getItem, writeLocal: (key: string, value: string) => { storage.setItem(key, value); return true; } },
+    "../utils/share": sharing, "../utils/playground": playground, "../utils/library": library,
+    "../utils/storage": {
+      readSession: sessionStorage.getItem, writeSession: (key: string, value: string) => {
+        try { sessionStorage.setItem(key, value); return true; } catch { return false; }
+      },
+      readLocal: storage.getItem, writeLocal: (key: string, value: string) => {
+        try { storage.setItem(key, value); return true; } catch { return false; }
+      },
+    },
     "../utils/analytics": { trackEvent() {} },
   };
   const history = {

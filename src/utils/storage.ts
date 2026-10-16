@@ -1,4 +1,5 @@
 const sessionFallback = new Map<string, string>();
+const tabFallback = new Map<string, string>();
 
 /** Drafts and editor preferences must not stop the app when browser storage is blocked. */
 export function readLocal(key: string): string | null {
@@ -23,11 +24,18 @@ export function writeLocal(key: string, value: string): boolean {
 
 /** The active saved document belongs to this tab; another tab must not replace its identity. */
 export function readSession(key: string): string | null {
+  if (tabFallback.has(key)) return tabFallback.get(key)!;
   try { return sessionStorage.getItem(key); }
-  catch { return null; }
+  catch { return tabFallback.get(key) ?? null; }
 }
 
-export function writeSession(key: string, value: string): void {
-  try { sessionStorage.setItem(key, value); }
-  catch { /* The current tab still keeps its identity in signals. */ }
+export function writeSession(key: string, value: string): boolean {
+  try {
+    sessionStorage.setItem(key, value);
+    tabFallback.delete(key);
+    return true;
+  } catch {
+    tabFallback.set(key, value);
+    return false;
+  }
 }

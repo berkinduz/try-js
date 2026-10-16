@@ -21,6 +21,8 @@ import { trackEvent } from "../utils/analytics";
 import { readLocal, writeLocal, readSession, writeSession } from "../utils/storage";
 import { parsePlayground, playgroundPath, playgroundText, playgroundSurface, samePlayground } from "../utils/playground";
 import type { AppMode, Language, PlaygroundState, PlaygroundSurface } from "../utils/playground";
+import { parseSavedPlayground, readLibrary } from "../utils/library";
+import type { SavedPlayground } from "../utils/library";
 
 export type { Language, AppMode } from "../utils/playground";
 export type Theme = "light" | "dark";
@@ -29,8 +31,77 @@ export type WebTab = "html" | "css" | "js";
 // Check URL hash for shared code (takes priority over localStorage)
 const sharedState = decodeFromHash(window.location.hash);
 const isEmbed = window.location.pathname.replace(/\/+$/, "") === "/embed";
+export const ACTIVE_PLAYGROUNDS_KEY = "tryjs:active-playgrounds:v1";
+export const SAVED_WORKSPACE_KEY = "tryjs:saved-workspace:v1";
+export const PREVIOUS_PLAYGROUND_KEY = "jspark:previous-playground:v1";
+const surfaces: PlaygroundSurface[] = ["javascript", "typescript", "web", "react"];
+let sharedRecovery: PlaygroundState | null = null;
+
+function readPreviousPlayground(): PlaygroundState | null {
+  if (isEmbed) return null;
+  try { return parsePlayground(JSON.parse(readLocal(PREVIOUS_PLAYGROUND_KEY) ?? "null"), Infinity); }
+  catch { return null; }
+}
+
+export const previousPlayground = signal<PlaygroundState | null>(readPreviousPlayground());
+
+interface SavedWorkspace {
+  saved: SavedPlayground;
+  working: PlaygroundState;
+  returnSurface: PlaygroundSurface;
+}
+
+function scratchPlayground(surface: PlaygroundSurface): PlaygroundState {
+  if (surface === "web") return {
+    mode: "web", language: "javascript", code: "",
+    html: readLocal("jspark:web:html") ?? DEFAULT_WEB_HTML,
+    css: readLocal("jspark:web:css") ?? DEFAULT_WEB_CSS,
+    webJs: readLocal("jspark:web:js") ?? DEFAULT_WEB_JS,
+  };
+  if (surface === "react") return {
+    mode: "react", language: "javascript",
+    code: readLocal("jspark:react:code") ?? DEFAULT_REACT_CODE,
+    css: readLocal("jspark:react:css") ?? DEFAULT_REACT_CSS,
+  };
+  return { mode: "js", language: surface, code: readLocal(`jspark:code:${surface}`) ?? (surface === "typescript" ? DEFAULT_TS_CODE : DEFAULT_JS_CODE) };
+}
+
+function readSavedWorkspace(): SavedWorkspace | null {
+  if (isEmbed) return null;
+  try {
+    const raw = JSON.parse(readSession(SAVED_WORKSPACE_KEY) ?? "null");
+    const saved = parseSavedPlayground(raw?.saved);
+    const working = parsePlayground(raw?.working, Infinity);
+    if (saved && working && playgroundSurface(saved.state) === playgroundSurface(working) && surfaces.includes(raw.returnSurface)) {
+      if (sharedState && playgroundSurface(sharedState) === playgroundSurface(working)) {
+        // A shared link must never inherit a local record's identity or erase its edits.
+        sharedRecovery = working;
+        writeSession(SAVED_WORKSPACE_KEY, "null");
+        return null;
+      }
+      return { saved, working, returnSurface: raw.returnSurface };
+    }
+    // Preserve the current record and edits when upgrading the old per-surface metadata.
+    if (raw === null && !sharedState) {
+      const path = window.location.pathname.replace(/\/+$/, "");
+      const surface = path === "/react" ? "react" : path === "/web" ? "web"
+        : readLocal("jspark:language") === "typescript" ? "typescript" : "javascript";
+      const previous = JSON.parse(readSession(ACTIVE_PLAYGROUNDS_KEY) ?? "null")?.[surface];
+      const entry = previous && readLibrary(window.localStorage).find(item => item.id === previous.id && playgroundSurface(item.state) === surface);
+      writeSession(ACTIVE_PLAYGROUNDS_KEY, "{}");
+      if (entry && typeof previous.updatedAt === "number") {
+        return { saved: { ...entry, updatedAt: previous.updatedAt }, working: scratchPlayground(surface), returnSurface: surface };
+      }
+    }
+  } catch { /* Invalid tab metadata must not affect the normal editor or named saves. */ }
+  return null;
+}
+
+const savedWorkspace = signal<SavedWorkspace | null>(readSavedWorkspace());
 
 const getStoredCode = (lang: Language): string => {
+  const working = savedWorkspace.value?.working;
+  if (working && playgroundSurface(working) === lang) return working.code;
   const stored = isEmbed ? null : readLocal(`jspark:code:${lang}`);
   return stored ?? (lang === "javascript" ? DEFAULT_JS_CODE : DEFAULT_TS_CODE);
 };
@@ -73,7 +144,7 @@ export function setLanguage(lang: Language) {
   if (lang === language.value) return;
   trackEvent("language_switch", { language: lang });
   // Save current code for current language
-  if (!isEmbed) writeLocal(`jspark:code:${language.value}`, code.value);
+  saveDraft();
   // Switch language
   language.value = lang;
   if (!isEmbed) writeLocal("jspark:language", lang);
@@ -128,6 +199,8 @@ const getStoredWebCode = (tab: WebTab): string => {
     if (tab === "css") return sharedState.css;
     return sharedState.webJs;
   }
+  const working = savedWorkspace.value?.working;
+  if (working?.mode === "web") return tab === "html" ? working.html : tab === "css" ? working.css : working.webJs;
   const stored = isEmbed ? null : readLocal(`jspark:web:${tab}`);
   if (stored !== null) return stored;
   if (tab === "html") return DEFAULT_WEB_HTML;
@@ -143,12 +216,14 @@ export const webActiveTab = signal<WebTab>("html");
 
 const getStoredReactCode = (): string => {
   if (sharedState?.mode === "react") return sharedState.code;
+  if (savedWorkspace.value?.working.mode === "react") return savedWorkspace.value.working.code;
   const stored = isEmbed ? null : readLocal("jspark:react:code");
   return stored ?? DEFAULT_REACT_CODE;
 };
 
 const getStoredReactCss = (): string => {
   if (sharedState?.mode === "react") return sharedState.css;
+  if (savedWorkspace.value?.working.mode === "react") return savedWorkspace.value.working.css;
   const stored = isEmbed ? null : readLocal("jspark:react:css");
   return stored ?? DEFAULT_REACT_CSS;
 };
@@ -157,41 +232,32 @@ export const reactCode = signal<string>(getStoredReactCode());
 export const reactCss = signal<string>(getStoredReactCss());
 export const playgroundVersion = signal(0);
 
-export interface SavedPlaygroundRef { id: string; updatedAt: number }
-export const ACTIVE_PLAYGROUNDS_KEY = "tryjs:active-playgrounds:v1";
-type ActivePlaygrounds = Partial<Record<PlaygroundSurface, SavedPlaygroundRef>>;
+export const currentSurface = computed<PlaygroundSurface>(() => mode.value === "js" ? language.value : mode.value);
+export const openedSavedPlayground = computed(() => savedWorkspace.value?.saved ?? null);
+export const activeSavedPlayground = computed(() => {
+  const workspace = savedWorkspace.value;
+  return workspace && playgroundSurface(workspace.working) === currentSurface.value ? workspace.saved : null;
+});
 
-function readActivePlaygrounds(): ActivePlaygrounds {
-  if (isEmbed) return {};
-  const result: ActivePlaygrounds = {};
-  try {
-    const stored = JSON.parse(readSession(ACTIVE_PLAYGROUNDS_KEY) ?? "null");
-    for (const key of ["javascript", "typescript", "web", "react"] as const) {
-      const entry = stored?.[key];
-      if (entry && typeof entry.id === "string" && entry.id.length > 0 && entry.id.length <= 100 &&
-        typeof entry.updatedAt === "number" && Number.isFinite(entry.updatedAt)) {
-        result[key] = { id: entry.id, updatedAt: entry.updatedAt };
-      }
-    }
-  } catch { /* Invalid tab metadata does not affect saved code. */ }
-  if (sharedState) {
-    delete result[playgroundSurface(sharedState)];
-    writeSession(ACTIVE_PLAYGROUNDS_KEY, JSON.stringify(result));
-  }
-  return result;
+export function setActiveSavedPlayground(entry: SavedPlayground | null): void {
+  if (isEmbed) return;
+  const previous = savedWorkspace.value;
+  savedWorkspace.value = entry ? {
+    saved: entry,
+    working: previous && playgroundSurface(entry.state) !== currentSurface.value && playgroundSurface(entry.state) === playgroundSurface(previous.working)
+      ? previous.working : capturePlayground(),
+    returnSurface: previous?.returnSurface ?? currentSurface.value,
+  } : null;
+  persistWorkspace();
 }
 
-const activePlaygrounds = signal<ActivePlaygrounds>(readActivePlaygrounds());
-export const currentSurface = computed<PlaygroundSurface>(() => mode.value === "js" ? language.value : mode.value);
-export const activeSavedPlayground = computed(() => activePlaygrounds.value[currentSurface.value] ?? null);
+export function captureSavedPlayground(): PlaygroundState | null {
+  const workspace = savedWorkspace.value;
+  return workspace ? activeSavedPlayground.value ? capturePlayground() : workspace.working : null;
+}
 
-export function setActiveSavedPlayground(entry: SavedPlaygroundRef | null, surface = currentSurface.value): void {
-  if (isEmbed) return;
-  const next = { ...activePlaygrounds.value };
-  if (entry) next[surface] = { id: entry.id, updatedAt: entry.updatedAt };
-  else delete next[surface];
-  activePlaygrounds.value = next;
-  writeSession(ACTIVE_PLAYGROUNDS_KEY, JSON.stringify(next));
+function persistWorkspace(): boolean {
+  return writeSession(SAVED_WORKSPACE_KEY, JSON.stringify(savedWorkspace.peek()));
 }
 
 export function setReactCode(newCode: string) {
@@ -238,6 +304,12 @@ export function capturePlayground(): PlaygroundState {
 /** Flush synchronously before navigation; a debounce must never lose the latest keystrokes. */
 export function saveDraft(): boolean {
   if (isEmbed) return true;
+  if (activeSavedPlayground.value) {
+    savedWorkspace.value = { ...savedWorkspace.peek()!, working: capturePlayground() };
+    const saved = persistWorkspace();
+    draftStorageUnavailable.value = !saved;
+    return saved;
+  }
   if (mode.value === "web") {
     const writes = [
       writeLocal("jspark:web:html", webHtml.value),
@@ -259,8 +331,6 @@ export function saveDraft(): boolean {
   return saved;
 }
 
-export const PREVIOUS_PLAYGROUND_KEY = "jspark:previous-playground:v1";
-
 /** Assign a validated playground inside the caller's batch, without navigation or storage writes. */
 function setPlaygroundState(next: PlaygroundState): void {
   if (next.mode === "web") {
@@ -279,19 +349,69 @@ function setPlaygroundState(next: PlaygroundState): void {
   mode.value = next.mode ?? "js";
 }
 
+/** Release the named editor without writing its code into any normal draft. */
+function releaseSavedWorkspace(): PlaygroundSurface | undefined {
+  const workspace = savedWorkspace.value;
+  if (!workspace) return;
+  const surface = playgroundSurface(workspace.working);
+  const previousMode = mode.value;
+  const previousLanguage = language.value;
+  if (surface === "web" || surface === "react" || surface === previousLanguage) {
+    setPlaygroundState(scratchPlayground(surface));
+    mode.value = previousMode;
+    // JS and TS share one signal; keep the visible language when the saved editor is paused.
+    if (surface !== "web" && surface !== "react") language.value = previousLanguage;
+  }
+  setActiveSavedPlayground(null);
+  return workspace.returnSurface;
+}
+
+export function openNamedPlayground(entry: SavedPlayground): void {
+  if (isEmbed) return;
+  if (!saveDraft()) throw new Error("Autosave is unavailable. Download your current playground before opening another one.");
+  batch(() => {
+    const returnSurface = releaseSavedWorkspace() ?? currentSurface.value;
+    savedWorkspace.value = { saved: entry, working: entry.state, returnSurface };
+    setPlaygroundState(entry.state);
+    if (entry.state.mode === "js") writeLocal("jspark:language", entry.state.language);
+    history.pushState(null, "", playgroundPath(entry.state));
+    ++playgroundVersion.value;
+  });
+  saveDraft();
+}
+
+export function closeNamedPlayground(): void {
+  if (!savedWorkspace.value || isEmbed) return;
+  batch(() => {
+    const returnSurface = releaseSavedWorkspace()!;
+    const previous = scratchPlayground(returnSurface);
+    setPlaygroundState(previous);
+    if (previous.mode === "js") writeLocal("jspark:language", previous.language);
+    history.pushState(null, "", playgroundPath(previous));
+    ++playgroundVersion.value;
+  });
+  saveDraft();
+}
+
 export function applyPlayground(value: PlaygroundState, allowLargeRecovery = false): void {
   const next = allowLargeRecovery ? parsePlayground(value, Infinity) : parsePlayground(value);
   if (!next) throw new Error("This file does not contain a supported playground.");
+  const workspace = savedWorkspace.value;
+  if (workspace && !activeSavedPlayground.value && playgroundSurface(workspace.working) === playgroundSurface(next) &&
+    !samePlayground(workspace.working, workspace.saved.state)) {
+    throw new Error("Save or close your open playground before replacing its code.");
+  }
   const previous = capturePlayground();
   if (!allowLargeRecovery && playgroundText(previous).trim() && !parsePlayground(previous)) {
     throw new Error("The current playground is too large for draft recovery. Copy its code before opening another playground.");
   }
   if (playgroundText(previous).trim() && !samePlayground(previous, next)) {
     writeLocal(PREVIOUS_PLAYGROUND_KEY, JSON.stringify(previous));
+    previousPlayground.value = previous;
   }
   saveDraft();
   batch(() => {
-    setActiveSavedPlayground(null, playgroundSurface(next));
+    if (workspace && playgroundSurface(workspace.working) === playgroundSurface(next)) releaseSavedWorkspace();
     setPlaygroundState(next);
     if (next.mode === "js") writeLocal("jspark:language", next.language);
     history.pushState(null, "", playgroundPath(next));
@@ -319,13 +439,14 @@ export function restorePreviousDraft(): void {
 
 // Opening a shared link keeps a recovery copy of the existing draft, before autosave runs.
 if (sharedState && !isEmbed) {
-  const oldDraft: PlaygroundState = sharedState.mode === "web"
+  const oldDraft: PlaygroundState = sharedRecovery ?? (sharedState.mode === "web"
     ? { mode: "web", language: "javascript", code: "", html: readLocal("jspark:web:html") ?? "", css: readLocal("jspark:web:css") ?? "", webJs: readLocal("jspark:web:js") ?? "" }
     : sharedState.mode === "react"
       ? { mode: "react", language: "javascript", code: readLocal("jspark:react:code") ?? "", css: readLocal("jspark:react:css") ?? "" }
-      : { mode: "js", language: sharedState.language, code: getStoredCode(sharedState.language) };
+      : { mode: "js", language: sharedState.language, code: getStoredCode(sharedState.language) });
   if (playgroundText(oldDraft).trim() && !samePlayground(oldDraft, sharedState)) {
     writeLocal(PREVIOUS_PLAYGROUND_KEY, JSON.stringify(oldDraft));
+    previousPlayground.value = oldDraft;
   }
 }
 

@@ -65,23 +65,24 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 ### Share & Export
 
 - **Share as URL** — JS, TS, Web, and React links preserve code and CSS, including empty tabs; existing share links remain compatible
-- **Export JSON** — download the complete current playground for a portable backup
+- **Download playground (.json)** — download the complete current playground for a portable TryJS file
 - **Embed code** — generate a sandboxed iframe for any mode; the dedicated `/embed` route hides site chrome and keeps editor/output visible on small screens
 
 ### My Playgrounds
 
-- **Visible save state** — the editor shows the current name and Saved / Unsaved changes. **Save** or `Cmd/Ctrl+S` asks for a name once, then updates the same record; Save options offers **Save a copy** and **Rename**
-- **My playgrounds** — search saved work and use **Open** to resume it; row actions offer rename, duplicate, and delete
-- **New playground** — start from the current mode’s original defaults without deleting named saves or other mode drafts; **Undo** restores the previous work
-- **JSON backups** — export the current playground or the full library; imports add copies and never overwrite matching saved IDs
-- **Draft recovery** — opening a saved/shared playground keeps the previous non-empty draft available through **Restore previous draft**
+- **Optional saving** — start writing immediately; the quiet **My playgrounds** entry opens a compact panel with **Save current code…**, saved work, and file actions
+- **Open saved work** — only an open named playground adds its name, save status, **Save changes** when needed, and **Close playground**; `Cmd/Ctrl+S` names new work or updates the open record
+- **Return to your code** — closing a saved playground restores the normal editor from before it was opened, even after opening other saves or refreshing; named edits stay separate from normal language/mode drafts
+- **Explicit changes** — leaving edited saved code offers save, leave without saving, or keep editing; row actions offer rename, duplicate, download, and delete
+- **Portable files** — import playgrounds or download all saved playgrounds directly from the panel; imports add copies and never overwrite matching saved IDs
+- **Earlier code** — code replaced by a shared link or example is identified by its language and a code preview before opening it
 - **Storage safeguards** — failed saves report an error, cross-tab conflicts offer a copy, and delete has Undo inside the library and briefly after closing it; blocked draft storage falls back to memory and prompts for a JSON export
 - Saved playgrounds stay in this browser. Clearing site data removes local saves, so export a separate backup for safekeeping. The library supports up to 50 playgrounds, up to 500,000 source characters each, within a 2 MB JSON budget.
 
 ### General
 
 - **Resizable split pane** — drag the divider between editor and console; position persisted across sessions
-- **Code persistence** — saved to localStorage per language and mode
+- **Code persistence** — normal drafts stay in localStorage per language and mode; the open saved editor keeps its pending edits and return point in this tab across refreshes
 - **Mobile support** — responsive layout with editor/console tabs on small screens
 - **SEO** — dynamic meta tags, canonical URLs, JSON-LD structured data (schema.org) with breadcrumbs for all pages
 - **Analytics** — privacy-friendly event tracking via Vercel Analytics

@@ -9,9 +9,10 @@ The current focus is usage and repeat visits, while retaining the simple two-pan
 - Run React as ES modules with a pinned React 19 runtime and shared dependency imports.
 - Use official TypeScript/DOM libraries and bounded package type acquisition in a lazy worker.
 - Provide optional Vim keybindings through the shared editor extension.
-- Keep New, Save and saved state visible in the editor. Use My playgrounds to find and open named saves, with backups in a secondary disclosure.
-- Preserve saved identity across reloads in the same tab, update the same record explicitly, and offer a copy when another tab has changed it.
-- Reset only the active surface to its defaults with Undo, retaining named saves, other drafts and preferences.
+- Keep the normal editor ready for quick experiments, with one quiet My playgrounds entry for optional saving and reopening.
+- Show name, save state, Save changes and Close only for an open saved playground. Keep its working copy separate from normal drafts and restore the starting editor on Close.
+- Preserve the open saved editor and return point across refreshes, ask before discarding edits, and offer a copy when another tab changes or removes the saved version.
+- Keep JSON import/download actions visible in the library and identify recoverable earlier code with a language label and preview.
 - Queue early Umami events until its deferred tracker loads, exclude development/preview domains, and omit source-bearing URL hashes.
 - Share and embed JS, TS, Web, and React with empty tabs preserved.
 - Run regression tests before deployment builds and in GitHub Actions.
@@ -25,7 +26,8 @@ Run `npm ci`, `npm run check`, and `npm audit`. Test the built preview in a brow
 - Language/mode switching and browser refresh without losing fresh edits.
 - Save, reopen, update, copy, remove/undo, and JSON import/export.
 - Save immediately followed by refresh; dirty state and rename without overwriting current edits; cross-tab save conflicts.
-- New and Undo in each surface, keeping the library and other language/mode drafts intact.
+- A to B to Close across all surfaces, returning to the original code (including an empty editor) while keeping other normal drafts and saved records intact.
+- Save/discard/keep-editing decisions for Close and Open, including a paused editor in another language and a deleted or changed saved copy.
 - Opening a shared link and a saved playground, followed by draft recovery.
 - JS/TS/Web/React embeds and small-screen editor/output visibility.
 - Switching examples within one embed, including reload/back/forward, without changing local drafts or retaining an old sandbox.

@@ -1,19 +1,22 @@
 import { signal, computed } from "@preact/signals";
 import {
-  activeSavedPlayground, applyPlayground, capturePlayground, currentSurface, saveDraft,
-  setActiveSavedPlayground,
+  activeSavedPlayground, capturePlayground, captureSavedPlayground, closeNamedPlayground,
+  currentSurface, openedSavedPlayground, openNamedPlayground, restorePreviousDraft, saveDraft, setActiveSavedPlayground,
 } from "./editor";
 import {
   LIBRARY_KEY, mergePlaygrounds, newSavedPlayground, readLibrary, writeLibrary,
 } from "../utils/library";
 import type { SavedPlayground } from "../utils/library";
 import { playgroundSurface, playgroundText, samePlayground } from "../utils/playground";
+import type { PlaygroundState } from "../utils/playground";
 import { trackEvent } from "../utils/analytics";
 
+export type PlaygroundTransition = { kind: "open"; id: string } | { kind: "close" } | { kind: "recover" };
 export type PlaygroundDialog =
   | { kind: "browse" }
-  | { kind: "save" | "copy" }
-  | { kind: "rename"; id: string };
+  | { kind: "save" | "copy"; next?: PlaygroundTransition }
+  | { kind: "rename"; id: string }
+  | { kind: "confirm"; next: PlaygroundTransition };
 
 export const playgroundDialog = signal<PlaygroundDialog | null>(null);
 export const savedPlaygrounds = signal<SavedPlayground[]>([]);
@@ -21,12 +24,19 @@ export const libraryError = signal("");
 const pageOpenedAt = Date.now();
 const isEmbed = window.location.pathname.replace(/\/+$/, "") === "/embed";
 
-export const activePlayground = computed(() => savedPlaygrounds.value.find(entry =>
-  entry.id === activeSavedPlayground.value?.id && playgroundSurface(entry.state) === currentSurface.value) ?? null);
-export const savedElsewhere = computed(() => Boolean(activePlayground.value &&
-  activePlayground.value.updatedAt !== activeSavedPlayground.value?.updatedAt));
+export const activePlayground = computed(() => activeSavedPlayground.value);
+export const openedChangedElsewhere = computed(() => {
+  const opened = openedSavedPlayground.value;
+  return Boolean(opened && savedPlaygrounds.value.find(entry => entry.id === opened.id)?.updatedAt !== opened.updatedAt);
+});
+export const savedElsewhere = computed(() => Boolean(activePlayground.value && openedChangedElsewhere.value));
 export const hasUnsavedChanges = computed(() => Boolean(activePlayground.value &&
   !samePlayground(capturePlayground(), activePlayground.value.state)));
+export const hasPendingSavedChanges = computed(() => {
+  const opened = openedSavedPlayground.value;
+  const working = captureSavedPlayground();
+  return Boolean(opened && working && !samePlayground(working, opened.state));
+});
 export const canSavePlayground = computed(() => Boolean(activePlayground.value || playgroundText(capturePlayground()).trim()));
 
 export function refreshPlaygrounds(): boolean {
@@ -36,7 +46,7 @@ export function refreshPlaygrounds(): boolean {
     libraryError.value = "";
     return true;
   } catch {
-    libraryError.value = "Saved playgrounds could not be read. Export your current code as a backup before making changes.";
+    libraryError.value = "Saved playgrounds could not be read. Download your current playground (.json) to keep a copy.";
     return false;
   }
 }
@@ -63,21 +73,29 @@ export function openLibrary(): void {
   if (readable) trackEvent("playground_library_opened", { has_saved_playgrounds: savedPlaygrounds.value.length > 0 });
 }
 
-export function savePlaygroundAs(name: string): SavedPlayground {
-  const state = capturePlayground();
+export function beginPlaygroundSave(copy = false): void {
+  playgroundDialog.value = { kind: copy ? "copy" : "save" };
+  trackEvent("playground_save_started", { surface: currentSurface.value, action: copy ? "copy" : "create" });
+}
+
+export function savePlaygroundAs(name: string, state: PlaygroundState = capturePlayground()): SavedPlayground {
   if (!playgroundText(state).trim()) throw new Error("Add some code before saving a playground.");
   const entry = newSavedPlayground(validName(name), state);
+  saveDraft();
   changeLibrary(entries => [entry, ...entries]);
-  setActiveSavedPlayground(entry);
+  // Saving the other mode must not replace a paused editor's pending changes.
+  if (!openedSavedPlayground.value || activeSavedPlayground.value || playgroundSurface(state) === playgroundSurface(openedSavedPlayground.value.state)) {
+    setActiveSavedPlayground(entry);
+  }
   saveDraft();
   trackEvent("playground_saved", { surface: playgroundSurface(state), action: "create" });
   return entry;
 }
 
 export function updateSavedPlayground(): SavedPlayground {
-  const active = activeSavedPlayground.value;
+  const active = openedSavedPlayground.value;
   if (!active) throw new Error("Save this playground with a name first.");
-  const state = capturePlayground();
+  const state = captureSavedPlayground()!;
   let saved!: SavedPlayground;
   changeLibrary(entries => {
     const current = entries.find(entry => entry.id === active.id);
@@ -96,11 +114,11 @@ export function updateSavedPlayground(): SavedPlayground {
   return saved;
 }
 
-export function openSavedPlayground(id: string): SavedPlayground {
+export function openSavedPlayground(id: string, discardChanges = false): SavedPlayground {
+  if (hasPendingSavedChanges.value && !discardChanges) throw new Error("Save your changes or choose Open without saving.");
   const entry = readLibrary(window.localStorage).find(item => item.id === id);
   if (!entry) throw new Error("This playground is no longer saved in this browser.");
-  applyPlayground(entry.state);
-  setActiveSavedPlayground(entry);
+  openNamedPlayground(entry);
   refreshPlaygrounds();
   playgroundDialog.value = null;
   trackEvent("playground_opened", {
@@ -109,9 +127,25 @@ export function openSavedPlayground(id: string): SavedPlayground {
   return entry;
 }
 
+export function completePlaygroundTransition(next: PlaygroundTransition, discardChanges = false): void {
+  if (next.kind === "open") openSavedPlayground(next.id, discardChanges);
+  else {
+    if (hasPendingSavedChanges.value && !discardChanges) throw new Error("Save your changes or choose Close without saving.");
+    if (next.kind === "close") closeNamedPlayground();
+    else restorePreviousDraft();
+    playgroundDialog.value = null;
+    if (next.kind === "close") trackEvent("playground_closed");
+  }
+}
+
+export function requestPlaygroundTransition(next: PlaygroundTransition): void {
+  if (hasPendingSavedChanges.value) playgroundDialog.value = { kind: "confirm", next };
+  else completePlaygroundTransition(next);
+}
+
 export function renameSavedPlayground(id: string, name: string): void {
   const value = validName(name);
-  const active = activeSavedPlayground.value;
+  const active = openedSavedPlayground.value;
   let renamed!: SavedPlayground;
   let previousVersion = 0;
   changeLibrary(entries => {
@@ -144,7 +178,7 @@ export function removeSavedPlayground(id: string): SavedPlayground {
     removed = entry;
     return entries.filter(item => item.id !== id);
   });
-  if (activeSavedPlayground.value?.id === id) setActiveSavedPlayground(null);
+  // Keep the edited code and its Close action if its saved copy was deleted.
   return removed;
 }
 
