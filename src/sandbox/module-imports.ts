@@ -58,9 +58,15 @@ export function hasImports(code: string): boolean {
  *   import 'normalize.css'             -> import 'https://esm.sh/normalize.css'
  *   const m = await import('lodash')   -> const m = await import('https://esm.sh/lodash')
  */
-export function rewriteImports(code: string, reactPreview = false): string {
-  let result = code;
-  for (const specifier of moduleSpecifiers(code).reverse()) {
+export interface ImportRewrite {
+  from: number;
+  to: number;
+  replacement: string;
+}
+
+export function rewriteImportsWithMapping(code: string, reactPreview = false): { code: string; changes: ImportRewrite[] } {
+  const changes: ImportRewrite[] = [];
+  for (const specifier of moduleSpecifiers(code)) {
     const pkg = parsePackageSpecifier(specifier.value);
     if (!pkg) continue;
     // React packages in a preview must use one runtime, including transitive dependencies.
@@ -69,12 +75,20 @@ export function rewriteImports(code: string, reactPreview = false): string {
         throw new Error(`React preview uses React ${REACT_VERSION}. Import from "${pkg.name}${pkg.path}" to use the shared runtime.`);
       }
       const mapped = pkg.name + pkg.path;
-      result = result.slice(0, specifier.from) + JSON.stringify(mapped) + result.slice(specifier.to);
+      changes.push({ ...specifier, replacement: JSON.stringify(mapped) });
       continue;
     }
     const url = new URL(ESM_SH_BASE + specifier.value);
     if (reactPreview) url.searchParams.set("external", "react,react-dom");
-    result = result.slice(0, specifier.from) + JSON.stringify(url.href) + result.slice(specifier.to);
+    changes.push({ ...specifier, replacement: JSON.stringify(url.href) });
   }
-  return result;
+  let result = code;
+  for (const change of [...changes].reverse()) {
+    result = result.slice(0, change.from) + change.replacement + result.slice(change.to);
+  }
+  return { code: result, changes };
+}
+
+export function rewriteImports(code: string, reactPreview = false): string {
+  return rewriteImportsWithMapping(code, reactPreview).code;
 }

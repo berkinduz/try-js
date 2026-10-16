@@ -1,5 +1,6 @@
 import { signal } from "@preact/signals";
 import type { SerializedValue } from "../utils/format";
+import type { SourceLocation } from "../sandbox/source-location";
 
 export interface ConsoleEntry {
   id: number;
@@ -7,6 +8,7 @@ export interface ConsoleEntry {
   method: "log" | "warn" | "error" | "info" | "table" | "clear" | "time" | "timeEnd" | "result";
   args: SerializedValue[];
   timestamp: number;
+  location?: SourceLocation;
 }
 
 export interface ErrorEntry {
@@ -18,6 +20,7 @@ export interface ErrorEntry {
   lineno?: number;
   colno?: number;
   timestamp: number;
+  location?: SourceLocation;
 }
 
 export type OutputEntry = ConsoleEntry | ErrorEntry;
@@ -32,7 +35,8 @@ export const isLoadingModules = signal(false);
 
 export function addConsoleEntry(
   method: ConsoleEntry["method"],
-  args: SerializedValue[]
+  args: SerializedValue[],
+  location?: SourceLocation,
 ) {
   if (method === "clear") {
     consoleOutput.value = [];
@@ -44,6 +48,7 @@ export function addConsoleEntry(
     method,
     args,
     timestamp: Date.now(),
+    location,
   };
   const next: OutputEntry[] = [...consoleOutput.value, entry];
   if (next.length > MAX_ENTRIES) {
@@ -57,7 +62,8 @@ export function addErrorEntry(
   message: string,
   stack?: string,
   lineno?: number,
-  colno?: number
+  colno?: number,
+  location?: SourceLocation,
 ) {
   const entry: ErrorEntry = {
     id: nextId++,
@@ -67,6 +73,7 @@ export function addErrorEntry(
     stack,
     lineno,
     colno,
+    location,
     timestamp: Date.now(),
   };
   const next: OutputEntry[] = [...consoleOutput.value, entry];

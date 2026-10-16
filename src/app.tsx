@@ -21,6 +21,8 @@ import { FeaturesPage } from "./components/Features/FeaturesPage";
 import { SnippetsPage } from "./components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
+import { isCurrentLocation } from "./sandbox/source-location";
+import type { SourceLocation } from "./sandbox/source-location";
 
 export function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -64,7 +66,15 @@ function JsPlayground() {
   const isEmbed = embedMode.value;
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const [mobileTab, setMobileTab] = useState<"editor" | "console">("editor");
+  const [navigation, setNavigation] = useState<SourceLocation | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const currentSource = { code: code.value, language: language.value, version: playgroundVersion.value };
+  const navigateToError = useCallback((location: SourceLocation) => {
+    const current = mode.value === "js" ? { code: code.value, language: language.value, version: playgroundVersion.value } : null;
+    if (!isCurrentLocation(location, current)) return;
+    setMobileTab("editor");
+    setNavigation({ ...location });
+  }, []);
 
   useEffect(() => {
     clearConsole();
@@ -78,7 +88,10 @@ function JsPlayground() {
 
   // Handle resize
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const onResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      setNavigation(null);
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -121,7 +134,7 @@ function JsPlayground() {
 
   if (isMobile && isEmbed) {
     return <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div class="embed-mobile-layout"><Editor /><Console /></div>
+      <div class="embed-mobile-layout"><Editor navigation={navigation} /><Console currentSource={currentSource} onNavigate={navigateToError} /></div>
       <EmbedOpenLink />
     </div>;
   }
@@ -151,10 +164,10 @@ function JsPlayground() {
         )}
         <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
           <div style={{ height: "100%", display: mobileTab === "editor" ? "block" : "none" }}>
-            <Editor />
+            <Editor navigation={navigation} />
           </div>
           <div style={{ height: "100%", display: mobileTab !== "editor" ? "block" : "none" }}>
-            <Console />
+            <Console currentSource={currentSource} onNavigate={navigateToError} />
           </div>
         </div>
         {!isEmbed && <StatusBar />}
@@ -167,8 +180,8 @@ function JsPlayground() {
     <div class="app" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {!isEmbed && <Toolbar />}
       <SplitPane
-        left={<Editor />}
-        right={<Console />}
+        left={<Editor navigation={navigation} />}
+        right={<Console currentSource={currentSource} onNavigate={navigateToError} />}
       />
       {!isEmbed && <StatusBar />}
       {isEmbed && <EmbedOpenLink />}

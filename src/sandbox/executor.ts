@@ -1,6 +1,11 @@
 import { SANDBOX_BOOTSTRAP } from "./sandbox-bootstrap";
 import { SANDBOX_BOOTSTRAP_MODULE } from "./sandbox-bootstrap";
-import { transpile, hasImports, rewriteImports } from "./transpiler";
+import { transpile } from "./transpiler";
+import { prepareExecution, moduleLoader } from "./execution-source";
+import type { ExecutionError } from "./execution-source";
+import type { SourceLocation, SourceSnapshot } from "./source-location";
+import { sourceLocation } from "./source-location";
+import { playgroundVersion } from "../state/editor";
 import { checkTypes } from "./type-checker";
 import type { Language } from "../state/editor";
 import {
@@ -18,78 +23,6 @@ import {
   type RunTrigger,
 } from "../utils/analytics";
 
-/**
- * REPL-style last expression evaluation.
- *
- * Given transpiled JS code, attempts to detect the last expression statement
- * and return it separately so it can be captured via eval().
- *
- * Returns { body, lastExpr } where body is the code without the last expression,
- * and lastExpr is the expression string (without trailing semicolons), or null
- * if the last statement is not an expression.
- *
- * Declarations (var/let/const/function/class/import/export), control flow
- * (if/for/while/switch/try), and statements ending with blocks are NOT wrapped.
- */
-function splitLastExpression(code: string): { body: string; lastExpr: string | null } {
-  const lines = code.split("\n");
-
-  // Find the last non-empty, non-comment line
-  let lastIdx = -1;
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const trimmed = lines[i].trim();
-    if (trimmed && !trimmed.startsWith("//") && !trimmed.startsWith("/*")) {
-      lastIdx = i;
-      break;
-    }
-  }
-
-  if (lastIdx === -1) return { body: code, lastExpr: null };
-
-  const lastLine = lines[lastIdx].trim();
-
-  // Skip lines that are clearly not standalone expressions
-  const nonExprPrefixes = [
-    "var ", "let ", "const ", "function ", "function*",
-    "class ", "import ", "export ", "return ", "throw ",
-    "if ", "if(", "else ", "else{",
-    "for ", "for(", "while ", "while(", "do ", "do{",
-    "switch ", "switch(",
-    "try ", "try{",
-    "break", "continue",
-    "debugger",
-  ];
-
-  for (const prefix of nonExprPrefixes) {
-    if (lastLine.startsWith(prefix)) return { body: code, lastExpr: null };
-  }
-
-  // Skip if the line ends with opening brace (block statement)
-  if (lastLine.endsWith("{")) return { body: code, lastExpr: null };
-
-  // Strip trailing semicolons to get the expression
-  const stripped = lastLine.replace(/;+$/, "").trim();
-  if (!stripped) return { body: code, lastExpr: null };
-
-  // Continuation-only closers from multiline expressions (e.g. "})();", ");", "]}").
-  // Treating these as standalone expressions breaks parsing when we split.
-  const firstChar = stripped[0];
-  if (firstChar === ")" || firstChar === "]" || firstChar === "}") {
-    return { body: code, lastExpr: null };
-  }
-
-  // "}" or "};" alone is a block closer, not an expression – don't treat as last expr
-  if (stripped === "}") return { body: code, lastExpr: null };
-
-  // Build body = all lines except the last expression line
-  const bodyLines = lines.slice(0, lastIdx);
-  // Include any trailing empty/comment lines after the expression
-  // (but not the expression line itself)
-  const body = bodyLines.join("\n");
-
-  return { body, lastExpr: stripped };
-}
-
 let currentIframe: HTMLIFrameElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
 let runningIndicatorId: ReturnType<typeof setTimeout> | null = null;
@@ -101,9 +34,14 @@ let activeRun: {
   eligibleAtStart: boolean;
 } | null = null;
 
-// Line number mapping: iframe reports line numbers in the generated HTML.
-let userCodeStartLine = 0;
-let userCodeLineCount = 0;
+let nextExecutionId = 0;
+let currentExecution: (ReturnType<typeof prepareExecution> & { source: SourceSnapshot }) | null = null;
+let typeCheckSource: SourceSnapshot | null = null;
+
+function errorLocation(error: ExecutionError): SourceLocation | undefined {
+  const position = currentExecution?.locate(error);
+  return currentExecution ? sourceLocation(currentExecution.source, position) : undefined;
+}
 // Code to run when iframe sends "ready" (avoids srcdoc/onload race).
 let pendingCode: string | null = null;
 // Clear console on first output of this run (avoids empty-console flicker between runs).
@@ -119,6 +57,7 @@ let typeCheckPromise: Promise<
 async function flushTypeErrors(): Promise<boolean> {
   if (!typeCheckPromise) return true;
   const capturedRunId = typeCheckRunId;
+  const source = typeCheckSource;
   const promise = typeCheckPromise;
   typeCheckPromise = null;
   const diagnostics = await promise;
@@ -128,7 +67,8 @@ async function flushTypeErrors(): Promise<boolean> {
   for (const d of diagnostics) {
     if (d.category === "error" || d.category === "warning") {
       passed = false;
-      addErrorEntry("error", `Type Error: ${d.message}`, undefined, d.line, d.col);
+      const location = source ? sourceLocation(source, { line: d.line, column: d.col }) : undefined;
+      addErrorEntry("error", `Type Error: ${d.message}`, undefined, d.line, d.col, location);
     }
   }
   return passed;
@@ -152,6 +92,7 @@ function cleanup() {
     currentIframe = null;
   }
   pendingCode = null;
+  currentExecution = null;
   isLoadingModules.value = false;
 }
 
@@ -167,7 +108,9 @@ function handleMessage(event: MessageEvent) {
       clearConsole();
       clearOnNextOutput = false;
     }
-    addConsoleEntry(data.method, data.args || []);
+    const args = data.args || [];
+    const error = args.find((arg: { type: string }) => arg.type === "error");
+    addConsoleEntry(data.method, args, error ? errorLocation(error) : undefined);
   } else if (data.type === "result") {
     if (clearOnNextOutput) {
       clearConsole();
@@ -180,25 +123,10 @@ function handleMessage(event: MessageEvent) {
       clearConsole();
       clearOnNextOutput = false;
     }
-    let lineno = data.lineno;
-    const colno = data.colno;
-    const message = data.message;
-    let stack = data.stack;
-    // Map iframe line to editor line; hide our internals from stack
-    if (
-      typeof lineno === "number" &&
-      userCodeStartLine > 0 &&
-      userCodeLineCount > 0
-    ) {
-      const userLine = lineno - userCodeStartLine + 1;
-      if (userLine >= 1 && userLine <= userCodeLineCount) {
-        lineno = userLine;
-      }
-    }
-    if (stack && /__jspark|postMessage|at about:srcdoc/.test(stack)) {
-      stack = undefined;
-    }
-    addErrorEntry(data.errorType || "error", message, stack, lineno, colno);
+    const location = errorLocation(data);
+    const stack = typeof data.stack === "string" && !/__jspark|postMessage|about:srcdoc|tryjs-run-|blob:/.test(data.stack)
+      ? data.stack : undefined;
+    addErrorEntry(data.errorType || "error", data.message, stack, location?.line, location?.column, location);
   } else if (data.type === "ready") {
     if (
       pendingCode !== null &&
@@ -265,6 +193,9 @@ export function executeCode(
   };
   executionTime.value = null;
 
+  const snapshot: SourceSnapshot = { code: source, language: lang, version: playgroundVersion.value };
+  typeCheckSource = snapshot;
+
   // Start type checking for TypeScript (non-blocking, results shown after execution)
   ++typeCheckRunId;
   if (lang === "typescript") {
@@ -289,7 +220,9 @@ export function executeCode(
   if (result.error !== null) {
     executionHadError = true;
     activeRun = null;
-    addErrorEntry("error", `Transpilation Error: ${result.error}`);
+    clearConsole();
+    const location = sourceLocation(snapshot, result.location);
+    addErrorEntry("error", `Transpilation Error: ${result.error}`, undefined, location?.line, location?.column, location);
     clearOnNextOutput = false;
     executionDone = true;
     if (runningIndicatorId) {
@@ -301,46 +234,16 @@ export function executeCode(
     return;
   }
 
-  const jsCode = result.code;
-
-  // Route to module execution if imports are detected
-  if (hasImports(jsCode)) {
-    executeModuleCode(jsCode);
+  currentExecution = { ...prepareExecution(source, result, ++nextExecutionId), source: snapshot };
+  if (currentExecution.module) {
+    executeModuleCode(currentExecution.code);
   } else {
-    executeEvalCode(jsCode);
+    executeEvalCode(currentExecution.code);
   }
 }
 
 /** Standard eval()-based execution path (no imports). */
-function executeEvalCode(jsCode: string) {
-  const { body, lastExpr } = splitLastExpression(jsCode);
-
-  const execBlock = lastExpr
-    ? `${body}
-var __jspark_result = eval(${JSON.stringify(lastExpr)});`
-    : jsCode;
-
-  const resultBlock = lastExpr
-    ? `
-if (typeof __jspark_result !== "undefined") {
-  parent.postMessage({
-    source: "jspark",
-    type: "result",
-    value: window.__jspark_serialize(__jspark_result, 0)
-  }, "*");
-}`
-    : "";
-
-  // Line numbers: code starts with __startTime then user code, so user line 1 = line 2 of code.
-  userCodeStartLine = 2;
-  userCodeLineCount = execBlock.split("\n").length;
-
-  const codeToRun =
-    "var __startTime = performance.now();\n" +
-    execBlock +
-    "\nvar __endTime = performance.now();\n" +
-    resultBlock;
-
+function executeEvalCode(codeToRun: string) {
   pendingCode = codeToRun;
 
   const bootstrapForHtml = SANDBOX_BOOTSTRAP.replace(/<\/script/gi, "<\\/script");
@@ -372,61 +275,14 @@ if (typeof __jspark_result !== "undefined") {
 }
 
 /** Module-based execution path (code has imports, uses esm.sh). */
-function executeModuleCode(jsCode: string) {
+function executeModuleCode(moduleCode: string) {
   isLoadingModules.value = true;
-
-  // Rewrite bare specifiers to esm.sh URLs
-  const rewritten = rewriteImports(jsCode);
-  const { body, lastExpr } = splitLastExpression(rewritten);
-
-  // Build module code with timing and result capture.
-  // In module mode, static imports must stay at top level (cannot be inside try/catch).
-  const execBlock = lastExpr
-    ? `${body}\nvar __jspark_result = ${lastExpr};`
-    : rewritten;
-
-  const resultBlock = lastExpr
-    ? `
-if (typeof __jspark_result !== "undefined") {
-  parent.postMessage({
-    source: "jspark",
-    type: "result",
-    value: window.__jspark_serialize(__jspark_result, 0)
-  }, "*");
-}`
-    : "";
-
-  // module code layout:
-  // 1: var __startTime ...
-  // 2+: user code
-  // N: timing/result/done postMessage
-  // So user line 1 starts at module line 2.
-  const preUserLinesInModule = 1;
-  userCodeLineCount = execBlock.split("\n").length;
-
-  const moduleCode = `
-var __startTime = performance.now();
-${execBlock}
-var __endTime = performance.now();
-${resultBlock}
-parent.postMessage({ source: "jspark", type: "done", executionTime: __endTime - __startTime }, "*");
-`;
-
   const bootstrapForHtml = SANDBOX_BOOTSTRAP_MODULE.replace(/<\/script/gi, "<\\/script");
-  const moduleForHtml = moduleCode.replace(/<\/script/gi, "<\\/script");
-
-  const htmlBeforeModuleScript =
-    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" +
-    "<script>" + bootstrapForHtml + "</script>" +
-    "<script type=\"module\">";
-  const moduleScriptStartLine = htmlBeforeModuleScript.split("\n").length;
-  userCodeStartLine = moduleScriptStartLine + preUserLinesInModule;
-
+  const loaderForHtml = moduleLoader(moduleCode).replace(/<\/script/gi, "<\\/script");
   const srcdoc =
     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>" +
     "<script>" + bootstrapForHtml + "</script>" +
-    "<script type=\"module\">" + moduleForHtml + "</script>" +
-    "</body></html>";
+    "<script type=\"module\">" + loaderForHtml + "</script></body></html>";
 
   const iframe = document.createElement("iframe");
   iframe.sandbox.add("allow-scripts");

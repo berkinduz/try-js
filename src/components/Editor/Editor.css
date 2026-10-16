@@ -330,3 +330,8 @@
   }
 }
 
+.cm-line.cm-error-target {
+  background-color: color-mix(in srgb, var(--console-error-fg) 16%, transparent);
+  box-shadow: inset 2px 0 var(--console-error-fg);
+}
+

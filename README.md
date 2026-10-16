@@ -16,6 +16,7 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 - **REPL-style evaluation** — bare expressions display their result in the console, like Chrome DevTools
 - **Object inspector** — expand objects, arrays, Maps, and Sets inline
 - **Console output** — supports `log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
+- **Jump to errors** — click a JS/TS error's line and column (or focus it with Tab and press Enter/Space) to focus and reveal the source, including on mobile; TypeScript, npm imports, and async errors map back to your code
 - **Sandboxed execution** — code runs in an iframe sandbox with a 5-second timeout (15s for module loading)
 
 ### Themes & Editor Customization
@@ -118,6 +119,8 @@ npm run preview
 ```
 
 GitHub Actions runs the checks and dependency audit on pushes and pull requests. The Vercel build command also runs `npm run check`, so a failing regression test stops the deployment build.
+
+Error navigation uses a snapshot of the code, language, and document that produced each error. Editing the code disables old locations until another run; opening another playground cannot reuse its error locations. TypeScript diagnostics use their original coordinates. Runtime errors use the nearest frame in your own code, with source maps for TypeScript and column corrections for import rewrites and result capture. Dependency-only errors, timeouts, and errors without a trustworthy source position remain text. Browsers can report the start of an expression rather than the precise failing identifier; navigation follows that reported position. If a browser omits syntax-error coordinates, a parser location is used when available.
 
 ## Keyboard Shortcuts
 

@@ -38,6 +38,29 @@ const bootstraps = [
 ] as const;
 
 for (const [name, bootstrap] of bootstraps) {
+  test(`${name} forwards the error's source identity and name for location mapping`, () => {
+    const messages: Record<string, unknown>[] = [];
+    const listeners = new Map<string, (event: unknown) => void>();
+    const context = vm.createContext({
+      console: {}, performance: { now: () => 0 },
+      parent: { postMessage: (message: Record<string, unknown>) => messages.push(message) },
+      window: { addEventListener: (type: string, listener: (event: unknown) => void) => listeners.set(type, listener) },
+    });
+    vm.runInContext(bootstrap, context);
+    vm.runInContext('window.onerror("Uncaught Error: boom", "tryjs-run-7.js", 4, 9, new Error("boom"))', context);
+    const error = messages.find(message => message.type === "error")!;
+    assert.equal(error.filename, "tryjs-run-7.js");
+    assert.equal(error.errorName, "Error");
+    assert.equal(error.lineno, 4);
+    assert.equal(error.colno, 9);
+    assert.match(error.stack as string, /Error: boom/);
+    messages.length = 0;
+    listeners.get("unhandledrejection")!({ reason: new Error("async") });
+    assert.equal(messages[0].errorType, "unhandledrejection");
+    assert.equal(messages[0].errorName, "Error");
+    assert.match(messages[0].stack as string, /Error: async/);
+  });
+
   test(`${name} preserves Map and Set entries for console rendering`, () => {
     assert.deepEqual(
       serialize(bootstrap, `new Map([["name", "karan dangol"]])`),

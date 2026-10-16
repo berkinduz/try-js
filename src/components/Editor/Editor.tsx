@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useState, useRef, useEffect, useLayoutEffect } from "preact/hooks";
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import {
@@ -16,7 +16,11 @@ import {
   setCode,
   setLanguage,
   setMode,
+  playgroundVersion,
 } from "../../state/editor";
+import { isCurrentLocation } from "../../sandbox/source-location";
+import type { SourceLocation } from "../../sandbox/source-location";
+import { highlightSource, sourceHighlight, revealSource } from "./source-navigation";
 import { trackFirstMeaningfulEdit } from "../../utils/analytics";
 import { ShareMenu } from "../Playgrounds/ShareMenu";
 import { setSelection, clearSelection } from "../../state/selection";
@@ -68,7 +72,7 @@ console.log(divide(10, 0));`,
   },
 ] as const;
 
-export function Editor() {
+export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const [copied, setCopied] = useState(false);
@@ -93,13 +97,13 @@ export function Editor() {
   };
 
   // Create editor on mount
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!containerRef.current) return;
 
     const view = new EditorView({
       state: EditorState.create({
         doc: code.value,
-        extensions: createExtensions(
+        extensions: [sourceHighlight, ...createExtensions(
           language.value,
           theme.value,
           syntaxTheme.value,
@@ -107,7 +111,7 @@ export function Editor() {
           handleSelectionChange,
           (before, after) =>
             trackFirstMeaningfulEdit(language.value, before, after),
-        ),
+        )],
       }),
       parent: containerRef.current,
     });
@@ -152,7 +156,7 @@ export function Editor() {
   }, [theme.value, syntaxTheme.value]);
 
   // Sync external code changes (e.g. language switch restoring saved code)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const view = viewRef.current;
     if (!view) return;
 
@@ -161,11 +165,31 @@ export function Editor() {
       clearSelection();
       view.setState(EditorState.create({
         doc: code.value,
-        extensions: createExtensions(language.value, theme.value, syntaxTheme.value, setCode,
-          handleSelectionChange, (before, after) => trackFirstMeaningfulEdit(language.value, before, after)),
+        extensions: [sourceHighlight, ...createExtensions(language.value, theme.value, syntaxTheme.value, setCode,
+          handleSelectionChange, (before, after) => trackFirstMeaningfulEdit(language.value, before, after))],
       }));
     }
   }, [code.value]);
+
+  useLayoutEffect(() => {
+    if (!navigation) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // Mobile switches the visible pane in this render. Measure/focus after it is visible.
+    const frame = requestAnimationFrame(() => {
+      const view = viewRef.current;
+      const current = { code: code.value, language: language.value, version: playgroundVersion.value };
+      if (!view || !isCurrentLocation(navigation, current) ||
+          view.state.doc.toString() !== current.code.replace(/\r\n?/g, "\n")) return;
+      if (revealSource(view, navigation)) {
+        timer = setTimeout(() => view.dispatch({ effects: highlightSource.of(null) }), 1500);
+      }
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+      viewRef.current?.dispatch({ effects: highlightSource.of(null) });
+    };
+  }, [navigation]);
 
   const showPlaceholder = code.value === "" && !editorFocused;
 

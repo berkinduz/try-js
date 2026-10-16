@@ -1,9 +1,13 @@
 import { useRef, useEffect } from "preact/hooks";
 import { consoleOutput, clearConsole } from "../../state/console";
 import { ConsoleEntry } from "./ConsoleEntry";
+import type { SourceLocation, SourceSnapshot } from "../../sandbox/source-location";
 import "./Console.css";
 
-export function Console() {
+export function Console({ currentSource, onNavigate }: {
+  currentSource: SourceSnapshot;
+  onNavigate: (location: SourceLocation) => void;
+}) {
   const listRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
 
@@ -57,7 +61,7 @@ export function Console() {
           </div>
         ) : (
           entries.map((entry) => (
-            <ConsoleEntry key={entry.id} entry={entry} />
+            <ConsoleEntry key={entry.id} entry={entry} currentSource={currentSource} onNavigate={onNavigate} />
           ))
         )}
       </div>

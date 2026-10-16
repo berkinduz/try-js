@@ -159,6 +159,33 @@
   word-break: break-word;
 }
 
+.console-location {
+  padding: 1px 2px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.console-location:hover:not(:disabled) {
+  background: var(--console-hover);
+}
+
+.console-location:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.console-location:disabled {
+  opacity: 0.6;
+  text-decoration: none;
+  cursor: default;
+}
+
 .console-stack {
   margin: 4px 0 0;
   padding: 4px 8px;

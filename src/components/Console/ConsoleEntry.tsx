@@ -2,9 +2,26 @@ import type { OutputEntry } from "../../state/console";
 import { formatValue, getValueClass } from "../../utils/format";
 import type { SerializedValue } from "../../utils/format";
 import { ObjectInspector } from "./ObjectInspector";
+import { isCurrentLocation } from "../../sandbox/source-location";
+import type { SourceLocation, SourceSnapshot } from "../../sandbox/source-location";
 
 interface Props {
   entry: OutputEntry;
+  currentSource: SourceSnapshot;
+  onNavigate: (location: SourceLocation) => void;
+}
+
+function LocationButton({ location, currentSource, onNavigate }: Omit<Props, "entry"> & { location: SourceLocation }) {
+  const available = isCurrentLocation(location, currentSource);
+  const label = `line ${location.line}, column ${location.column}`;
+  return <button
+    type="button"
+    class="console-location"
+    disabled={!available}
+    aria-label={`Go to ${label}`}
+    title={available ? `Show ${label} in the editor` : "Code has changed. Run it again to update this location."}
+    onClick={() => onNavigate(location)}
+  >{label}</button>;
 }
 
 const METHOD_ICONS: Record<string, string> = {
@@ -93,9 +110,9 @@ function renderTable(args: SerializedValue[]) {
   }
 }
 
-export function ConsoleEntry({ entry }: Props) {
+export function ConsoleEntry({ entry, currentSource, onNavigate }: Props) {
   if (entry.kind === "error") {
-    const location =
+    const fallbackLocation =
       entry.lineno != null || entry.colno != null
         ? ` (line ${entry.lineno ?? "?"}, column ${entry.colno ?? "?"})`
         : "";
@@ -103,7 +120,9 @@ export function ConsoleEntry({ entry }: Props) {
       <div class="console-entry console-entry--error">
         <span class="console-icon">✕</span>
         <div class="console-content">
-          <span class="console-message">{entry.message}{location}</span>
+          <span class="console-message">{entry.message}{entry.location ? <> (<LocationButton
+            location={entry.location} currentSource={currentSource} onNavigate={onNavigate}
+          />)</> : fallbackLocation}</span>
           {entry.stack && (
             <pre class="console-stack">{entry.stack}</pre>
           )}
@@ -129,6 +148,7 @@ export function ConsoleEntry({ entry }: Props) {
       {icon && <span class="console-icon">{icon}</span>}
       <div class="console-content console-args">
         {entry.args.map(renderValue)}
+        {entry.location && <LocationButton location={entry.location} currentSource={currentSource} onNavigate={onNavigate} />}
       </div>
     </div>
   );

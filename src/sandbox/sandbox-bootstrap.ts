@@ -153,7 +153,9 @@ export const SANDBOX_BOOTSTRAP = `
       source: "jspark",
       type: "error",
       errorType: "error",
+      errorName: error && error.name,
       message: String(message),
+      filename: source,
       stack: error ? error.stack : undefined,
       lineno: lineno,
       colno: colno
@@ -167,6 +169,7 @@ export const SANDBOX_BOOTSTRAP = `
       source: "jspark",
       type: "error",
       errorType: "unhandledrejection",
+      errorName: event.reason && event.reason.name,
       message: event.reason ? String(event.reason) : "Unhandled Promise Rejection",
       stack: event.reason && event.reason.stack ? event.reason.stack : undefined
     }, "*");
@@ -183,10 +186,11 @@ export const SANDBOX_BOOTSTRAP = `
         source: "jspark",
         type: "error",
         errorType: "error",
-        message: err.message || String(err),
-        stack: err.stack,
-        lineno: err.lineno,
-        colno: err.colno
+        errorName: err && err.name,
+        message: err && err.message || String(err),
+        stack: err && err.stack,
+        lineno: err && err.lineno,
+        colno: err && err.colno
       }, "*");
     }
     var execTime = (typeof __endTime !== "undefined" && typeof __startTime !== "undefined") ? (__endTime - __startTime) : 0;
@@ -346,7 +350,9 @@ export const SANDBOX_BOOTSTRAP_MODULE = `
       source: "jspark",
       type: "error",
       errorType: "error",
+      errorName: error && error.name,
       message: String(message),
+      filename: source,
       stack: error ? error.stack : undefined,
       lineno: lineno,
       colno: colno
@@ -359,6 +365,7 @@ export const SANDBOX_BOOTSTRAP_MODULE = `
       source: "jspark",
       type: "error",
       errorType: "unhandledrejection",
+      errorName: event.reason && event.reason.name,
       message: event.reason ? String(event.reason) : "Unhandled Promise Rejection",
       stack: event.reason && event.reason.stack ? event.reason.stack : undefined
     }, "*");
