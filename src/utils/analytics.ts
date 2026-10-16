@@ -102,6 +102,23 @@ export function initializeAnalytics() {
   trackEvent("visitor_classified", { visitor_type: visitorType });
 }
 
+/** First mounted full playground in this tab, shared by all four surfaces. */
+export function trackPlaygroundEntered(surface: AnalyticsSurface) {
+  if (window.location.pathname === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "playground_entered")) return;
+  trackEvent("playground_entered", { surface });
+}
+
+/** Measure a Features link's intent with bounded values, never its URL. */
+export function trackFeaturesPlaygroundClick(
+  href: string | undefined,
+  placement: "navigation" | "hero" | "mode" | "faq" | "closing" | "footer",
+) {
+  const target = href === "/" ? "js-ts" : href === "/web" ? "web" : href === "/react" ? "react" : null;
+  if (!target) return;
+  trackEvent("features_playground_clicked", { target, placement });
+}
+
 /** Track the first user-authored non-whitespace edit in this tab session. */
 export function trackFirstMeaningfulEdit(
   surface: AnalyticsSurface,
@@ -129,11 +146,17 @@ export function trackSuccessfulRun(
   surface: AnalyticsSurface,
   trigger: RunTrigger,
   eligibleAtStart: boolean,
+  editedAtStart = trigger === "auto" && eligibleAtStart,
 ) {
   if (!eligibleAtStart) return;
   const storage = getStorage("sessionStorage");
-  if (!claimSessionEvent(storage, `successful_run:${surface}`)) return;
-  trackEvent("successful_run", { surface, trigger });
+  if (claimSessionEvent(storage, `successful_run:${surface}`)) {
+    trackEvent("successful_run", { surface, trigger });
+  }
+  // An earlier manual run of starter code must not consume edited activation.
+  if (editedAtStart && window.location.pathname !== "/embed" && claimSessionEvent(storage, "activation_completed")) {
+    trackEvent("activation_completed", { surface, trigger });
+  }
 }
 
 /** Snapshot activation eligibility when a run or preview generation starts. */

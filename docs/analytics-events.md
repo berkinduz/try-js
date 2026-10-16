@@ -7,8 +7,11 @@ TryJS sends custom events to the existing Vercel Analytics and Umami integration
 | Event | Trigger | Properties | Frequency / guard |
 | --- | --- | --- | --- |
 | `visitor_classified` | Application startup | `visitor_type`: `new` or `returning` | Once per page load. A session keeps its original classification across reloads. |
+| `playground_entered` | A full playground mounts, including direct JS/TS, Web and React entries | `surface`: `javascript`, `typescript`, `web`, or `react` | Once per tab session, across all surfaces. Informational pages and embeds do not qualify. Remounts, mode switches and reloads do not inflate the entry count. |
+| `features_playground_clicked` | A playground link is clicked on Features | `target`: `js-ts`, `web`, or `react`; `placement`: `navigation`, `hero`, `mode`, `faq`, `closing`, or `footer` | Every explicit click. Measures intent; `playground_entered` confirms the editor mounted. Ordinary links still work without JavaScript. |
 | `first_meaningful_edit` | A CodeMirror user-input transaction changes trimmed document content | `surface`: `javascript`, `typescript`, `web`, or `react` | First qualifying edit per tab session across all surfaces. Programmatic snippet, starter-template, language, and tab loads do not qualify. |
 | `successful_run` | JS/TS sandbox posts `done` without a transpile, runtime, or timeout error; Web/React preview posts an explicit success message | `surface`; `trigger`: `manual` or `auto` | First success per surface and tab session. Auto-run/preview success is ignored until a meaningful edit has occurred, so rendering default code is not activation. |
+| `activation_completed` | The same confirmed success, after a meaningful edit existed when that run began | `surface`; `trigger`: `manual` or `auto` | First edited success per tab session, excluding embeds. A manual starter-code run cannot consume this event; existing `successful_run` behavior is preserved. |
 | `share_created` | A share URL is successfully written to the clipboard | `surface`; `scope`: `document` or `selection`; `length_warning`: boolean | Every completed share action. Failed clipboard writes are excluded. |
 | `embed_copied` | Embed markup is successfully written to the clipboard | `surface` | Every completed embed copy. Failed clipboard writes are excluded. |
 | `support_clicked` | Buy Me a Coffee link is clicked | `provider`: `buy_me_a_coffee`; `placement`: `toolbar` | Every explicit click. |
@@ -26,7 +29,7 @@ Local playground actions also use bounded event properties:
 | `playground_backup_imported` | A valid backup is saved successfully | None |
 | `playground_backup_exported` | A local download is requested | `scope`: `current` or `all` |
 
-These events never contain saved IDs, names, timestamps, source code, filenames, URLs, or package names. Save timestamps and IDs exist only inside the local library and user-requested JSON backups. The export event measures a download request, not confirmation that the operating system retained the file.
+These events never contain saved IDs, names, timestamps, source code, filenames, URLs, or package names. Features click targets use only the enumerated mode names above. Save timestamps and IDs exist only inside the local library and user-requested JSON backups. The export event measures a download request, not confirmation that the operating system retained the file.
 
 The Umami script uses `data-domains="tryjs.app,www.tryjs.app"` so local and Vercel preview checks do not contribute production pageviews or events. `data-exclude-hash="true"` omits share/embed code from Umami’s default URL payload. See the [official tracker configuration](https://docs.umami.is/docs/tracker-configuration). Custom events that occur before the deferred script loads wait in memory (maximum 50, maximum 15 seconds); load flushes them once, and error/timeout discards them without polling, storage or retries. Collection is still best effort when analytics is blocked or the page closes.
 
@@ -52,11 +55,16 @@ No analytics identifier, timestamp, account, cookie, fingerprint, IP address, or
 
 A basic activation funnel is:
 
-1. `visitor_classified`
+1. `playground_entered`
 2. `first_meaningful_edit`
-3. `successful_run`
-4. `share_created` or `embed_copied`
+3. `activation_completed`
 
-Segment each step by `visitor_type` at the reporting layer and use `surface` to compare JS, TypeScript, Web, and React. Use `support_clicked` to measure clicks on Buy Me a Coffee.
+Use a 60-minute maximum gap between consecutive steps. Track Features acquisition separately as `features_view → features_playground_clicked`. A click measures intent, not a confirmed destination load. The once-per-tab entry may already have occurred before a Features visit, so it is not a required step in that acquisition funnel. A person who visits the editor directly belongs in activation without having to visit Features. Since the first edit and entry are once per tab across all modes, they can occur on different surfaces. The entry's `surface` is the initial editor; do not interpret this funnel as proof that all steps occurred in one mode.
+
+Keep `share_created`, `embed_copied`, and `playground_saved` as independent goals. They are optional outcomes, not requirements for activation. A `successful_run` goal also includes an explicit manual run without editing. Use `activation_completed` for edited success: a manual starter run may have already claimed `successful_run` before the first edit, so the existing success event is unsuitable as the last step in this ordered funnel.
+
+Use Umami's built-in device and source filters to compare the same funnel. Compare individual outcome events by `surface`. Only `visitor_classified` carries `visitor_type`: its new/returning breakdown does not automatically segment other events or the entire funnel.
 
 Use `playground_library_opened → playground_opened` to assess whether people find and open named saves, and `playground_save_started → playground_saved` to assess naming completion. `saved_before_page_load` compares the saved version’s local timestamp with this page’s initialization time and sends only the boolean. It can include a reload, a second tab, or a clock change; it does not prove a distinct later visit. The existing new/returning classification is a browser-level indicator, not a D7 retention cohort or a cross-device user identity. Do not interpret repeated openings or owner smoke tests as retention growth.
+
+The common entry, edited activation and Features click events begin with the October 16, 2026 analytics update. Earlier records cannot be backfilled. Use a chart note for the release date and allow fresh traffic to accumulate before comparing conversion rates. Production verification creates a small number of owner test events; those are delivery checks, not evidence of user activation or growth.

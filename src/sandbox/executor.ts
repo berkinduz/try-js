@@ -32,6 +32,7 @@ let activeRun: {
   surface: Language;
   trigger: RunTrigger;
   eligibleAtStart: boolean;
+  editedAtStart: boolean;
 } | null = null;
 
 let nextExecutionId = 0;
@@ -168,6 +169,7 @@ function handleMessage(event: MessageEvent) {
           completedRun.surface,
           completedRun.trigger,
           completedRun.eligibleAtStart,
+          completedRun.editedAtStart,
         );
       }
     });
@@ -190,6 +192,7 @@ export function executeCode(
     surface: lang,
     trigger,
     eligibleAtStart: isSuccessfulRunEligible(trigger),
+    editedAtStart: isSuccessfulRunEligible("auto"),
   };
   executionTime.value = null;
 

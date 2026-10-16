@@ -2,7 +2,10 @@ import { useEffect } from "preact/hooks";
 import { FEATURES, FEATURE_IMAGES } from "../../data/features";
 import type { FeatureDetail, ProductImage } from "../../data/features";
 import { getPageSeo } from "../../data/seo";
-import { trackEvent } from "../../utils/analytics";
+import {
+  trackEvent,
+  trackFeaturesPlaygroundClick,
+} from "../../utils/analytics";
 import "./FeaturesPage.css";
 
 function ProductScreenshot({
@@ -47,7 +50,11 @@ function FeatureCopy({ detail }: { detail: FeatureDetail }) {
       <h3>{detail.title}</h3>
       <p>{detail.description}</p>
       {detail.href && (
-        <a class="features-text-link" href={detail.href}>
+        <a
+          class="features-text-link"
+          href={detail.href}
+          onClick={() => trackFeaturesPlaygroundClick(detail.href, "mode")}
+        >
           {detail.linkLabel}
         </a>
       )}
@@ -68,7 +75,12 @@ export function FeaturesPage() {
       </a>
       <div class="features-shell">
         <header class="features-nav">
-          <a class="features-brand" href="/" aria-label="TryJS playground">
+          <a
+            class="features-brand"
+            href="/"
+            aria-label="TryJS playground"
+            onClick={() => trackFeaturesPlaygroundClick("/", "navigation")}
+          >
             <img src="/favicon.svg" width="32" height="32" alt="" />
             <span>TryJS</span>
           </a>
@@ -94,7 +106,11 @@ export function FeaturesPage() {
               </p>
             </div>
             <div class="features-intro__action">
-              <a class="features-open" href="/">
+              <a
+                class="features-open"
+                href="/"
+                onClick={() => trackFeaturesPlaygroundClick("/", "hero")}
+              >
                 Open Playground
               </a>
               <p>No account. No project setup.</p>
@@ -205,19 +221,45 @@ export function FeaturesPage() {
               <details>
                 <summary>Do I need an account or a saved playground?</summary>
                 <p>
-                  No. <a href="/">Open TryJS</a> and start typing. Named saves
-                  are optional and live in this browser. Download a JSON copy to
-                  keep work outside browser storage or move it to another
-                  device.
+                  No.{" "}
+                  <a
+                    href="/"
+                    onClick={() => trackFeaturesPlaygroundClick("/", "faq")}
+                  >
+                    Open TryJS
+                  </a>{" "}
+                  and start typing. Named saves are optional and live in this
+                  browser. Download a JSON copy to keep work outside browser
+                  storage or move it to another device.
                 </p>
               </details>
               <details>
                 <summary>Which playground should I use?</summary>
                 <p>
-                  Use <a href="/">JavaScript or TypeScript</a> for code and
-                  console output, <a href="/web">Web</a> for HTML, CSS and
-                  JavaScript together, or <a href="/react">React</a> for JSX
-                  components and hooks.{" "}
+                  Use{" "}
+                  <a
+                    href="/"
+                    onClick={() => trackFeaturesPlaygroundClick("/", "faq")}
+                  >
+                    JavaScript or TypeScript
+                  </a>{" "}
+                  for code and console output,{" "}
+                  <a
+                    href="/web"
+                    onClick={() => trackFeaturesPlaygroundClick("/web", "faq")}
+                  >
+                    Web
+                  </a>{" "}
+                  for HTML, CSS and JavaScript together, or{" "}
+                  <a
+                    href="/react"
+                    onClick={() =>
+                      trackFeaturesPlaygroundClick("/react", "faq")
+                    }
+                  >
+                    React
+                  </a>{" "}
+                  for JSX components and hooks.{" "}
                   <a href="/snippets">Runnable examples</a> are available when
                   you want a starting point.
                 </p>
@@ -247,7 +289,11 @@ export function FeaturesPage() {
 
           <section class="features-start" aria-labelledby="start-heading">
             <h2 id="start-heading">Have something to try?</h2>
-            <a class="features-open" href="/">
+            <a
+              class="features-open"
+              href="/"
+              onClick={() => trackFeaturesPlaygroundClick("/", "closing")}
+            >
               Open Playground
             </a>
           </section>
@@ -255,9 +301,24 @@ export function FeaturesPage() {
 
         <footer class="features-footer">
           <nav aria-label="More from TryJS">
-            <a href="/">JS / TS</a>
-            <a href="/web">Web</a>
-            <a href="/react">React</a>
+            <a
+              href="/"
+              onClick={() => trackFeaturesPlaygroundClick("/", "footer")}
+            >
+              JS / TS
+            </a>
+            <a
+              href="/web"
+              onClick={() => trackFeaturesPlaygroundClick("/web", "footer")}
+            >
+              Web
+            </a>
+            <a
+              href="/react"
+              onClick={() => trackFeaturesPlaygroundClick("/react", "footer")}
+            >
+              React
+            </a>
             <a href="/snippets">Examples</a>
             <a
               href="https://github.com/berkinduz/try-js"

@@ -15,7 +15,7 @@ import { ScreenshotModal } from "./components/Screenshot/ScreenshotModal";
 import { embedMode } from "./state/ui";
 import { EmbedOpenLink } from "./components/Playgrounds/EmbedOpenLink";
 import { PlaygroundLibrary } from "./components/Playgrounds/PlaygroundLibrary";
-import { trackEvent } from "./utils/analytics";
+import { trackEvent, trackPlaygroundEntered } from "./utils/analytics";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
 import { isCurrentLocation } from "./sandbox/source-location";
@@ -29,6 +29,7 @@ export function App() {
   const path = normalizePath(window.location.pathname);
   const isEmbed = embedMode.value;
   const currentMode = mode.value;
+  const surface = currentMode === "js" ? language.value : currentMode;
   const seo = getPageSeo(path);
   useEffect(() => {
     const onPopState = () => setLocation(window.location.pathname);
@@ -36,6 +37,9 @@ export function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
   useLayoutEffect(() => { applySeo(getPageSeo(window.location.pathname)); }, [path, currentMode]);
+  useEffect(() => {
+    if (!isEmbed && seo.status !== 404) trackPlaygroundEntered(surface);
+  }, [isEmbed, seo.status, surface]);
 
   if (seo.status === 404) return <NotFoundPage />;
 
