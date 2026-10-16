@@ -16,6 +16,11 @@
   flex-shrink: 0;
 }
 
+.react-editor__tabs .format-code-button {
+  margin-left: auto;
+  align-self: center;
+}
+
 .react-editor__tab {
   padding: 0 14px;
   font-size: 12px;

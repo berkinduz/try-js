@@ -23,6 +23,7 @@ import type { SourceLocation } from "../../sandbox/source-location";
 import { highlightSource, sourceHighlight, revealSource } from "./source-navigation";
 import { trackFirstMeaningfulEdit } from "../../utils/analytics";
 import { ShareMenu } from "../Playgrounds/ShareMenu";
+import { FormatButton } from "./FormatButton";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
 import "./Editor.css";
@@ -308,6 +309,8 @@ export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
         </div>
       )}
       <div class="editor-actions">
+        <span class="editor-actions__title">Code</span>
+        <FormatButton />
         <button
           type="button"
           class="editor-action-btn"

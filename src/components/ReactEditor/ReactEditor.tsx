@@ -9,6 +9,7 @@ import {
 import { theme, syntaxTheme, reactCode, reactCss, reactActiveTab, setReactCode, setReactCss } from "../../state/editor";
 import { DEFAULT_REACT_CODE, DEFAULT_REACT_CSS } from "../../utils/constants";
 import { trackFirstMeaningfulEdit } from "../../utils/analytics";
+import { FormatButton } from "../Editor/FormatButton";
 import "./ReactEditor.css";
 
 export function ReactEditor() {
@@ -137,6 +138,7 @@ export function ReactEditor() {
         >
           App.css
         </button>
+        <FormatButton />
       </div>
       <div class="react-editor__body">
         {isEmpty && !editorFocused && activeTab === "jsx" && (

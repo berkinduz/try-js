@@ -99,7 +99,7 @@ export function StatusBar() {
                 <strong>Themes</strong> pick syntax theme and editor font
               </li>
               <li>
-                <strong>Format code</strong> in More options formats the active tab; Undo restores your code
+                <strong>Format</strong> above the editor formats the active tab; Undo restores your code
               </li>
             </ul>
             <div class="statusbar__help-shortcuts">

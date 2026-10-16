@@ -1,29 +1,31 @@
 .editor-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  min-height: 0;
+  min-width: 0;
 }
 
-/* Action bar: top-right, shows on hover */
+/* Keep editor actions visible without covering source code. */
 .editor-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: relative;
   z-index: 5;
   display: flex;
-  gap: 2px;
-  padding: 3px;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+  height: 34px;
+  padding: 0 8px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.15s;
+  border-bottom: 1px solid var(--border);
 }
 
-.editor-wrapper:hover .editor-actions,
-.editor-actions:focus-within,
-.editor-share-wrap:has(.editor-dropdown) ~ .editor-actions,
-.editor-actions:has(.editor-dropdown) {
-  opacity: 1;
+.editor-actions__title {
+  margin-right: auto;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
 }
 
 .editor-action-btn {
@@ -106,7 +108,8 @@
 
 /* Editor container */
 .editor-container {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -129,7 +132,7 @@
 /* Placeholder overlay */
 .editor-placeholder {
   position: absolute;
-  top: 0;
+  top: 34px;
   left: 0;
   right: 0;
   bottom: 0;

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 import { trackSupportClick } from "../../utils/analytics";
-import { formatActiveEditor, formatting, formatShortcutLabel } from "../Editor/formatting";
 import "./Toolbar.css";
 
 const GITHUB_URL = "https://github.com/berkinduz/try-js";
@@ -53,19 +52,6 @@ export function ToolbarLinks(_: { currentPath?: string }) {
         </button>
         {menuOpen && (
           <div class="toolbar__dropdown">
-            <button
-              type="button"
-              class="toolbar__dropdown-item"
-              disabled={formatting.value}
-              aria-busy={formatting.value}
-              onClick={() => { setMenuOpen(false); formatActiveEditor(); }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="m8 4-6 8 6 8m8-16 6 8-6 8M14 4l-4 16" />
-              </svg>
-              {formatting.value ? "Formatting…" : "Format code"}
-              <kbd>{formatShortcutLabel}</kbd>
-            </button>
             <a
               href="/snippets"
               class="toolbar__dropdown-item"

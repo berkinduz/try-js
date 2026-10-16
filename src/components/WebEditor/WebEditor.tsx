@@ -20,6 +20,7 @@ import {
 } from "../../state/editor";
 import type { WebTab } from "../../state/editor";
 import { trackFirstMeaningfulEdit } from "../../utils/analytics";
+import { FormatButton } from "../Editor/FormatButton";
 import "./WebEditor.css";
 
 const TAB_LANGUAGE_MAP: Record<WebTab, EditorLanguage> = {
@@ -161,6 +162,7 @@ export function WebEditor() {
             {tab.label}
           </button>
         ))}
+        <FormatButton />
       </div>
       <div class="web-editor__body">
         {showPlaceholder && (
