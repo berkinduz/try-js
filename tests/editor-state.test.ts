@@ -1,48 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import vm from "node:vm";
-import { readFileSync } from "node:fs";
-import { transform } from "sucrase";
-import { signal, computed, batch } from "@preact/signals";
-import * as constants from "../src/utils/constants.ts";
 import * as sharing from "../src/utils/share.ts";
-import * as playground from "../src/utils/playground.ts";
-
-/** Run the real state module with only browser APIs and unrelated visual services substituted. */
-function editorState(hash = "", pathname = "/", initial: [string, string][] = []) {
-  const values = new Map(initial);
-  const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); } };
-  const exports: Record<string, any> = {};
-  const location = { hash, pathname, search: "" };
-  const listeners = new Map<string, (() => void)[]>();
-  const modules: Record<string, unknown> = {
-    "@preact/signals": { signal, computed, batch }, "../utils/constants": constants,
-    "../sandbox/type-checker": { preloadTypeScript() {} },
-    "../components/Editor/themes": { SYNTAX_THEMES: [{ id: "one-dark" }], getUiModeForSyntax: () => "dark" },
-    "../utils/share": sharing, "../utils/playground": playground,
-    "../utils/storage": { readLocal: storage.getItem, writeLocal: (key: string, value: string) => { storage.setItem(key, value); return true; } },
-    "../utils/analytics": { trackEvent() {} },
-  };
-  const history = {
-    replaceState(_: unknown, __: string, path: string) { location.pathname = path; location.hash = ""; },
-    pushState(_: unknown, __: string, path: string) { location.pathname = path; },
-  };
-  vm.runInNewContext(transform(readFileSync(new URL("../src/state/editor.ts", import.meta.url), "utf8"), { transforms: ["typescript", "imports"] }).code, {
-    exports, require: (id: string) => { assert.ok(id in modules, `Unexpected import: ${id}`); return modules[id]; },
-    window: { location, addEventListener(type: string, listener: () => void) {
-      listeners.set(type, [...(listeners.get(type) ?? []), listener]);
-    } }, history, localStorage: storage, document: { documentElement: { setAttribute() {} } },
-  });
-  const dispatch = (type: string) => { for (const listener of listeners.get(type) ?? []) listener(); };
-  const navigate = (nextHash: string, nextPath = location.pathname) => {
-    const previousHash = location.hash;
-    location.hash = nextHash;
-    location.pathname = nextPath;
-    dispatch("popstate");
-    if (previousHash !== nextHash) dispatch("hashchange");
-  };
-  return { editor: exports, values, location, navigate, dispatch };
-}
+import type * as playground from "../src/utils/playground.ts";
+import * as constants from "../src/utils/constants.ts";
+import { editorState } from "./helpers/editor-state.ts";
 
 test("switching language after opening a shared link preserves edits and the other language draft", () => {
   const hash = sharing.encodeToHash({ code: 'console.log("shared")', language: "javascript" });
@@ -129,12 +90,12 @@ test("same-document embed navigation loads every mode and supports back and forw
   ];
   const { editor, location, values, navigate, dispatch } = editorState(sharing.encodeToHash(states[0]), "/embed/", initial);
   location.search = "?example=1";
-  let revision = editor.embedVersion.value;
+  let revision = editor.playgroundVersion.value;
   for (const state of [...states.slice(1), states[2], states[3], states[0]]) {
     const hash = sharing.encodeToHash(state);
     navigate(hash);
     assert.deepEqual(JSON.parse(JSON.stringify(editor.capturePlayground())), state);
-    assert.equal(editor.embedVersion.value, ++revision, "one fresh editor/sandbox lifetime per navigation");
+    assert.equal(editor.playgroundVersion.value, ++revision, "one fresh editor/sandbox lifetime per navigation");
     assert.equal(location.pathname, "/embed/");
     assert.equal(location.hash, hash);
     assert.equal(location.search, "?example=1");
@@ -150,7 +111,7 @@ test("same-mode embed navigation starts a new lifetime even when the code is ide
   navigate(sharing.encodeToHash({ ...state, css: "body{color:red}" }));
   assert.equal(editor.reactCode.value, state.code);
   assert.equal(editor.reactCss.value, "body{color:red}");
-  assert.equal(editor.embedVersion.value, 1);
+  assert.equal(editor.playgroundVersion.value, 1);
 });
 
 test("invalid or empty embed hashes preserve edits, mode and the current sandbox lifetime", () => {
@@ -161,7 +122,7 @@ test("invalid or empty embed hashes preserve edits, mode and the current sandbox
     navigate(hash);
     assert.equal(editor.mode.value, "react");
     assert.equal(editor.reactCode.value, "export default () => <h1>Fresh edit</h1>");
-    assert.equal(editor.embedVersion.value, 0);
+    assert.equal(editor.playgroundVersion.value, 0);
   }
 });
 
@@ -179,4 +140,68 @@ test("regular page history still saves fresh drafts and follows the destination 
   navigate("", "/");
   assert.equal(editor.mode.value, "js");
   assert.equal(editor.code.value, "const fresh = 42;");
+});
+
+test("New resets only the current surface, preserves named saves and offers recovery", () => {
+  const { editor, values } = editorState("", "/", [
+    ["tryjs:playgrounds:v1", "saved library"], ["jspark:code:typescript", "const typed: number = 8;"],
+    ["jspark:web:html", "<h1>Other draft</h1>"],
+  ]);
+  editor.setCode("console.log('fresh edit')");
+  editor.setActiveSavedPlayground({ id: "named", updatedAt: 1 });
+  editor.startNewPlayground();
+  assert.equal(editor.code.value, constants.DEFAULT_JS_CODE);
+  assert.equal(editor.activeSavedPlayground.value, null);
+  assert.equal(values.get("tryjs:playgrounds:v1"), "saved library");
+  assert.equal(values.get("jspark:code:typescript"), "const typed: number = 8;");
+  assert.equal(values.get("jspark:web:html"), "<h1>Other draft</h1>");
+  editor.restorePreviousDraft();
+  assert.equal(editor.code.value, "console.log('fresh edit')");
+});
+
+test("New uses TypeScript, Web and React defaults in their respective surfaces", () => {
+  const { editor } = editorState();
+  editor.setLanguage("typescript"); editor.setCode("const typed: number = 1;");
+  editor.startNewPlayground(); assert.equal(editor.code.value, constants.DEFAULT_TS_CODE);
+  editor.setMode("web"); editor.webHtml.value = "<h1>Changed</h1>";
+  editor.startNewPlayground();
+  assert.equal(editor.webHtml.value, constants.DEFAULT_WEB_HTML);
+  assert.equal(editor.webCss.value, constants.DEFAULT_WEB_CSS);
+  assert.equal(editor.webJs.value, constants.DEFAULT_WEB_JS);
+  editor.setMode("react"); editor.setReactCode("export default () => null"); editor.setReactCss("body{color:red}");
+  editor.startNewPlayground();
+  assert.equal(editor.reactCode.value, constants.DEFAULT_REACT_CODE);
+  assert.equal(editor.reactCss.value, constants.DEFAULT_REACT_CSS);
+});
+
+test("saved identity survives reload, follows each surface, and is cleared for external code", () => {
+  const state = editorState();
+  state.editor.setActiveSavedPlayground({ id: "javascript-save", updatedAt: 1 });
+  state.editor.setLanguage("typescript");
+  assert.equal(state.editor.activeSavedPlayground.value, null);
+  state.editor.setActiveSavedPlayground({ id: "typescript-save", updatedAt: 2 });
+  state.editor.setMode("react");
+  state.editor.setActiveSavedPlayground({ id: "react-save", updatedAt: 3 });
+  const reloaded = editorState("", "/react", [...state.values], [...state.sessions]);
+  assert.equal(reloaded.editor.activeSavedPlayground.value.id, "react-save");
+  reloaded.editor.setMode("js"); reloaded.editor.setLanguage("javascript");
+  assert.equal(reloaded.editor.activeSavedPlayground.value.id, "javascript-save");
+  reloaded.editor.applyPlayground({ mode: "js", language: "javascript", code: "// snippet" });
+  assert.equal(reloaded.editor.activeSavedPlayground.value, null);
+  const shared = editorState(sharing.encodeToHash({ code: "// shared", language: "javascript" }), "/", [...state.values], [...state.sessions]);
+  assert.equal(shared.editor.activeSavedPlayground.value, null);
+  shared.editor.setMode("react"); assert.equal(shared.editor.activeSavedPlayground.value.id, "react-save");
+  const embedded = editorState("", "/embed", [...state.values], [...state.sessions]);
+  embedded.editor.setActiveSavedPlayground({ id: "embed", updatedAt: 10 });
+  embedded.editor.startNewPlayground();
+  assert.deepEqual([...embedded.sessions], [...state.sessions]);
+});
+
+test("New refuses to discard a draft beyond the recovery limit", () => {
+  const { editor } = editorState();
+  editor.setCode("x".repeat(500_001));
+  editor.setActiveSavedPlayground({ id: "large", updatedAt: 1 });
+  assert.throws(() => editor.startNewPlayground(), /Copy its code/);
+  assert.equal(editor.code.value.length, 500_001);
+  assert.equal(editor.activeSavedPlayground.value.id, "large");
 });
