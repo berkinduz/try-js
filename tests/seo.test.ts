@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { getIndexablePaths, getPageSeo, SITE_URL } from "../src/data/seo.ts";
 import { getAllSnippets } from "../src/data/snippets.ts";
+import { FEATURES } from "../src/data/features.ts";
 import { renderSeoHead, serializeSchema } from "../src/utils/seo.ts";
 
 test("only real public pages are indexable, with unique descriptions and canonical URLs", () => {
@@ -103,4 +104,37 @@ test("HTML serialization preserves literal content and cannot close a structured
   const serialized = serializeSchema([{ "@type": "WebPage", name: value }]);
   assert.ok(!serialized.includes("<"));
   assert.equal(JSON.parse(serialized)["@graph"][0].name, value);
+});
+
+test("Features schema follows the visible narrative and links to each section", () => {
+  const page = getPageSeo("/features");
+  const webPage = page.schema.find((item) => item["@type"] === "WebPage")!;
+  const list = webPage.mainEntity as {
+    numberOfItems: number;
+    itemListElement: {
+      position: number;
+      name: string;
+      description: string;
+      url: string;
+      item: { "@id": string; description: string };
+    }[];
+  };
+  assert.deepEqual(
+    FEATURES.map((section) => section.id),
+    ["try-code", "understand-results", "share-or-save", "editor-comforts"],
+  );
+  assert.equal(list.numberOfItems, FEATURES.length);
+  assert.equal(list.itemListElement.length, FEATURES.length);
+  list.itemListElement.forEach((item, index) => {
+    const section = FEATURES[index];
+    assert.equal(item.position, index + 1);
+    assert.equal(item.name, section.title);
+    assert.equal(item.description, section.summary);
+    assert.equal(item.url, `${page.canonical}#${section.id}`);
+    assert.equal(item.item["@id"], item.url);
+    for (const detail of section.details) {
+      assert.ok(item.item.description.includes(detail.description));
+      if (detail.href) assert.ok(getIndexablePaths().includes(detail.href));
+    }
+  });
 });

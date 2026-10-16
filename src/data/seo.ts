@@ -42,10 +42,10 @@ const PAGES = {
     heading: "React playground with JSX and live preview",
   },
   "/features": {
-    title: "TryJS Features — A Simple Playground for Code Experiments",
+    title: "TryJS Features — JavaScript, TypeScript, Web & React",
     description:
-      "Explore TryJS: JS and TypeScript, Web and React previews, code formatting, console tools, optional local saves, runnable links, embeds and image export.",
-    heading: "A small playground for quick code experiments",
+      "Try JavaScript, TypeScript, Web and React in your browser. Inspect console output, follow errors, share runnable links and optionally save examples locally.",
+    heading: "Try code. See what happens.",
   },
   "/snippets": {
     title: "JavaScript & TypeScript Examples You Can Run | TryJS",
@@ -193,6 +193,15 @@ export function getPageSeo(pathname: string): PageSeo {
         position: index + 1,
         name: feature.title,
         description: feature.summary,
+        url: `${canonical}#${feature.id}`,
+        item: {
+          "@type": "WebPageElement",
+          "@id": `${canonical}#${feature.id}`,
+          name: feature.title,
+          description: feature.details
+            .map((detail) => `${detail.title}: ${detail.description}`)
+            .join(" "),
+        },
       })),
     };
   } else if (path === "/snippets") {

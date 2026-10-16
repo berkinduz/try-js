@@ -18,7 +18,7 @@ Shared code lives in a URL fragment, which is not part of a canonical URL or sit
 ## Where to make changes
 
 - `src/data/seo.ts` owns public routes, titles, descriptions, canonical URLs and structured data.
-- `src/data/features.ts` owns the Features copy and image dimensions. `src/data/snippets.ts` owns runnable example articles.
+- `src/data/features.ts` owns the visible Features narrative, section anchors and responsive screenshot dimensions. The Features ItemList uses those same headings and descriptions, in reading order, with links to the visible sections. `src/data/snippets.ts` owns runnable example articles.
 - `src/utils/seo.ts` serializes the same metadata for HTML and updates it during editor navigation. Each page has one JSON-LD graph. Strings are escaped separately for HTML and JSON-LD.
 - `scripts/render-pages.tsx` renders the actual informational components at build time. Their content and internal links are available without JavaScript. The editor starts with a lightweight skeleton matching its pane layout, then its interactive UI. Its accessible heading is present from the initial HTML. A descriptive fallback is available inside noscript when JavaScript is disabled; it is not a temporary landing screen.
 - `scripts/prerender-meta.mjs` writes the route documents, custom `404.html`, page styles, editor-only module preloads and sitemap. The build-only Preact renderer is not a client dependency.
@@ -42,7 +42,9 @@ npm run verify:seo -- https://tryjs.app
 
 `npm run build` includes verification of all generated documents, unique metadata, canonical URLs, JSON-LD, page styles, image/script files, internal links, sitemap coverage and social-card dimensions. The unit tests cover route eligibility, collection completeness and safe serialization.
 
-Also check the rendered browser: JS → Web → React → Back, embeds, a missing route, a snippet detail, feature tabs, and mobile layout. The initial HTML and the rendered document must agree about their canonical URL and indexing policy. Content pages must not initialize an editor or sandbox.
+Also check the rendered browser: JS → Web → React → Back, embeds, a missing route, a snippet detail, the Features reading order and keyboard-operated FAQ, and mobile layout at 320/375 px, tablet and desktop. The initial HTML and the rendered document must agree about their canonical URL and indexing policy. Content pages must not initialize an editor, sandbox or TypeScript worker.
+
+Features screenshots are static WebP captures of the actual playground and My playgrounds panel, with separate mobile captures so code and output stay legible. The hero image loads eagerly; the supporting images load lazily. Image sizes are checked against the actual WebP headers during build verification. The page remains readable with JavaScript disabled, including the native FAQ disclosures.
 
 Indexing, query performance and field Core Web Vitals should be monitored in Search Console when access is available. These cannot be established by a local build or an automated SEO score.
 

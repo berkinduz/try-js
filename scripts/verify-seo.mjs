@@ -9,6 +9,7 @@ import {
   SOCIAL_IMAGE,
 } from "../src/data/seo.ts";
 import { escapeHtml, serializeSchema } from "../src/utils/seo.ts";
+import { FEATURES, FEATURE_IMAGES } from "../src/data/features.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const dist = join(root, "dist");
@@ -20,8 +21,37 @@ const tags = (html, name) =>
   [...html.matchAll(new RegExp(`<${name}\\b[^>]*>`, "g"))].map(
     (match) => match[0],
   );
+const escapeText = (value) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const outputFile = (path) =>
   path === "/404" ? "404.html" : join(path.slice(1), "index.html");
+// Read the dimensions from the image itself, not just its declared HTML attributes.
+function webpDimensions(bytes) {
+  assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+  assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+  for (let offset = 12; offset + 8 < bytes.length;) {
+    const kind = bytes.toString("ascii", offset, offset + 4);
+    const length = bytes.readUInt32LE(offset + 4);
+    const data = offset + 8;
+    if (kind === "VP8 ")
+      return [
+        bytes.readUInt16LE(data + 6) & 0x3fff,
+        bytes.readUInt16LE(data + 8) & 0x3fff,
+      ];
+    if (kind === "VP8L") {
+      const size = bytes.readUInt32LE(data + 1);
+      return [(size & 0x3fff) + 1, ((size >>> 14) & 0x3fff) + 1];
+    }
+    if (kind === "VP8X")
+      return [
+        bytes.readUIntLE(data + 4, 3) + 1,
+        bytes.readUIntLE(data + 7, 3) + 1,
+      ];
+    offset = data + length + (length % 2);
+  }
+  throw new Error("WebP image has no dimension header");
+}
+
 const getText = async (path) => {
   if (!base) return readFile(join(dist, outputFile(path)), "utf8");
   const response = await fetch(new URL(path, base));
@@ -179,9 +209,78 @@ for (const path of paths) {
     }
   }
   if (path === "/features") {
-    assert.ok(html.includes("Format code when you choose"));
-    assert.ok(html.includes("Keep an idea without creating an account"));
-    assert.ok(html.includes("Follow errors and keep useful output"));
+    const body = html.slice(html.indexOf("<body"));
+    assert.ok(
+      !body.includes('role="tablist"'),
+      "Features is a readable page, not a tabbed gallery",
+    );
+    let previousHeading = -1;
+    for (const section of FEATURES) {
+      const heading = `<h2 id="${section.id}-heading">${escapeText(section.title)}</h2>`;
+      const position = body.indexOf(heading);
+      assert.ok(
+        position > previousHeading,
+        `Features: ${section.id} is visible in narrative order`,
+      );
+      previousHeading = position;
+      assert.ok(
+        body.includes(`id="${section.id}"`),
+        `Features: ${section.id} has a schema link target`,
+      );
+      assert.ok(
+        body.includes(escapeText(section.summary)),
+        `Features: ${section.id} summary is visible`,
+      );
+      for (const detail of section.details) {
+        assert.ok(
+          body.includes(`<h3>${escapeText(detail.title)}</h3>`),
+          `Features: ${detail.title} is visible`,
+        );
+        assert.ok(
+          body.includes(escapeText(detail.description)),
+          `Features: ${detail.title} description is visible`,
+        );
+      }
+    }
+    for (const image of Object.values(FEATURE_IMAGES)) {
+      for (const variant of [
+        image,
+        image.mobile,
+        ...(image.tablet ? [image.tablet] : []),
+      ]) {
+        const tag = [...tags(body, "img"), ...tags(body, "source")].find(
+          (tag) =>
+            attribute(tag, "src") === variant.src ||
+            attribute(tag, "srcset") === variant.src,
+        );
+        assert.ok(tag, `Features: ${variant.src} is rendered`);
+        assert.equal(attribute(tag, "width"), String(variant.width));
+        assert.equal(attribute(tag, "height"), String(variant.height));
+        const bytes = base
+          ? Buffer.from(
+              await (await fetch(new URL(variant.src, base))).arrayBuffer(),
+            )
+          : await readFile(join(dist, variant.src));
+        assert.deepEqual(
+          webpDimensions(bytes),
+          [variant.width, variant.height],
+          `${variant.src}: real image dimensions`,
+        );
+      }
+      const tag = tags(body, "img").find(
+        (tag) => attribute(tag, "src") === image.src,
+      );
+      assert.equal(
+        attribute(tag, "alt"),
+        escapeHtml(image.alt),
+        "Features: descriptive image alt text",
+      );
+    }
+    assert.match(
+      body,
+      /loading="eager"[^>]*fetchPriority="high"/i,
+      "Features: main screenshot loads eagerly",
+    );
   }
   if (path.startsWith("/snippets/"))
     assert.ok(

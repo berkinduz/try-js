@@ -1,197 +1,172 @@
-export type FeatureItem = {
-  id: string;
-  tab: string;
+export type FeatureDetail = {
   title: string;
-  summary: string;
-  points: string[];
-  image: string;
-  imageAlt: string;
-  imageWidth: number;
-  imageHeight: number;
+  description: string;
+  href?: string;
+  linkLabel?: string;
 };
 
-export const FEATURES: FeatureItem[] = [
+export type FeatureSection = {
+  id: string;
+  title: string;
+  summary: string;
+  details: FeatureDetail[];
+};
+
+/** Visible narrative and structured data share the same content and order. */
+export const FEATURES: FeatureSection[] = [
   {
-    id: "javascript-typescript",
-    tab: "JS / TS",
-    title: "Run JavaScript and TypeScript instantly",
+    id: "try-code",
+    title: "Try a small piece of code",
     summary:
-      "Write code, switch between JavaScript and TypeScript, and see console output directly in your browser.",
-    points: [
-      "No signup or installation needed",
-      "TypeScript completions, hover information and diagnostics",
-      "Live console for logs, warnings, errors, tables, and timings",
-      "JavaScript and TypeScript errors can link back to the source",
+      "Check a function, explore a package, or try an interface. Choose the playground that fits the question.",
+    details: [
+      {
+        title: "JavaScript & TypeScript",
+        description:
+          "Try a function or work through an async example. Switch to TypeScript for type checking, completions and hover information.",
+        href: "/",
+        linkLabel: "Open JS / TS",
+      },
+      {
+        title: "Browser-ready npm imports",
+        description:
+          "Import browser-compatible packages, including specific versions, through esm.sh. No local install needed; packages that require a Node.js server won't run here.",
+      },
+      {
+        title: "HTML, CSS & JavaScript",
+        description:
+          "See how markup, styles and browser code work together. Each has its own tab, with a live Web preview beside the editor.",
+        href: "/web",
+        linkLabel: "Open Web",
+      },
+      {
+        title: "React components & hooks",
+        description:
+          "Work out a component with JSX, hooks and a CSS tab. React 19 renders the preview as you type, with npm imports when you need them.",
+        href: "/react",
+        linkLabel: "Open React",
+      },
     ],
-    image: "/images/javascript-playground.jpg",
-    imageWidth: 1280,
-    imageHeight: 720,
-    imageAlt: "TryJS JavaScript and TypeScript playground demo",
   },
   {
-    id: "web-playground",
-    tab: "Web",
-    title: "Build HTML, CSS, and JavaScript with live preview",
+    id: "understand-results",
+    title: "Make sense of the result",
     summary:
-      "The Web Playground gives you a tabbed HTML/CSS/JS editor with instant browser preview and console feedback.",
-    points: [
-      "Separate HTML, CSS, and JS tabs",
-      "Live preview updates as you type",
-      "No local server or bundler required",
-      "Good for prototypes, demos, and quick UI experiments",
+      "Keep the output close to the code. Inspect what happened, follow an error, and take the useful parts with you.",
+    details: [
+      {
+        title: "Look inside the output",
+        description:
+          "Expand objects and collections, compare rows with console.table, and see logs, warnings and errors together.",
+      },
+      {
+        title: "Go back to the source",
+        description:
+          "Follow a JavaScript or TypeScript error to its line in the editor when a reliable source location is available.",
+      },
+      {
+        title: "Copy what you need",
+        description:
+          "Copy a console row as plain text in JavaScript, TypeScript, Web or React. Keep a result for a note, a bug report or your next experiment.",
+      },
     ],
-    image: "/tryjs_html_gif.gif",
-    imageWidth: 1280,
-    imageHeight: 610,
-    imageAlt: "TryJS Web Playground with HTML/CSS/JS live preview",
   },
   {
-    id: "react-playground",
-    tab: "React",
-    title: "Write JSX components with live rendering",
+    id: "share-or-save",
+    title: "Share it. Or pick it up later.",
     summary:
-      "React mode gives you a JSX editor with a CSS tab, live-rendered using React 19 from esm.sh. Use hooks, import npm packages, and see your component update as you type.",
-    points: [
-      "JSX editor with useState, useEffect, and full hook support",
-      "Live component preview powered by React 19 via esm.sh",
-      "Error and warning badges surface issues inline",
-      "Starter template to go from zero to running in one click",
+      "An experiment can stay a quick experiment. Share or save only when you need to.",
+    details: [
+      {
+        title: "Send a runnable example",
+        description:
+          "Copy a link with a snapshot of your code, or copy an iframe embed for a doc or blog post. In JS / TS, you can also share just the selected code.",
+      },
+      {
+        title: "Keep an idea in this browser",
+        description:
+          "Named saves are optional. Use My playgrounds to save and reopen an example locally, then explicitly save changes when you're ready. There is no account sync.",
+      },
+      {
+        title: "Take a copy with you",
+        description:
+          "Download a playground as a TryJS JSON file and import it in another browser. Browser storage can be cleared, so keep a file for work you want to keep.",
+      },
     ],
-    image: "/tryjs_react_gif.gif",
-    imageWidth: 1216,
-    imageHeight: 720,
-    imageAlt: "TryJS React playground demo",
   },
   {
-    id: "npm-imports",
-    tab: "NPM Imports",
-    title: "Run package-based examples without setup churn",
-    summary:
-      "Try browser-compatible npm packages through esm.sh, including versioned and scoped imports. Packages that require a Node.js server are outside this browser playground.",
-    points: [
-      "Use imports directly in editor code",
-      "No local install, no node_modules",
-      "Good for trying APIs before committing",
+    id: "editor-comforts",
+    title: "A few useful comforts",
+    summary: "Small editor tools, there when you want them.",
+    details: [
+      {
+        title: "Format on your terms",
+        description:
+          "Use Format or Shift+Alt+F for the active JS, TS, HTML, CSS or JSX tab. Formatting runs locally and one Undo puts things back.",
+      },
+      {
+        title: "Your way to edit",
+        description:
+          "Turn on optional Vim keybindings, choose a syntax theme and editor font, or adjust wrapping and font size in settings.",
+      },
+      {
+        title: "A picture of the code",
+        description:
+          "Export JavaScript or TypeScript code as a PNG with a frame, padding and background of your choice.",
+      },
     ],
-    image: "/tryjs_import.png",
-    imageWidth: 912,
-    imageHeight: 756,
-    imageAlt: "TryJS NPM imports code example",
-  },
-  {
-    id: "themes",
-    tab: "Themes",
-    title: "Six syntax themes, three editor fonts",
-    summary:
-      "Swap between One Dark, One Light, Dracula, GitHub Light, Monokai, and Solarized Dark — and pair them with Geist Mono, Fira Code, or JetBrains Mono. Your choice persists across sessions.",
-    points: [
-      "6 syntax themes with instant preview",
-      "3 curated monospace fonts",
-      "Configurable font size, tab size, word wrap, auto-run delay",
-      "All preferences saved to localStorage",
-    ],
-    image: "/tryJS_theme_change_gif.gif",
-    imageWidth: 1280,
-    imageHeight: 650,
-    imageAlt: "TryJS theme change demo",
-  },
-  {
-    id: "share-embed",
-    tab: "Share / Embed",
-    title: "Send runnable context instead of static code blocks",
-    summary:
-      "Share links preserve editor state, and embeds let docs include live examples with minimal overhead.",
-    points: [
-      "URL sharing with code state",
-      "Iframe embed for docs and blog posts",
-      "Selection-level sharing for focused examples",
-    ],
-    image: "/embed_code.png",
-    imageWidth: 2254,
-    imageHeight: 864,
-    imageAlt: "TryJS share and embed capabilities",
-  },
-  {
-    id: "export-png",
-    tab: "Export PNG",
-    title: "Produce consistent code visuals in one pass",
-    summary:
-      "Export with frame, padding, syntax theme, and background presets for release notes and social content.",
-    points: [
-      "Uniform output dimensions",
-      "Gradient and transparent backgrounds",
-      "Download or copy-to-clipboard flow",
-    ],
-    image: "/tryjs_export_image_gif.gif",
-    imageWidth: 1080,
-    imageHeight: 720,
-    imageAlt: "TryJS export code to image demo",
-  },
-  {
-    id: "examples",
-    tab: "Examples",
-    title: "Start from runnable examples when useful",
-    summary:
-      "The examples library is a supporting entry point for loading working JavaScript, async, and TypeScript patterns into the playground.",
-    points: [
-      "One click to load and run",
-      "Good defaults for learning and demos",
-      "Quick path from working code to your own variation",
-    ],
-    image: "/images/javascript-playground.jpg",
-    imageWidth: 1280,
-    imageHeight: 720,
-    imageAlt: "TryJS runnable examples loading into the playground",
-  },
-  {
-    id: "editing",
-    tab: "Editing",
-    title: "Format code when you choose",
-    summary:
-      "Use Format above any editor, or Shift+Alt+F, to tidy the active JavaScript, TypeScript, HTML, CSS or JSX tab. Formatting runs locally and can be reversed with one Undo.",
-    points: [
-      "Prettier and parsers load on the first format request",
-      "Only the active tab is formatted",
-      "Optional Vim keybindings in editor settings",
-    ],
-    image: "/images/javascript-playground.jpg",
-    imageWidth: 1280,
-    imageHeight: 720,
-    imageAlt: "TryJS editor with a visible Format action and console output",
-  },
-  {
-    id: "console-tools",
-    tab: "Console tools",
-    title: "Follow errors and keep useful output",
-    summary:
-      "Inspect objects in the console, copy a row as plain text, or follow a JavaScript or TypeScript error back to the matching line of code.",
-    points: [
-      "Copy captured output in JS, TS, Web and React consoles",
-      "Source links appear when a JS or TS error has a reliable location",
-      "TypeScript checks run in a local worker with available npm package types",
-    ],
-    image: "/images/javascript-playground.jpg",
-    imageWidth: 1280,
-    imageHeight: 720,
-    imageAlt:
-      "TryJS JavaScript console showing a table, an expanded Set and a result",
-  },
-  {
-    id: "local-saves",
-    tab: "Local saves",
-    title: "Keep an idea without creating an account",
-    summary:
-      "Normal drafts are restored in this browser when storage is available. For a named save, open My playgrounds and choose Save current code. Saving is optional.",
-    points: [
-      "Open a named save, edit it and explicitly save changes",
-      "Close playground returns to the code you were working on before",
-      "Download or import a TryJS JSON file to move work between browsers",
-      "Local saves belong to this browser; they do not sync to an account",
-    ],
-    image: "/images/my-playgrounds.jpg",
-    imageWidth: 435,
-    imageHeight: 515,
-    imageAlt:
-      "My playgrounds with named local saves and JSON download and import actions",
   },
 ];
+
+export type ProductImage = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  mobile: { src: string; width: number; height: number };
+  tablet?: { src: string; width: number; height: number };
+};
+
+export const FEATURE_IMAGES: Record<
+  "playground" | "console" | "saves",
+  ProductImage
+> = {
+  playground: {
+    src: "/images/features/playground-desktop.webp",
+    width: 2320,
+    height: 1140,
+    alt: "TryJS JavaScript playground with the editor, Format, sharing and console tools.",
+    tablet: {
+      src: "/images/features/playground-tablet.webp",
+      width: 1536,
+      height: 1000,
+    },
+    mobile: {
+      src: "/images/features/playground-mobile.webp",
+      width: 640,
+      height: 1160,
+    },
+  },
+  console: {
+    src: "/images/features/console-desktop.webp",
+    width: 1106,
+    height: 548,
+    alt: "TryJS console with a table of prices, an inspectable object and an error linked to its source line.",
+    mobile: {
+      src: "/images/features/console-mobile.webp",
+      width: 640,
+      height: 582,
+    },
+  },
+  saves: {
+    src: "/images/features/local-saves-desktop.webp",
+    width: 840,
+    height: 642,
+    alt: "My playgrounds showing a named example saved in this browser and a JSON import action.",
+    mobile: {
+      src: "/images/features/local-saves-mobile.webp",
+      width: 572,
+      height: 642,
+    },
+  },
+};
