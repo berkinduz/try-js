@@ -20,8 +20,8 @@ Shared code lives in a URL fragment, which is not part of a canonical URL or sit
 - `src/data/seo.ts` owns public routes, titles, descriptions, canonical URLs and structured data.
 - `src/data/features.ts` owns the Features copy and image dimensions. `src/data/snippets.ts` owns runnable example articles.
 - `src/utils/seo.ts` serializes the same metadata for HTML and updates it during editor navigation. Each page has one JSON-LD graph. Strings are escaped separately for HTML and JSON-LD.
-- `scripts/render-pages.tsx` renders the actual informational components at build time. Their content and internal links are available without JavaScript. The editor has a short loading fallback, then its normal UI and an accessible heading.
-- `scripts/prerender-meta.mjs` writes the route documents, custom `404.html`, page styles and sitemap. The build-only Preact renderer is not a client dependency.
+- `scripts/render-pages.tsx` renders the actual informational components at build time. Their content and internal links are available without JavaScript. The editor starts with a lightweight skeleton matching its pane layout, then its interactive UI. Its accessible heading is present from the initial HTML. A descriptive fallback is available inside noscript when JavaScript is disabled; it is not a temporary landing screen.
+- `scripts/prerender-meta.mjs` writes the route documents, custom `404.html`, page styles, editor-only module preloads and sitemap. The build-only Preact renderer is not a client dependency.
 - `vercel.json` serves the generated files with the filesystem router. Do not add a catch-all rewrite to the homepage: it turns missing addresses into soft 404s.
 
 The sitemap is generated from the indexable route list. It omits `lastmod` rather than presenting every deployment as a content update. Do not add ratings, reviews or FAQ rich-result markup without a supported, visible source. The current schema describes the site, free browser application, example collection, articles and breadcrumbs.

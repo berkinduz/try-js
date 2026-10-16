@@ -2,6 +2,8 @@ import { render } from "preact-render-to-string";
 import { FeaturesPage } from "../src/components/Features/FeaturesPage";
 import { SnippetsPage } from "../src/components/Snippets/SnippetsPage";
 import { SnippetDetailPage } from "../src/components/Snippets/SnippetDetailPage";
+import { PlaygroundLoading } from "../src/components/Playgrounds/PlaygroundLoading";
+import startupStyles from "../src/components/Playgrounds/PlaygroundLoading.css?inline";
 import { NotFoundPage } from "../src/components/NotFoundPage";
 import { getIndexablePaths, getPageSeo, SITE_URL } from "../src/data/seo";
 import { escapeHtml, renderSeoHead } from "../src/utils/seo";
@@ -10,26 +12,6 @@ export { getPageSeo };
 
 export const indexablePaths = getIndexablePaths();
 export const pagePaths = [...indexablePaths, "/embed", "/404"];
-
-function PageLoading({ path }: { path: string }) {
-  const seo = getPageSeo(path);
-  return (
-    <main class="page-loading">
-      <h1>{seo.heading}</h1>
-      <p>{seo.description}</p>
-      <p role="status">
-        Loading the editor… JavaScript is required to edit and run code.
-      </p>
-      <nav aria-label="TryJS pages">
-        <a href="/">JavaScript / TypeScript</a>
-        <a href="/web">Web</a>
-        <a href="/react">React</a>
-        <a href="/features">Features</a>
-        <a href="/snippets">Examples</a>
-      </nav>
-    </main>
-  );
-}
 
 export function renderPage(template: string, path: string): string {
   const seo = getPageSeo(path);
@@ -43,9 +25,15 @@ export function renderPage(template: string, path: string): string {
     ) : path.startsWith("/snippets/") ? (
       <SnippetDetailPage slug={path.slice("/snippets/".length)} />
     ) : (
-      <PageLoading path={path} />
+      <PlaygroundLoading path={path} />
     );
+  const startup = ["/", "/web", "/react", "/embed"].includes(path);
   return template
+    .replace(
+      "</head>",
+      () =>
+        `${startup ? `<style id="startup-styles">${startupStyles}</style>` : ""}</head>`,
+    )
     .replace(
       /<!-- seo:start -->[\s\S]*?<!-- seo:end -->/,
       () => `<!-- seo:start -->\n${renderSeoHead(seo)}\n<!-- seo:end -->`,

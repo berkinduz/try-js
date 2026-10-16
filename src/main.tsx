@@ -34,4 +34,14 @@ async function mountPage() {
   }
 }
 
-void mountPage();
+void mountPage().catch(() => {
+  const error = document.getElementById("startup-error");
+  if (!error) return; // Informational pages already have their readable HTML.
+  document.getElementById("startup-skeleton")?.setAttribute("hidden", "");
+  document.getElementById("startup-status")?.remove();
+  error.closest("main")?.setAttribute("aria-busy", "false");
+  error.hidden = false;
+  document
+    .getElementById("startup-reload")
+    ?.addEventListener("click", () => window.location.reload());
+});

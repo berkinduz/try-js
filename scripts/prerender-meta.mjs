@@ -28,7 +28,7 @@ const template = await readFile(join(dist, "index.html"), "utf8");
 const manifest = JSON.parse(
   await readFile(join(dist, ".vite/manifest.json"), "utf8"),
 );
-function pageStyles(path) {
+function pageAssets(path) {
   const entry =
     path === "/features"
       ? "src/components/Features/FeaturesPage.tsx"
@@ -40,6 +40,8 @@ function pageStyles(path) {
             ? "src/components/NotFoundPage.tsx"
             : "src/app.tsx";
   const styles = new Set();
+  const modules = new Set();
+  const editor = ["/", "/web", "/react", "/embed"].includes(path);
   const visited = new Set();
   function collect(key) {
     if (visited.has(key)) return;
@@ -47,13 +49,24 @@ function pageStyles(path) {
     const chunk = manifest[key];
     if (!chunk) throw new Error(`Missing manifest entry for ${key}`);
     for (const css of chunk.css ?? []) styles.add(css);
+    if (
+      editor &&
+      chunk.file.endsWith(".js") &&
+      !template.includes(`src="/${chunk.file}"`)
+    )
+      modules.add(chunk.file);
     for (const dependency of chunk.imports ?? []) collect(dependency);
   }
   collect(entry);
-  return [...styles]
+  const links = [...styles]
     .filter((css) => !template.includes(`href="/${css}"`))
-    .map((css) => `<link rel="stylesheet" href="/${css}" />`)
-    .join("\n");
+    .map((css) => `<link rel="stylesheet" href="/${css}" />`);
+  return [
+    ...links,
+    ...[...modules].map(
+      (file) => `<link rel="modulepreload" crossorigin href="/${file}" />`,
+    ),
+  ].join("\n");
 }
 for (const path of pagePaths) {
   const output =
@@ -65,7 +78,7 @@ for (const path of pagePaths) {
     output,
     renderPage(template, path).replace(
       "</head>",
-      () => `${pageStyles(path)}\n</head>`,
+      () => `${pageAssets(path)}\n</head>`,
     ),
   );
 }

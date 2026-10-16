@@ -53,6 +53,44 @@ for (const path of paths) {
     head.includes(`<title>${escapeHtml(page.title)}</title>`),
     `${path}: correct title`,
   );
+  const editorRoute = ["/", "/web", "/react", "/embed"].includes(path);
+  const hasEditorPreload = tags(head, "link").some(
+    (tag) =>
+      attribute(tag, "rel") === "modulepreload" &&
+      /\/assets\/app-[^/]+\.js$/.test(attribute(tag, "href") ?? ""),
+  );
+  assert.equal(
+    hasEditorPreload,
+    editorRoute,
+    `${path}: only editors preload the editor runtime`,
+  );
+  if (editorRoute) {
+    const body = html.split("<body>")[1];
+    const enhanced = body.replace(/<noscript>[\s\S]*?<\/noscript>/g, "");
+    const noscript = body.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? "";
+    assert.ok(
+      enhanced.includes('id="startup-skeleton"') &&
+        enhanced.includes('aria-busy="true"'),
+      `${path}: initial editor skeleton`,
+    );
+    assert.ok(
+      !enhanced.includes(escapeHtml(page.description)),
+      `${path}: no temporary description screen`,
+    );
+    assert.ok(
+      noscript.includes(escapeHtml(page.description)) &&
+        noscript.includes('href="/features"'),
+      `${path}: useful no-JavaScript fallback`,
+    );
+    assert.ok(
+      head.includes('id="startup-styles"'),
+      `${path}: first paint has critical skeleton styles`,
+    );
+    assert.ok(
+      !head.includes(".page-loading"),
+      `${path}: old loading-page styles removed`,
+    );
+  }
   const metas = tags(head, "meta");
   const keys = metas
     .map((tag) => attribute(tag, "name") ?? attribute(tag, "property"))
