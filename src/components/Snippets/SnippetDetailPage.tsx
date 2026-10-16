@@ -5,7 +5,6 @@ import {
   type Snippet,
 } from "../../data/snippets";
 import { encodeToHash } from "../../utils/share";
-import { applySeo } from "../../utils/seo";
 import { trackEvent } from "../../utils/analytics";
 import "./SnippetsPage.css";
 
@@ -28,76 +27,6 @@ export function SnippetDetailPage({ slug }: { slug: string }) {
       language: snippet.language,
     });
 
-    const jsonLd: Record<string, unknown>[] = [
-      {
-        "@context": "https://schema.org",
-        "@type": "TechArticle",
-        headline: snippet.seoTitle,
-        description: snippet.seoDescription,
-        url: `https://tryjs.app/snippets/${snippet.slug}`,
-        mainEntityOfPage: `https://tryjs.app/snippets/${snippet.slug}`,
-        inLanguage: "en",
-        keywords: snippet.keywords?.join(", "),
-        author: {
-          "@type": "Person",
-          name: "berkinduz",
-          url: "https://github.com/berkinduz",
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "TryJS",
-          url: "https://tryjs.app",
-        },
-        proficiencyLevel: "Beginner",
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "TryJS",
-            item: "https://tryjs.app/",
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Runnable Examples",
-            item: "https://tryjs.app/snippets",
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: snippet.title,
-            item: `https://tryjs.app/snippets/${snippet.slug}`,
-          },
-        ],
-      },
-    ];
-
-    if (snippet.faq && snippet.faq.length > 0) {
-      jsonLd.push({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: snippet.faq.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: f.answer,
-          },
-        })),
-      });
-    }
-
-    return applySeo({
-      title: `${snippet.seoTitle} | TryJS`,
-      description: snippet.seoDescription,
-      canonical: `https://tryjs.app/snippets/${snippet.slug}`,
-      jsonLd,
-      jsonLdId: "snippet-detail-schema",
-    });
   }, [slug, result]);
 
   if (!result) {

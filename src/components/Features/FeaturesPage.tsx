@@ -1,140 +1,11 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { applySeo } from "../../utils/seo";
+import { FEATURES } from "../../data/features";
+import { getPageSeo } from "../../data/seo";
 import { trackEvent } from "../../utils/analytics";
 import "./FeaturesPage.css";
 
-type FeatureItem = {
-  id: string;
-  tab: string;
-  title: string;
-  summary: string;
-  points: string[];
-  image: string;
-  imageAlt: string;
-};
-
-const FEATURES: FeatureItem[] = [
-  {
-    id: "javascript-typescript",
-    tab: "JS / TS",
-    title: "Run JavaScript and TypeScript instantly",
-    summary:
-      "Write code, switch between JavaScript and TypeScript, and see console output directly in your browser.",
-    points: [
-      "No signup, install, or backend round-trip",
-      "TypeScript transpiles in-browser with Sucrase",
-      "Live console for logs, warnings, errors, tables, and timings",
-      "Sandboxed execution with a timeout for runaway code",
-    ],
-    image: "/tryJS_JS_gif.gif",
-    imageAlt: "TryJS JavaScript and TypeScript playground demo",
-  },
-  {
-    id: "web-playground",
-    tab: "Web",
-    title: "Build HTML, CSS, and JavaScript with live preview",
-    summary:
-      "The Web Playground gives you a tabbed HTML/CSS/JS editor with instant browser preview and console feedback.",
-    points: [
-      "Separate HTML, CSS, and JS tabs",
-      "Live preview updates as you type",
-      "No local server or bundler required",
-      "Good for prototypes, demos, and quick UI experiments",
-    ],
-    image: "/tryjs_html_gif.gif",
-    imageAlt: "TryJS Web Playground with HTML/CSS/JS live preview",
-  },
-  {
-    id: "react-playground",
-    tab: "React",
-    title: "Write JSX components with live rendering",
-    summary:
-      "React mode gives you a JSX editor with a CSS tab, live-rendered using React 19 from esm.sh. Use hooks, import npm packages, and see your component update as you type.",
-    points: [
-      "JSX editor with useState, useEffect, and full hook support",
-      "Live component preview powered by React 19 via esm.sh",
-      "Error and warning badges surface issues inline",
-      "Starter template to go from zero to running in one click",
-    ],
-    image: "/tryjs_react_gif.gif",
-    imageAlt: "TryJS React playground demo",
-  },
-  {
-    id: "npm-imports",
-    tab: "NPM Imports",
-    title: "Run package-based examples without setup churn",
-    summary:
-      "Bare specifiers are rewritten to esm.sh and executed inside the sandbox, so experiments stay fast.",
-    points: [
-      "Use imports directly in editor code",
-      "No local install, no node_modules",
-      "Good for trying APIs before committing",
-    ],
-    image: "/tryjs_import.png",
-    imageAlt: "TryJS NPM imports code example",
-  },
-  {
-    id: "themes",
-    tab: "Themes",
-    title: "Six syntax themes, three editor fonts",
-    summary:
-      "Swap between One Dark, One Light, Dracula, GitHub Light, Monokai, and Solarized Dark — and pair them with Geist Mono, Fira Code, or JetBrains Mono. Your choice persists across sessions.",
-    points: [
-      "6 syntax themes with instant preview",
-      "3 curated monospace fonts",
-      "Configurable font size, tab size, word wrap, auto-run delay",
-      "All preferences saved to localStorage",
-    ],
-    image: "/tryJS_theme_change_gif.gif",
-    imageAlt: "TryJS theme change demo",
-  },
-  {
-    id: "share-embed",
-    tab: "Share / Embed",
-    title: "Send runnable context instead of static code blocks",
-    summary:
-      "Share links preserve editor state, and embeds let docs include live examples with minimal overhead.",
-    points: [
-      "URL sharing with code state",
-      "Iframe embed for docs and blog posts",
-      "Selection-level sharing for focused examples",
-    ],
-    image: "/embed_code.png",
-    imageAlt: "TryJS share and embed capabilities",
-  },
-  {
-    id: "export-png",
-    tab: "Export PNG",
-    title: "Produce consistent code visuals in one pass",
-    summary:
-      "Export with frame, padding, syntax theme, and background presets for release notes and social content.",
-    points: [
-      "Uniform output dimensions",
-      "Gradient and transparent backgrounds",
-      "Download or copy-to-clipboard flow",
-    ],
-    image: "/tryjs_export_image_gif.gif",
-    imageAlt: "TryJS export code to image demo",
-  },
-  {
-    id: "examples",
-    tab: "Examples",
-    title: "Start from runnable examples when useful",
-    summary:
-      "The examples library is a supporting entry point for loading working JavaScript, async, and TypeScript patterns into the playground.",
-    points: [
-      "One click to load and run",
-      "Good defaults for learning and demos",
-      "Quick path from working code to your own variation",
-    ],
-    image: "/tryJS_JS_gif.gif",
-    imageAlt: "TryJS runnable examples loading into the playground",
-  },
-];
-
 export function FeaturesPage() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const active = FEATURES[activeIndex];
 
   const onTabsKeyDown = (event: KeyboardEvent) => {
     let nextIndex = activeIndex;
@@ -159,32 +30,8 @@ export function FeaturesPage() {
     [activeIndex],
   );
 
-  // Set page-specific meta for /features
   useEffect(() => {
     trackEvent("features_view");
-    return applySeo({
-      title: "TryJS Features — JS, TypeScript, Web & React Playground",
-      description:
-        "Explore TryJS features: run JavaScript and TypeScript online, build HTML/CSS/JS and React previews, import npm packages, share links, and export code images.",
-      canonical: "https://tryjs.app/features",
-      jsonLd: [
-        {
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          name: "TryJS Features",
-          description: "Key features of the TryJS online JavaScript and TypeScript playground.",
-          url: "https://tryjs.app/features",
-          numberOfItems: FEATURES.length,
-          itemListElement: FEATURES.map((f, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            name: f.tab,
-            description: f.summary,
-          })),
-        },
-      ],
-      jsonLdId: "features-page-schema",
-    });
   }, []);
 
   return (
@@ -193,11 +40,11 @@ export function FeaturesPage() {
         <header class="features-head">
           <div class="features-head__left">
             <p class="features-eyebrow">tryjs.app</p>
-            <h1>Online JavaScript &amp; TypeScript Playground</h1>
+            <h1>{getPageSeo("/features").heading}</h1>
             <p>
-              TryJS is a fast JavaScript and TypeScript playground for testing
-              ideas, importing npm packages, building with HTML/CSS/JS or
-              React, sharing runnable links, and exporting code visuals.
+              Open TryJS, write or paste code, and see what happens. Use
+              JavaScript or TypeScript, build a Web or React preview, and share
+              an example when you need to. No account or project setup required.
             </p>
           </div>
           <div class="features-head__actions">
@@ -253,65 +100,113 @@ export function FeaturesPage() {
             ))}
           </div>
 
-          <article
-            class="features-stage"
-            role="tabpanel"
-            id={`feature-panel-${active.id}`}
-            aria-labelledby={`feature-tab-${active.id}`}
-          >
-            <section class="stage-copy">
-              <span class="stage-copy__index">
-                {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                {String(FEATURES.length).padStart(2, "0")}
-              </span>
-              <h2>{active.title}</h2>
-              <p class="stage-copy__summary">{active.summary}</p>
-              <ul class="stage-points">
-                {active.points.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <div class="stage-nav">
-                <button
-                  type="button"
-                  class="stage-nav__btn"
-                  onClick={() =>
-                    setActiveIndex(
-                      (prev) => (prev - 1 + FEATURES.length) % FEATURES.length,
-                    )
-                  }
-                  aria-label="Previous feature"
-                >
-                  Prev
-                </button>
-                <button
-                  type="button"
-                  class="stage-nav__btn"
-                  onClick={() =>
-                    setActiveIndex((prev) => (prev + 1) % FEATURES.length)
-                  }
-                  aria-label="Next feature"
-                >
-                  Next
-                </button>
-              </div>
-            </section>
+          {FEATURES.map((active, index) => (
+            <article
+              key={active.id}
+              hidden={index !== activeIndex}
+              class="features-stage"
+              role="tabpanel"
+              id={`feature-panel-${active.id}`}
+              aria-labelledby={`feature-tab-${active.id}`}
+            >
+              <section class="stage-copy">
+                <span class="stage-copy__index">
+                  {String(index + 1).padStart(2, "0")} /{" "}
+                  {String(FEATURES.length).padStart(2, "0")}
+                </span>
+                <h2>{active.title}</h2>
+                <p class="stage-copy__summary">{active.summary}</p>
+                <ul class="stage-points">
+                  {active.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+                <div class="stage-nav">
+                  <button
+                    type="button"
+                    class="stage-nav__btn"
+                    onClick={() =>
+                      setActiveIndex(
+                        (prev) =>
+                          (prev - 1 + FEATURES.length) % FEATURES.length,
+                      )
+                    }
+                    aria-label="Previous feature"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    type="button"
+                    class="stage-nav__btn"
+                    onClick={() =>
+                      setActiveIndex((prev) => (prev + 1) % FEATURES.length)
+                    }
+                    aria-label="Next feature"
+                  >
+                    Next
+                  </button>
+                </div>
+              </section>
 
-            <figure class="stage-media">
-              <img
-                key={active.id}
-                src={active.image}
-                alt={active.imageAlt}
-                loading="lazy"
-                width="1200"
-                height="630"
-              />
-            </figure>
-          </article>
+              <figure class="stage-media">
+                <img
+                  key={active.id}
+                  src={active.image}
+                  alt={active.imageAlt}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  width={active.imageWidth}
+                  height={active.imageHeight}
+                />
+              </figure>
+            </article>
+          ))}
 
           <div class="stage-progress" aria-hidden>
             <span class="stage-progress__bar" style={{ width: progress }} />
           </div>
+        </section>
+
+        <section class="features-questions" aria-labelledby="questions-heading">
+          <h2 id="questions-heading">Before you start</h2>
+          <details>
+            <summary>Do I need an account or a saved playground?</summary>
+            <p>
+              No. <a href="/">Open TryJS</a> and start typing. Named saves are
+              optional and live in this browser. Download a JSON copy to keep
+              work outside browser storage or move it to another device.
+            </p>
+          </details>
+          <details>
+            <summary>Which playground should I use?</summary>
+            <p>
+              Use <a href="/">JavaScript or TypeScript</a> for code and console
+              output, <a href="/web">Web</a> for HTML, CSS and JavaScript
+              together, or <a href="/react">React</a> for JSX components and
+              hooks. <a href="/snippets">Runnable examples</a> are available
+              when you want a starting point.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Can I use Node.js packages or run a whole project?
+            </summary>
+            <p>
+              TryJS loads browser-compatible npm modules through esm.sh. It does
+              not provide a Node.js server, a local filesystem or a multi-file
+              project environment. Package imports and code that makes network
+              requests need an internet connection.
+            </p>
+          </details>
+          <details>
+            <summary>Where does my code run?</summary>
+            <p>
+              Editing, execution, TypeScript checks and formatting happen in
+              your browser. Package imports contact external CDNs, and code you
+              run can make its own network requests. A shared link contains a
+              snapshot of your code, so share it only with people who should
+              have access.
+            </p>
+          </details>
         </section>
 
         <footer class="features-footer">

@@ -1,64 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-    />
-    <title>JavaScript Playground Online — Run JS & TypeScript Instantly | TryJS</title>
-    <meta
-      name="description"
-      content="Free online JavaScript and TypeScript playground. Run JS instantly in your browser with npm imports, live console, HTML/CSS/JS and React playgrounds, shareable URLs, and no signup."
-    />
-    <meta
-      name="keywords"
-      content="javascript playground, js playground, typescript playground, online javascript editor, run javascript online, run js online, js playground online, javascript sandbox, typescript online, npm import playground, html css js playground, web playground, runnable javascript examples, code image export, js sandbox, javascript code runner, online code editor javascript, test javascript online, javascript compiler online, react playground, react playground online, react jsx playground, react sandbox, react online editor, react hooks playground, react component playground"
-    />
-    <meta name="author" content="TryJS" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <!-- Use your production domain; canonical must match the URL users see -->
-    <link rel="canonical" href="https://tryjs.app/" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://tryjs.app/" />
-    <meta
-      property="og:title"
-      content="JavaScript Playground Online — Run JS & TypeScript Instantly | TryJS"
-    />
-    <meta
-      property="og:description"
-      content="Free JavaScript and TypeScript playground to run code online. Use npm imports, live console, HTML/CSS/JS and React playgrounds, and shareable links. No setup required."
-    />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:site_name" content="TryJS" />
-    <meta property="og:image" content="https://tryjs.app/og-tryjs.png" />
-    <meta
-      property="og:image:alt"
-      content="TryJS — Free online JavaScript and TypeScript playground with live console, npm imports, and code sharing"
-    />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="JavaScript Playground Online — Run JS & TypeScript Instantly | TryJS"
-    />
-    <meta
-      name="twitter:description"
-      content="Free JavaScript and TypeScript playground to run code online. Use npm imports, live console, HTML/CSS/JS and React playgrounds, and shareable links. No setup required."
-    />
-    <meta name="twitter:image" content="https://tryjs.app/og-tryjs.png" />
-    <meta
-      name="twitter:image:alt"
-      content="TryJS — Free online JavaScript and TypeScript playground with live console, npm imports, and code sharing"
-    />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- theme:bootstrap -->
+    <!-- seo:start --><!-- seo:end -->
+    <meta name="theme-color" content="#252524" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#faf8f0" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -66,105 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Structured data: WebSite -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "TryJS",
-        "alternateName": "TryJS JavaScript Playground",
-        "url": "https://tryjs.app/"
-      }
-    </script>
-
-    <!-- Structured data: WebApplication -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "TryJS — JavaScript Playground",
-        "description": "Free online JavaScript and TypeScript playground. Write and run JS code instantly in your browser with npm imports, live console, HTML/CSS/JS and React playgrounds, shareable links, and image export.",
-        "url": "https://tryjs.app/",
-        "applicationCategory": "DeveloperApplication",
-        "browserRequirements": "Requires a modern web browser with JavaScript enabled",
-        "operatingSystem": "Any",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "screenshot": "https://tryjs.app/og-tryjs.png",
-        "author": {
-          "@type": "Person",
-          "name": "berkinduz",
-          "url": "https://github.com/berkinduz"
-        },
-        "featureList": [
-          "JavaScript and TypeScript toggle with one click",
-          "In-browser TypeScript transpilation via Sucrase",
-          "NPM package imports via esm.sh — no node_modules",
-          "HTML, CSS and JS web playground with live preview",
-          "React 19 JSX playground with hooks and live component preview",
-          "Shareable URLs that preserve editor state",
-          "Embeddable iframe for docs and blog posts",
-          "Code to image export with themes and gradient backgrounds",
-          "Curated runnable examples for starting from working code",
-          "Sandboxed execution with 5-second timeout",
-          "Six syntax themes, three monospace fonts",
-          "Runs entirely client-side — no code sent to any server"
-        ],
-        "sameAs": ["https://github.com/berkinduz/try-js"]
-      }
-    </script>
-
-    <!-- Structured data: FAQPage for rich snippets -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is TryJS?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "TryJS is a free online JavaScript and TypeScript playground that runs entirely in your browser. You can write, run, and share JS code instantly — no signup, no installation, no backend needed."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Can I use npm packages in TryJS?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. Simply write a standard import statement like 'import confetti from \"canvas-confetti\"' and TryJS will automatically load the package from esm.sh. No node_modules or bundler configuration required."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Is TryJS free to use?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes, TryJS is completely free and open source under the MIT license. No signup, no ads, no limitations. All code runs locally in your browser."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Does TryJS support TypeScript?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. TryJS supports both JavaScript and TypeScript. You can switch between them with one click. TypeScript is transpiled in-browser using Sucrase with zero server round-trip."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Can I share my code from TryJS?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. TryJS generates shareable URLs that preserve your editor state. You can also embed the playground as an iframe in blog posts and documentation, or export your code as a styled PNG image."
-            }
-          }
-        ]
-      }
-    </script>
-
-    <!-- Umami analytics (privacy-friendly, cookie-free) -->
+    <!-- Umami analytics excludes code in URL fragments. -->
     <script
       id="umami-tracker"
       defer
@@ -173,216 +23,18 @@
       data-domains="tryjs.app,www.tryjs.app"
       data-exclude-hash="true"
     ></script>
-
-    <!-- Set embed attribute early to prevent layout flash -->
     <script>
       if ((location.pathname.replace(/\/+$/, "") || "/") === "/embed")
         document.documentElement.setAttribute("data-embed", "");
     </script>
-
     <style>
-      body {
-        margin: 0;
-        overflow: auto;
-      }
-      .app-wrap {
-        height: 100vh;
-        min-height: 100vh;
-      }
-      [data-embed] .seo-content {
-        display: none;
-      }
-      .seo-content {
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 2rem 1.5rem 3rem;
-        font:
-          1rem/1.6 system-ui,
-          sans-serif;
-        color: #374151;
-      }
-      .seo-content h1 {
-        font-size: 1.5rem;
-        margin: 0 0 1rem;
-        color: #111;
-      }
-      .seo-content h2 {
-        font-size: 1.1rem;
-        margin: 1.5rem 0 0.5rem;
-        color: #222;
-      }
-      .seo-content h3 {
-        font-size: 1rem;
-        margin: 1.25rem 0 0.25rem;
-        color: #333;
-      }
-      .seo-content p {
-        margin: 0 0 0.75rem;
-      }
-      .seo-content ul {
-        margin: 0 0 1rem;
-        padding-left: 1.25rem;
-      }
-      .seo-content li {
-        margin: 0 0 0.35rem;
-      }
-      .seo-content pre {
-        overflow: auto;
-        margin: 0 0 1rem;
-        padding: 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #0f172a;
-        color: #e5e7eb;
-      }
-      .seo-content code,
-      .seo-content kbd {
-        font-family:
-          "Fira Code",
-          "JetBrains Mono",
-          ui-monospace,
-          SFMono-Regular,
-          Menlo,
-          monospace;
-      }
-      .seo-content :not(pre) > code,
-      .seo-content kbd {
-        padding: 0.1rem 0.25rem;
-        border-radius: 4px;
-        background: #f3f4f6;
-        color: #111827;
-      }
-      .seo-content a {
-        color: #2563eb;
-        text-decoration: none;
-      }
-      .seo-content a:hover {
-        text-decoration: underline;
-      }
+      .page-loading { max-width: 720px; margin: 0 auto; padding: 40px 24px; line-height: 1.6; }
+      .page-loading h1 { font-size: 28px; line-height: 1.2; }
+      .page-loading nav { display: flex; flex-wrap: wrap; gap: 16px; }
     </style>
   </head>
   <body>
-    <div class="app-wrap"><div id="app"></div></div>
-    <noscript>
-      <section style="max-width:720px;margin:2rem auto;padding:1.5rem;font-family:system-ui,sans-serif">
-        <h1>JavaScript Playground Online — TryJS</h1>
-        <p>TryJS is a free online JavaScript and TypeScript playground. Write and run JS code instantly in your browser. Please enable JavaScript to use the playground.</p>
-        <p>Features: npm imports, live console, HTML/CSS/JS playground, React playground, shareable URLs, and code-to-image export.</p>
-      </section>
-    </noscript>
-    <section class="seo-content" id="about" aria-label="About TryJS JavaScript Playground">
-      <h1>JavaScript Playground Online — Run JS Code Instantly</h1>
-      <p>
-        TryJS is a free, fast <strong>JavaScript playground</strong> and
-        <strong>TypeScript playground</strong> that runs entirely in your
-        browser. Write and <strong>run JavaScript online</strong> and see
-        results instantly — no signup, no backend, no installation required.
-        Whether you want to learn JavaScript, experiment with TypeScript, test
-        a quick idea, or prototype browser code, TryJS gives you a fast
-        and distraction-free <strong>JS sandbox</strong> to do it.
-      </p>
-
-      <h2>Write and Run JavaScript Online Instantly</h2>
-      <p>
-        Switch between
-        <a href="https://tryjs.app/">JavaScript and TypeScript</a>
-        with one click in this <strong>online JavaScript editor</strong>.
-        TypeScript is transpiled in-browser using Sucrase, so there is zero
-        server round-trip. The editor auto-runs your code as you type with a
-        smart debounce, and you can trigger immediate execution with
-        <kbd>Cmd</kbd>+<kbd>Enter</kbd>. The built-in console displays logs,
-        warnings, errors, tables, timing output, and REPL-style expression
-        results — just like Chrome DevTools.
-      </p>
-
-      <h2>NPM Imports in the Browser</h2>
-      <p>
-        Import any npm package by writing a standard import statement such as
-        <code>import confetti from "canvas-confetti"</code>. TryJS rewrites bare
-        specifiers to
-        <a href="https://esm.sh" rel="noopener noreferrer">esm.sh</a> and loads
-        modules on the fly. No <code>node_modules</code>, no bundler
-        configuration — just import and use. See it in action on the
-        <a href="/features">features page</a>.
-      </p>
-
-      <h2>Web &amp; React Playground</h2>
-      <p>
-        Open the <a href="/web">Web Playground</a> to write HTML, CSS, and
-        JavaScript in a tabbed editor with live preview. Or jump straight into
-        the <a href="/react">React Playground</a> to build
-        <strong>React components</strong> with JSX, use hooks like useState
-        and useEffect, and import npm packages — all with instant live
-        preview. Build and prototype web pages and React UIs directly in the
-        browser without any extra setup.
-      </p>
-
-      <h2>Sharing, Export & Runnable Examples</h2>
-      <p>
-        Share your code as a compact URL that preserves editor state, or embed
-        the playground as an iframe in blog posts and documentation. You can also
-        <a href="/features">export your code as a styled PNG image</a>
-        with syntax-highlighted themes, window frames, adjustable padding, and
-        gradient backgrounds. If you do not want to start from an empty editor,
-        open the <a href="/snippets">runnable examples</a> and edit them in the
-        playground.
-      </p>
-
-      <h2>Customization & Themes</h2>
-      <p>
-        Choose from six syntax themes including One Dark, Dracula, GitHub Light,
-        Monokai, and Solarized Dark. Pick your preferred editor font from Geist
-        Mono, Fira Code, or JetBrains Mono. The resizable split pane lets you
-        control how much space the editor and console each occupy. Code is saved
-        to localStorage per language so you never lose your work.
-      </p>
-
-      <h2>Safe, Private & Open Source</h2>
-      <p>
-        All code execution happens inside a sandboxed iframe with a five-second
-        timeout to prevent runaway scripts. No code is ever sent to a server.
-        TryJS works on desktop and mobile with a responsive, streamlined
-        interface optimized for speed.
-      </p>
-      <p>
-        TryJS is open source under the MIT license. View the source code on
-        <a href="https://github.com/berkinduz/try-js" rel="noopener noreferrer"
-          >GitHub</a
-        >, explore all capabilities on the
-        <a href="/features">features page</a>, or start coding now at
-        <a href="https://tryjs.app/">tryjs.app</a>.
-      </p>
-
-      <h2>Frequently Asked Questions</h2>
-      <h3>What is TryJS?</h3>
-      <p>
-        TryJS is a free online <strong>JavaScript playground</strong> that lets
-        you write and run JS and TypeScript code directly in your browser. No
-        signup, no installation — just open and code.
-      </p>
-      <h3>Can I use npm packages in TryJS?</h3>
-      <p>
-        Yes. Write a standard import statement like
-        <code>import confetti from "canvas-confetti"</code> and TryJS
-        automatically loads the package via esm.sh. No node_modules or bundler
-        config needed.
-      </p>
-      <h3>Is TryJS free?</h3>
-      <p>
-        Yes, TryJS is completely free and open source. All code runs locally in
-        your browser with no server-side processing.
-      </p>
-      <h3>Does TryJS support TypeScript?</h3>
-      <p>
-        Yes. Switch between JavaScript and TypeScript with one click. TypeScript
-        is transpiled in-browser using Sucrase with zero server round-trip.
-      </p>
-      <h3>How do I share my code?</h3>
-      <p>
-        TryJS generates shareable URLs that preserve your editor state. You can
-        also embed the playground as an iframe or export code as a styled PNG.
-      </p>
-    </section>
+    <div id="app"><!-- app:start --><!-- app:end --></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

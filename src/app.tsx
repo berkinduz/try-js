@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { Editor } from "./components/Editor/Editor";
 import { Console } from "./components/Console/Console";
 import { Toolbar } from "./components/Toolbar/Toolbar";
@@ -17,35 +17,36 @@ import { EmbedOpenLink } from "./components/Playgrounds/EmbedOpenLink";
 import { PlaygroundLibrary } from "./components/Playgrounds/PlaygroundLibrary";
 import { trackEvent } from "./utils/analytics";
 import { MOBILE_BREAKPOINT } from "./utils/constants";
-import { FeaturesPage } from "./components/Features/FeaturesPage";
-import { SnippetsPage } from "./components/Snippets/SnippetsPage";
-import { SnippetDetailPage } from "./components/Snippets/SnippetDetailPage";
 import { WebPlaygroundPage } from "./components/WebPlayground/WebPlaygroundPage";
 import { isCurrentLocation } from "./sandbox/source-location";
 import type { SourceLocation } from "./sandbox/source-location";
+import { NotFoundPage } from "./components/NotFoundPage";
+import { getPageSeo, normalizePath } from "./data/seo";
+import { applySeo } from "./utils/seo";
 
 export function App() {
-  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  const [, setLocation] = useState(window.location.pathname);
+  const path = normalizePath(window.location.pathname);
   const isEmbed = embedMode.value;
-
-  if (path === "/features") {
-    return <FeaturesPage />;
-  }
-
-  if (path === "/snippets") {
-    return <SnippetsPage />;
-  }
-
-  const snippetMatch = path.match(/^\/snippets\/(.+)$/);
-  if (snippetMatch) {
-    return <SnippetDetailPage slug={snippetMatch[1]} />;
-  }
-
   const currentMode = mode.value;
+  const seo = getPageSeo(path);
+  useEffect(() => {
+    const onPopState = () => setLocation(window.location.pathname);
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+  useLayoutEffect(() => { applySeo(getPageSeo(window.location.pathname)); }, [path, currentMode]);
+
+  if (seo.status === 404) return <NotFoundPage />;
+
   // Opening or starting a document cancels the previous editor and sandbox lifetime.
   const playgroundKey = playgroundVersion.value;
+  const heading = getPageSeo(currentMode === "web" ? "/web" : currentMode === "react" ? "/react" : "/").heading;
   return <>
-    {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage key={playgroundKey} /> : <JsPlayground key={playgroundKey} />}
+    <main class="playground" aria-label={heading}>
+      <h1 class="sr-only">{heading}</h1>
+      {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage key={playgroundKey} /> : <JsPlayground key={playgroundKey} />}
+    </main>
     {!isEmbed && <PlaygroundLibrary />}
     <Gallery />
     <ScreenshotModal />

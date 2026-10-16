@@ -1,48 +1,18 @@
 import { useEffect } from "preact/hooks";
-import { SNIPPET_CATEGORIES, getAllSnippets } from "../../data/snippets";
-import { applySeo } from "../../utils/seo";
+import { SNIPPET_CATEGORIES } from "../../data/snippets";
+import { getPageSeo } from "../../data/seo";
 import { trackEvent } from "../../utils/analytics";
 import "./SnippetsPage.css";
 
 export function SnippetsPage() {
-  useEffect(() => {
-    trackEvent("snippets_index_view");
-    const allSnippets = getAllSnippets();
-    return applySeo({
-      title: "Runnable JavaScript Examples for the TryJS Playground",
-      description:
-        "Start from runnable JavaScript and TypeScript examples, then edit and run them in the TryJS playground. Covers JS fundamentals, async patterns, and TypeScript essentials.",
-      canonical: "https://tryjs.app/snippets",
-      jsonLd: [
-        {
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "Runnable JavaScript Examples for the TryJS Playground",
-          description:
-            "A curated collection of runnable JavaScript and TypeScript examples that open in the TryJS playground.",
-          url: "https://tryjs.app/snippets",
-          mainEntity: {
-            "@type": "ItemList",
-            numberOfItems: allSnippets.length,
-            itemListElement: allSnippets.slice(0, 10).map((s, i) => ({
-              "@type": "ListItem",
-              position: i + 1,
-              name: s.seoTitle,
-              url: `https://tryjs.app/snippets/${s.slug}`,
-            })),
-          },
-        },
-      ],
-      jsonLdId: "snippets-page-schema",
-    });
-  }, []);
+  useEffect(() => { trackEvent("snippets_index_view"); }, []);
 
   return (
     <main class="snippets-page">
       <div class="snippets-shell">
         <header class="snippets-head">
           <p class="snippets-eyebrow">tryjs.app</p>
-          <h1>Runnable JavaScript Examples</h1>
+          <h1>{getPageSeo("/snippets").heading}</h1>
           <p>
             Start from working JavaScript, async, and TypeScript examples, then
             open them in the TryJS playground to edit, run, share, or extend.

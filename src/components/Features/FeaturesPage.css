@@ -3,7 +3,7 @@
   overflow: auto;
   padding: 24px 18px 34px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   background:
     radial-gradient(
       700px 320px at 95% -5%,
@@ -23,6 +23,20 @@
   max-width: 1120px;
   margin: 0 auto;
 }
+
+.features-stage[hidden] { display: none; }
+
+.features-questions {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.features-questions h2 { color: var(--text-primary); font-size: 20px; margin: 0 0 16px; }
+.features-questions details { margin: 12px 0; }
+.features-questions summary { cursor: pointer; color: var(--text-primary); font-weight: 500; }
+.features-questions p { max-width: 80ch; margin: 8px 0 16px; }
 
 .features-head {
   display: flex;
@@ -267,7 +281,7 @@
 
 .stage-media img {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 420px;
   width: auto;
   height: auto;
   object-fit: contain;

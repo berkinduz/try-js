@@ -13,7 +13,6 @@ import { ShareMenu } from "../Playgrounds/ShareMenu";
 import { EmbedOpenLink } from "../Playgrounds/EmbedOpenLink";
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { MOBILE_BREAKPOINT } from "../../utils/constants";
-import { applySeo } from "../../utils/seo";
 import { trackEvent } from "../../utils/analytics";
 import "./WebPlaygroundPage.css";
 
@@ -44,51 +43,8 @@ export function WebPlaygroundPage() {
     window.history.pushState(null, "", newPath);
   };
 
-  // SEO meta tags + analytics
   useEffect(() => {
-    const isReact = subMode === "react";
-    trackEvent("web_playground_view", { mode: isReact ? "react" : "vanilla" });
-    return applySeo({
-      title: isReact
-        ? "React Playground Online — Write & Run React JSX Instantly | TryJS"
-        : "Web Playground Online — HTML, CSS & JavaScript Editor | TryJS",
-      description: isReact
-        ? "Free online React playground. Write React components with JSX, see live preview instantly, import npm packages, and use hooks — all in your browser. No setup required."
-        : "Free online web playground. Write HTML, CSS, and JavaScript in a tabbed editor with live preview. Build and prototype web pages directly in your browser — no setup required.",
-      canonical: isReact ? "https://tryjs.app/react" : "https://tryjs.app/web",
-      ogImage: "https://tryjs.app/tryjs_web.png",
-      jsonLd: [
-        {
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: isReact
-            ? "TryJS — React Playground"
-            : "TryJS — Web Playground",
-          description: isReact
-            ? "Free online React playground with JSX, hooks, npm imports, and live preview."
-            : "Free online web playground with HTML, CSS, and JavaScript tabbed editor and live preview.",
-          url: isReact ? "https://tryjs.app/react" : "https://tryjs.app/web",
-          applicationCategory: "DeveloperApplication",
-          operatingSystem: "Any",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-          featureList: isReact
-            ? [
-                "React JSX editor with live preview",
-                "React hooks (useState, useEffect, useRef, useMemo)",
-                "NPM package imports via esm.sh",
-                "Built-in console for debugging",
-                "Toggle between Vanilla and React modes",
-              ]
-            : [
-                "HTML, CSS, and JavaScript tabbed editor",
-                "Live preview updates as you type",
-                "Built-in console for debugging",
-                "Toggle between Vanilla and React modes",
-              ],
-        },
-      ],
-      jsonLdId: "web-page-schema",
-    });
+    trackEvent("web_playground_view", { mode: subMode === "react" ? "react" : "vanilla" });
   }, [subMode]);
 
   // Clear stale console when switching sub-mode
@@ -141,20 +97,30 @@ export function WebPlaygroundPage() {
 
       {/* Vanilla/React sub-toggle (only show when Web is active) */}
       {!isEmbed && <div class="web-sub-toggle">
-        <button
-          type="button"
+        <a
+          href="/web"
           class={`web-sub-toggle__btn ${subMode === "vanilla" ? "active" : ""}`}
-          onClick={() => switchSubMode("vanilla")}
+          aria-current={subMode === "vanilla" ? "page" : undefined}
+          onClick={(event) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            switchSubMode("vanilla");
+          }}
         >
           Vanilla
-        </button>
-        <button
-          type="button"
+        </a>
+        <a
+          href="/react"
           class={`web-sub-toggle__btn ${subMode === "react" ? "active" : ""}`}
-          onClick={() => switchSubMode("react")}
+          aria-current={subMode === "react" ? "page" : undefined}
+          onClick={(event) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            switchSubMode("react");
+          }}
         >
           React
-        </button>
+        </a>
         <ShareMenu label />
       </div>}
 

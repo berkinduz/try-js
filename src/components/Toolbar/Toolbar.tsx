@@ -11,6 +11,8 @@ export function Toolbar() {
 
   const isJsMode = currentMode === "js";
   const isWebMode = currentMode === "web" || currentMode === "react";
+  const webPath = isWebMode ? currentMode === "react" ? "/react" : "/web"
+    : readLocal("jspark:webSubMode") === "react" ? "/react" : "/web";
 
   const goto = (path: string) => {
     if (window.location.pathname !== path) {
@@ -59,16 +61,20 @@ export function Toolbar() {
             >
               TS
             </button>
-            <button
-              type="button"
+            <a
+              href={webPath}
               class={`toolbar__logo toolbar__logo--web ${isWebMode ? "active" : ""}`}
-              onClick={activateWeb}
+              onClick={(event) => {
+                if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                activateWeb();
+              }}
               title="Web"
               aria-label="Web"
-              aria-pressed={isWebMode}
+              aria-current={isWebMode ? "page" : undefined}
             >
               Web
-            </button>
+            </a>
           </div>
         </div>
       </div>

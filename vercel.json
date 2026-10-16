@@ -1,10 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run check",
   "outputDirectory": "dist",
   "redirects": [
     {
       "source": "/:path(.*)",
-      "has": [{ "type": "host", "value": "www.tryjs.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tryjs.app"
+        }
+      ],
       "destination": "https://tryjs.app/:path",
       "permanent": true
     },
@@ -22,12 +28,16 @@
       "source": "/regex/:slug*",
       "destination": "/",
       "permanent": true
-    }
-  ],
-  "rewrites": [
+    },
     {
-      "source": "/((?!robots\\.txt|sitemap\\.xml|favicon\\.svg|assets/).*)",
-      "destination": "/index.html"
+      "source": "/:path*/index.html",
+      "destination": "/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/404.html",
+      "destination": "/404",
+      "permanent": true
     }
   ],
   "headers": [
@@ -43,19 +53,54 @@
     {
       "source": "/embed",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors *" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors *"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
       ]
     },
     {
       "source": "/((?!embed$).*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self'" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self'"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    },
+    {
+      "source": "/404",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
       ]
     }
-  ]
+  ],
+  "trailingSlash": false
 }
