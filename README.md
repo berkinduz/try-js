@@ -16,6 +16,7 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 - **REPL-style evaluation** — bare expressions display their result in the console, like Chrome DevTools
 - **Object inspector** — expand objects, arrays, Maps, and Sets inline
 - **Console output** — supports `log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
+- **Copy output** — each console row has a Copy action on hover, keyboard focus, or touch, including Web and React consoles; copies captured output as plain text, preserving serialization placeholders when full data is unavailable
 - **Jump to errors** — click a JS/TS error's line and column (or focus it with Tab and press Enter/Space) to focus and reveal the source, including on mobile; TypeScript, npm imports, and async errors map back to your code
 - **Sandboxed execution** — code runs in an iframe sandbox with a 5-second timeout (15s for module loading)
 

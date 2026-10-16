@@ -4,6 +4,7 @@ import { webHtml, webCss, webJs } from "../../state/editor";
 import { autoRunDelay } from "../../state/settings";
 import { PREVIEW_CONSOLE_FORMATTER } from "../../sandbox/preview-console-formatter";
 import { buildWebDocument } from "../../sandbox/web-document";
+import { CopyOutputButton } from "../Console/CopyOutputButton";
 import {
   isSuccessfulRunEligible,
   trackSuccessfulRun,
@@ -182,9 +183,10 @@ export function WebPreview() {
                 entries.map((entry) => (
                   <div
                     key={entry.id}
-                    class={`web-preview__console-entry web-preview__console-entry--${entry.method}`}
+                    class={`web-preview__console-entry web-preview__console-entry--${entry.method} console-output-row`}
                   >
-                    {entry.args.join(" ")}
+                    <span class="console-output-text">{entry.args.join(" ")}</span>
+                    <CopyOutputButton getText={() => entry.args.join(" ")} />
                   </div>
                 ))
               )}

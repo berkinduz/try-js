@@ -2,6 +2,8 @@ import type { OutputEntry } from "../../state/console";
 import { formatValue, getValueClass } from "../../utils/format";
 import type { SerializedValue } from "../../utils/format";
 import { ObjectInspector } from "./ObjectInspector";
+import { CopyOutputButton } from "./CopyOutputButton";
+import { consoleEntryText } from "../../utils/console-copy";
 import { isCurrentLocation } from "../../sandbox/source-location";
 import type { SourceLocation, SourceSnapshot } from "../../sandbox/source-location";
 
@@ -117,7 +119,7 @@ export function ConsoleEntry({ entry, currentSource, onNavigate }: Props) {
         ? ` (line ${entry.lineno ?? "?"}, column ${entry.colno ?? "?"})`
         : "";
     return (
-      <div class="console-entry console-entry--error">
+      <div class="console-entry console-entry--error console-output-row">
         <span class="console-icon">✕</span>
         <div class="console-content">
           <span class="console-message">{entry.message}{entry.location ? <> (<LocationButton
@@ -127,6 +129,7 @@ export function ConsoleEntry({ entry, currentSource, onNavigate }: Props) {
             <pre class="console-stack">{entry.stack}</pre>
           )}
         </div>
+        <CopyOutputButton getText={() => consoleEntryText(entry)} />
       </div>
     );
   }
@@ -136,20 +139,22 @@ export function ConsoleEntry({ entry, currentSource, onNavigate }: Props) {
 
   if (method === "table") {
     return (
-      <div class={`console-entry console-entry--${method}`}>
+      <div class={`console-entry console-entry--${method} console-output-row`}>
         {icon && <span class="console-icon">{icon}</span>}
         <div class="console-content">{renderTable(entry.args)}</div>
+        <CopyOutputButton getText={() => consoleEntryText(entry)} />
       </div>
     );
   }
 
   return (
-    <div class={`console-entry console-entry--${method}`}>
+    <div class={`console-entry console-entry--${method} console-output-row`}>
       {icon && <span class="console-icon">{icon}</span>}
       <div class="console-content console-args">
         {entry.args.map(renderValue)}
         {entry.location && <LocationButton location={entry.location} currentSource={currentSource} onNavigate={onNavigate} />}
       </div>
+      <CopyOutputButton getText={() => consoleEntryText(entry)} />
     </div>
   );
 }
