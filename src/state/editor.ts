@@ -18,9 +18,9 @@ import {
 } from "../components/Editor/themes";
 import { decodeFromHash } from "../utils/share";
 import { trackEvent } from "../utils/analytics";
-import { readLocal, writeLocal } from "../utils/storage";
-import { parsePlayground, playgroundPath, playgroundText } from "../utils/playground";
-import type { AppMode, Language, PlaygroundState } from "../utils/playground";
+import { readLocal, writeLocal, readSession, writeSession } from "../utils/storage";
+import { parsePlayground, playgroundPath, playgroundText, playgroundSurface, samePlayground } from "../utils/playground";
+import type { AppMode, Language, PlaygroundState, PlaygroundSurface } from "../utils/playground";
 
 export type { Language, AppMode } from "../utils/playground";
 export type Theme = "light" | "dark";
@@ -155,7 +155,44 @@ const getStoredReactCss = (): string => {
 
 export const reactCode = signal<string>(getStoredReactCode());
 export const reactCss = signal<string>(getStoredReactCss());
-export const embedVersion = signal(0);
+export const playgroundVersion = signal(0);
+
+export interface SavedPlaygroundRef { id: string; updatedAt: number }
+export const ACTIVE_PLAYGROUNDS_KEY = "tryjs:active-playgrounds:v1";
+type ActivePlaygrounds = Partial<Record<PlaygroundSurface, SavedPlaygroundRef>>;
+
+function readActivePlaygrounds(): ActivePlaygrounds {
+  if (isEmbed) return {};
+  const result: ActivePlaygrounds = {};
+  try {
+    const stored = JSON.parse(readSession(ACTIVE_PLAYGROUNDS_KEY) ?? "null");
+    for (const key of ["javascript", "typescript", "web", "react"] as const) {
+      const entry = stored?.[key];
+      if (entry && typeof entry.id === "string" && entry.id.length > 0 && entry.id.length <= 100 &&
+        typeof entry.updatedAt === "number" && Number.isFinite(entry.updatedAt)) {
+        result[key] = { id: entry.id, updatedAt: entry.updatedAt };
+      }
+    }
+  } catch { /* Invalid tab metadata does not affect saved code. */ }
+  if (sharedState) {
+    delete result[playgroundSurface(sharedState)];
+    writeSession(ACTIVE_PLAYGROUNDS_KEY, JSON.stringify(result));
+  }
+  return result;
+}
+
+const activePlaygrounds = signal<ActivePlaygrounds>(readActivePlaygrounds());
+export const currentSurface = computed<PlaygroundSurface>(() => mode.value === "js" ? language.value : mode.value);
+export const activeSavedPlayground = computed(() => activePlaygrounds.value[currentSurface.value] ?? null);
+
+export function setActiveSavedPlayground(entry: SavedPlaygroundRef | null, surface = currentSurface.value): void {
+  if (isEmbed) return;
+  const next = { ...activePlaygrounds.value };
+  if (entry) next[surface] = { id: entry.id, updatedAt: entry.updatedAt };
+  else delete next[surface];
+  activePlaygrounds.value = next;
+  writeSession(ACTIVE_PLAYGROUNDS_KEY, JSON.stringify(next));
+}
 
 export function setReactCode(newCode: string) {
   reactCode.value = newCode;
@@ -224,10 +261,6 @@ export function saveDraft(): boolean {
 
 export const PREVIOUS_PLAYGROUND_KEY = "jspark:previous-playground:v1";
 
-function samePlayground(first: PlaygroundState, second: PlaygroundState): boolean {
-  return JSON.stringify(parsePlayground(first, Infinity)) === JSON.stringify(parsePlayground(second, Infinity));
-}
-
 /** Assign a validated playground inside the caller's batch, without navigation or storage writes. */
 function setPlaygroundState(next: PlaygroundState): void {
   if (next.mode === "web") {
@@ -258,11 +291,23 @@ export function applyPlayground(value: PlaygroundState, allowLargeRecovery = fal
   }
   saveDraft();
   batch(() => {
+    setActiveSavedPlayground(null, playgroundSurface(next));
     setPlaygroundState(next);
     if (next.mode === "js") writeLocal("jspark:language", next.language);
     history.pushState(null, "", playgroundPath(next));
+    ++playgroundVersion.value;
   });
   saveDraft();
+}
+
+/** Start from this mode's original defaults, keeping all named saves and the previous draft. */
+export function startNewPlayground(): void {
+  const next: PlaygroundState = mode.value === "react"
+    ? { mode: "react", language: "javascript", code: DEFAULT_REACT_CODE, css: DEFAULT_REACT_CSS }
+    : mode.value === "web"
+      ? { mode: "web", language: "javascript", code: "", html: DEFAULT_WEB_HTML, css: DEFAULT_WEB_CSS, webJs: DEFAULT_WEB_JS }
+      : { mode: "js", language: language.value, code: language.value === "typescript" ? DEFAULT_TS_CODE : DEFAULT_JS_CODE };
+  applyPlayground(next);
 }
 
 /** Recovery is not an import: an existing local draft must remain recoverable at its original size. */
@@ -299,7 +344,7 @@ if (isEmbed) {
     if (!next) return;
     batch(() => {
       setPlaygroundState(next);
-      ++embedVersion.value;
+      ++playgroundVersion.value;
     });
   });
 }

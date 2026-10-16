@@ -124,11 +124,7 @@ export function WebPlaygroundPage() {
 
   // Keyboard shortcuts
   useKeyboard([
-    {
-      key: "s",
-      mod: true,
-      handler: saveDraft,
-    },
+    ...(isEmbed ? [{ key: "s", mod: true, handler: saveDraft }] : []),
     { key: "l", mod: true, handler: () => {
       if (subMode === "react") reactConsoleOutput.value = [];
       else webConsoleOutput.value = [];

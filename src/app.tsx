@@ -4,7 +4,7 @@ import { Console } from "./components/Console/Console";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { StatusBar } from "./components/StatusBar/StatusBar";
 import { SplitPane } from "./components/SplitPane/SplitPane";
-import { code, language, mode, saveDraft, draftStorageUnavailable, embedVersion } from "./state/editor";
+import { code, language, mode, saveDraft, draftStorageUnavailable, playgroundVersion } from "./state/editor";
 import { clearConsole, consoleOutput } from "./state/console";
 import { autoRunDelay } from "./state/settings";
 import { executeCode, stopExecution } from "./sandbox/executor";
@@ -40,8 +40,8 @@ export function App() {
   }
 
   const currentMode = mode.value;
-  // A new embedded example cancels pending runs and removes the previous sandbox on unmount.
-  const playgroundKey = embedVersion.value;
+  // Opening or starting a document cancels the previous editor and sandbox lifetime.
+  const playgroundKey = playgroundVersion.value;
   return <>
     {currentMode === "web" || currentMode === "react" ? <WebPlaygroundPage key={playgroundKey} /> : <JsPlayground key={playgroundKey} />}
     {!isEmbed && <PlaygroundLibrary />}
@@ -107,13 +107,7 @@ function JsPlayground() {
   // Keyboard shortcuts
   useKeyboard([
     { key: "Enter", mod: true, handler: run },
-    {
-      key: "s",
-      mod: true,
-      handler: () => {
-        saveDraft();
-      },
-    },
+    ...(isEmbed ? [{ key: "s", mod: true, handler: saveDraft }] : []),
     { key: "l", mod: true, handler: clearConsole },
   ]);
 

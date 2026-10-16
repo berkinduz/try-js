@@ -89,6 +89,12 @@ export function StatusBar() {
                 <strong>Snippets</strong> open ready-made examples
               </li>
               <li>
+                <strong>Save</strong> name your code; <strong>My playgrounds</strong> opens saved work
+              </li>
+              <li>
+                <strong>New</strong> starts fresh in this mode; Undo brings your code back
+              </li>
+              <li>
                 <strong>Themes</strong> pick syntax theme and editor font
               </li>
             </ul>

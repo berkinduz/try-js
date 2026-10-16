@@ -1,7 +1,7 @@
 import { language, setLanguage, mode, setMode } from "../../state/editor";
 import type { Language } from "../../state/editor";
 import { ToolbarLinks } from "./ToolbarLinks";
-import { openLibrary } from "../Playgrounds/PlaygroundLibrary";
+import { PlaygroundActions } from "../Playgrounds/PlaygroundActions";
 import { readLocal } from "../../utils/storage";
 import "./Toolbar.css";
 
@@ -73,10 +73,8 @@ export function Toolbar() {
         </div>
       </div>
 
-      <div class="toolbar__saved-actions">
-        <button type="button" class="playgrounds-trigger" onClick={openLibrary} aria-haspopup="dialog">My playgrounds</button>
-        <ToolbarLinks />
-      </div>
+      <PlaygroundActions />
+      <ToolbarLinks />
     </div>
   );
 }

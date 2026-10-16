@@ -20,3 +20,14 @@ export function writeLocal(key: string, value: string): boolean {
     return false;
   }
 }
+
+/** The active saved document belongs to this tab; another tab must not replace its identity. */
+export function readSession(key: string): string | null {
+  try { return sessionStorage.getItem(key); }
+  catch { return null; }
+}
+
+export function writeSession(key: string, value: string): void {
+  try { sessionStorage.setItem(key, value); }
+  catch { /* The current tab still keeps its identity in signals. */ }
+}

@@ -19,11 +19,16 @@ Local playground actions also use bounded event properties:
 | --- | --- | --- |
 | `editor_keymap_change` | The user toggles Vim | `keymap`: `vim` or `standard` |
 | `playground_saved` | Browser storage confirms a named save | `surface`; `action`: `create` or `update` |
-| `playground_opened` | The user opens a saved playground | `surface` |
+| `playground_library_opened` | The user opens a readable saved library | `has_saved_playgrounds`: boolean |
+| `playground_save_started` | The naming form opens from Save or Save a copy | `surface`; `action`: `create` or `copy` |
+| `playground_opened` | A saved playground is successfully applied | `surface`; `saved_before_page_load`: boolean |
+| `playground_started` | New successfully restores the current mode’s defaults | `surface` |
 | `playground_backup_imported` | A valid backup is saved successfully | None |
 | `playground_backup_exported` | A local download is requested | `scope`: `current` or `all` |
 
 These events never contain saved IDs, names, timestamps, source code, filenames, URLs, or package names. Save timestamps and IDs exist only inside the local library and user-requested JSON backups. The export event measures a download request, not confirmation that the operating system retained the file.
+
+The Umami script uses `data-domains="tryjs.app,www.tryjs.app"` so local and Vercel preview checks do not contribute production pageviews or events. `data-exclude-hash="true"` omits share/embed code from Umami’s default URL payload. See the [official tracker configuration](https://docs.umami.is/docs/tracker-configuration). Custom events that occur before the deferred script loads wait in memory (maximum 50, maximum 15 seconds); load flushes them once, and error/timeout discards them without polling, storage or retries. Collection is still best effort when analytics is blocked or the page closes.
 
 Existing diagnostic events such as `playground_view`, `code_run`, `code_share`, and `language_switch` remain unchanged. `code_run` and `code_share` describe attempts; `successful_run`, `share_created`, and `embed_copied` are the corresponding outcome events to use for activation measurement.
 
@@ -54,4 +59,4 @@ A basic activation funnel is:
 
 Segment each step by `visitor_type` at the reporting layer and use `surface` to compare JS, TypeScript, Web, and React. Use `support_clicked` to measure clicks on Buy Me a Coffee.
 
-The `playground_opened` event can show whether the library is being reused across visits. The existing new/returning classification is a browser-level indicator, not a D7 retention cohort or a cross-device user identity.
+Use `playground_library_opened → playground_opened` to assess whether people find and open named saves, and `playground_save_started → playground_saved` to assess naming completion. `saved_before_page_load` compares the saved version’s local timestamp with this page’s initialization time and sends only the boolean. It can include a reload, a second tab, or a clock change; it does not prove a distinct later visit. The existing new/returning classification is a browser-level indicator, not a D7 retention cohort or a cross-device user identity. Do not interpret repeated openings or owner smoke tests as retention growth.

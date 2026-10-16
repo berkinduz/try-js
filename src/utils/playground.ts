@@ -1,5 +1,6 @@
 export type Language = "javascript" | "typescript";
 export type AppMode = "js" | "web" | "react";
+export type PlaygroundSurface = Language | "web" | "react";
 
 export type PlaygroundState =
   | { mode?: "js"; code: string; language: Language }
@@ -48,4 +49,14 @@ export function playgroundLabel(state: PlaygroundState): string {
   if (state.mode === "web") return "HTML / CSS / JS";
   if (state.mode === "react") return "React";
   return state.language === "typescript" ? "TypeScript" : "JavaScript";
+}
+
+export function playgroundSurface(state: PlaygroundState): PlaygroundSurface {
+  return state.mode === "web" || state.mode === "react" ? state.mode : state.language;
+}
+
+export function samePlayground(first: PlaygroundState, second: PlaygroundState): boolean {
+  if (first.mode === "web") return second.mode === "web" && first.html === second.html && first.css === second.css && first.webJs === second.webJs;
+  if (first.mode === "react") return second.mode === "react" && first.code === second.code && first.css === second.css;
+  return (second.mode === undefined || second.mode === "js") && first.language === second.language && first.code === second.code;
 }

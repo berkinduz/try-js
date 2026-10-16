@@ -11,16 +11,25 @@
 }
 
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   padding: 8px 16px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   font-family: var(--font-sans);
-  white-space: nowrap;
+  max-width: min(560px, calc(100vw - 32px));
+  width: max-content;
+  white-space: normal;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   animation: toast-in 0.2s ease-out;
   pointer-events: auto;
 }
+
+.toast button { flex-shrink: 0; border: 0; border-radius: 3px; padding: 4px; background: transparent; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.toast button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
 .toast--success {
   background: var(--success);

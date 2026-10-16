@@ -25,15 +25,52 @@ const unavailableStorage: Pick<Storage, "getItem" | "setItem"> = {
 declare global {
   interface Window {
     umami?: {
-      track: (name: string, data?: EventProps) => void;
+      track: (name: string, data?: EventProps) => void | Promise<unknown>;
     };
   }
 }
 
-/**
- * Tracks an event in both Vercel Analytics and Umami.
- * Safe to call before Umami script has loaded — calls are no-ops in that case.
- */
+const pendingUmami: { name: string; props?: EventProps }[] = [];
+let stopWaitingForUmami: (() => void) | undefined;
+
+function sendToUmami(name: string, props?: EventProps) {
+  try {
+    // A blocked collection request may reject asynchronously.
+    void Promise.resolve(window.umami?.track(name, props)).catch(() => {});
+  } catch { /* Analytics must never interrupt the playground. */ }
+}
+
+function flushUmami() {
+  if (!window.umami) return;
+  stopWaitingForUmami?.();
+  for (const event of pendingUmami.splice(0)) sendToUmami(event.name, event.props);
+}
+
+function trackUmami(name: string, props?: EventProps) {
+  if (typeof window === "undefined") return;
+  const script = document.getElementById("umami-tracker");
+  if (!script) return;
+  const domains = script.getAttribute("data-domains")?.split(",").map(domain => domain.trim());
+  if (domains && !domains.includes(window.location.hostname)) return;
+  if (window.umami) { flushUmami(); sendToUmami(name, props); return; }
+  // Keep startup events until the deferred tracker loads, with bounded memory
+  // and one deadline. Blockers never cause polling or persistent storage.
+  if (pendingUmami.length < 50) pendingUmami.push({ name, props: props ? { ...props } : undefined });
+  if (stopWaitingForUmami) return;
+  const discard = () => { pendingUmami.length = 0; stopWaitingForUmami?.(); };
+  const loaded = () => { flushUmami(); discard(); };
+  const deadline = window.setTimeout(discard, 15_000);
+  stopWaitingForUmami = () => {
+    window.clearTimeout(deadline);
+    script.removeEventListener("load", loaded);
+    script.removeEventListener("error", discard);
+    stopWaitingForUmami = undefined;
+  };
+  script.addEventListener("load", loaded, { once: true });
+  script.addEventListener("error", discard, { once: true });
+}
+
+/** Send outcome events to both integrations; late Umami loading is non-blocking. */
 export function trackEvent(name: string, props?: EventProps) {
   try {
     track(name, props);
@@ -41,9 +78,7 @@ export function trackEvent(name: string, props?: EventProps) {
     // Vercel Analytics not available (dev mode, blocked, etc.)
   }
   try {
-    if (typeof window !== "undefined" && window.umami) {
-      window.umami.track(name, props);
-    }
+    trackUmami(name, props);
   } catch {
     // Umami not loaded yet or blocked
   }

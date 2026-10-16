@@ -70,10 +70,12 @@ A fast, free JavaScript & TypeScript playground that runs entirely in your brows
 
 ### My Playgrounds
 
-- **Named local saves** — save, update, reopen, duplicate, and remove playgrounds from one compact dialog
+- **Visible save state** — the editor shows the current name and Saved / Unsaved changes. **Save** or `Cmd/Ctrl+S` asks for a name once, then updates the same record; Save options offers **Save a copy** and **Rename**
+- **My playgrounds** — search saved work and use **Open** to resume it; row actions offer rename, duplicate, and delete
+- **New playground** — start from the current mode’s original defaults without deleting named saves or other mode drafts; **Undo** restores the previous work
 - **JSON backups** — export the current playground or the full library; imports add copies and never overwrite matching saved IDs
-- **Draft recovery** — opening a saved/shared playground keeps the previous non-empty draft available through **Previous draft**
-- **Storage safeguards** — failed saves report an error; removal has Undo while the dialog stays open; blocked draft storage falls back to memory and prompts for a JSON export
+- **Draft recovery** — opening a saved/shared playground keeps the previous non-empty draft available through **Restore previous draft**
+- **Storage safeguards** — failed saves report an error, cross-tab conflicts offer a copy, and delete has Undo inside the library and briefly after closing it; blocked draft storage falls back to memory and prompts for a JSON export
 - Saved playgrounds stay in this browser. Clearing site data removes local saves, so export a separate backup for safekeeping. The library supports up to 50 playgrounds, up to 500,000 source characters each, within a 2 MB JSON budget.
 
 ### General
@@ -121,7 +123,7 @@ GitHub Actions runs the checks and dependency audit on pushes and pull requests.
 | Shortcut    | Action               |
 | ----------- | -------------------- |
 | `Cmd/Ctrl+Enter` | Run JS/TS code             |
-| `Cmd/Ctrl+S` | Save the current draft |
+| `Cmd/Ctrl+S` | Name a playground or update its saved record |
 | `Cmd/Ctrl+L` | Clear the active console        |
 | `Tab`       | Accept completion    |
 
