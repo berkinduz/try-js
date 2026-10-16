@@ -1,184 +1,161 @@
 # TryJS
 
-A fast, free JavaScript & TypeScript playground that runs entirely in your browser. Write code, see output instantly — no setup, no backend.
+Open a tab. Write or paste some code. See the result.
 
-**Live:** [tryjs.app](https://tryjs.app) · **Features:** [tryjs.app/features](https://tryjs.app/features)
+TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and React. Use it to check an idea, understand a language feature, or share a small working example without setting up a project first. No account or installation required.
 
-## Features
+**[Open TryJS](https://tryjs.app/)** · [Browse snippets](https://tryjs.app/snippets) · [Explore features](https://tryjs.app/features)
 
-### JavaScript & TypeScript Playground
+![TryJS running JavaScript beside a console with a table, an expanded Set and an expression result](docs/images/javascript-playground.jpg)
 
-![TryJS JavaScript playground demo](public/tryJS_JS_gif.gif)
+*Filter some data, inspect it, change it. [Open this example](https://tryjs.app/#v=2&code=MYewdgzgLgBGJQKYRgXhgbQFAxgbxihAAcBLYALhgCIBBAJ3oEMBPCagGhgFtSwBXJBCoBGAExcAJuERUo9fohgBfDjnyES5KtQAK9ELwjJOPPoOSiAHFJlUAZkwA2xlWtwEiZSjQAqLYkQAZWB6UmIoU14BIVEAVlswWRhHFyVVLABdAG4sLFBIWCSADygAVWI0OARkADp7UickegAKFoJpJJUASjQAPhgAQk7EbtyCiBAnRFqoJgAjaZaS8uIxvInYaIsUdBWK2vpESX5gRBb1FqI5py54JF7UAevnGABqaqRa7aF3GAAGNTrCZTGZOEAAcxa1F8pG4SnsIHohAAFkoVoQAO4gGCkSSIJjCKLmX40aLUdb5cDQTTeXZwRCYmBBRBQZaIUoHbhMYhtTxaYA9fq08jdYHU0G1cFQmEClBEGAc4jgo4UUxecgQSkAem1MAAosViEcIBBSNSYBAUSAmVA0aRkSb%2BE0uEQQLUsPtiN8eXyRYLlI9ngLZiAADI2xD0ADChPOYuyQA&lang=js).*
 
-- **Instant execution** — code auto-runs on change with configurable debounce; `Cmd+Enter` runs immediately
-- **JavaScript & TypeScript** — toggle with one click; TypeScript is transpiled in-browser via Sucrase
-- **NPM imports** — browser-compatible packages, versioned imports (`zod@4.1.0`), scoped packages, and literal dynamic imports are resolved through [esm.sh](https://esm.sh)
-- **REPL-style evaluation** — bare expressions display their result in the console, like Chrome DevTools
-- **Object inspector** — expand objects, arrays, Maps, and Sets inline
-- **Console output** — supports `log`, `warn`, `error`, `info`, `table`, `time`/`timeEnd`, and `clear`
-- **Copy output** — each console row has a Copy action on hover, keyboard focus, or touch, including Web and React consoles; copies captured output as plain text, preserving serialization placeholders when full data is unavailable
-- **Jump to errors** — click a JS/TS error's line and column (or focus it with Tab and press Enter/Space) to focus and reveal the source, including on mobile; TypeScript, npm imports, and async errors map back to your code
-- **Sandboxed execution** — code runs in an iframe sandbox with a 5-second timeout (15s for module loading)
+[Getting started](#getting-started) · [Sharing](#share-a-working-example) · [Saving](#come-back-to-an-idea) · [Shortcuts](#keyboard-shortcuts) · [Development](#local-development)
 
-### Themes & Editor Customization
+## Getting started
 
-![TryJS theme change demo](public/tryJS_theme_change_gif.gif)
+1. [Open the playground](https://tryjs.app/) and write or paste JavaScript.
+2. Pause to let it run, or press **Cmd/Ctrl+Enter** to run immediately.
+3. Inspect the output, change something, and see what happens.
 
-- **6 syntax themes** — One Dark, One Light, Dracula, GitHub Light, Monokai, Solarized Dark
-- **3 editor fonts** — Geist Mono, Fira Code, JetBrains Mono
-- **Optional Vim keybindings** — enable Vim from the status bar in JS, TS, HTML, CSS, and JSX editors; standard editing remains the default, and the Vim extension loads only when enabled
-- **Persistent preferences** — syntax theme, editor font, Vim mode, and split position are remembered in this browser
+Choose the workspace that fits the question:
 
-### Web Playground (HTML/CSS/JS)
+| Workspace | What you can try |
+| --- | --- |
+| [JavaScript / TypeScript](https://tryjs.app/) | Expressions, data transformations, async code, types and npm packages, with console output beside the editor. Use **JS / TS** to switch languages. |
+| [Web](https://tryjs.app/web) | HTML, CSS and JavaScript in separate tabs, with a live page preview and a console drawer. |
+| [React](https://tryjs.app/react) | A JSX component and its CSS, with hooks, npm imports and a live React 19 preview. |
 
-![TryJS HTML playground demo](public/tryjs_html_gif.gif)
+For a starting point, open **Snippets** in the status bar or [browse the gallery](https://tryjs.app/snippets). Examples cover JavaScript fundamentals, async patterns and TypeScript; each has an explanation and can be loaded into the editor.
 
-- **Vanilla mode** — tabbed HTML/CSS/JS editor with a live iframe preview and built-in console drawer
+## Follow the result
 
-### React Playground
+- **Inspect values.** Bare JS/TS expressions show their result without `console.log`. Expand objects, arrays, Maps and Sets, or use `console.table` to compare rows.
+- **Keep useful output.** Logs, warnings, errors and timers appear in the console. **Copy** on a row copies its captured output as plain text, including in Web and React consoles.
+- **Go from an error to the code.** Click a JS/TS error's line and column to reveal its source. On mobile, this also opens the editor tab. Locations are offered when they can be mapped reliably to the current code; editing makes old locations inactive until the next run.
 
-![TryJS React playground demo](public/tryjs_react_gif.gif)
+### Try an npm package
 
-- **React mode** — write JSX components with a CSS tab, normal ES module imports, and a pinned React 19 runtime from esm.sh; dependency imports use the shared React runtime, with render errors surfaced in the preview and console
+Use normal imports for browser-compatible packages. Versioned and scoped packages are supported, as are literal dynamic imports such as `import("dayjs")`.
 
-### Code-to-PNG Export
+Switch to **TS** and try this, or [open the example](https://tryjs.app/#v=2&code=JYWwDg9gTgLgBAbzgLzgXzgMyhEcBEyEAJgAIAsAdAIyUAM%2BA3AFDMDGEAdgM7wByEGAFM4AXhSUIAIwBWQtjAAUCZnDgwIYYGwBcE3lGCcA5ooCUAGlVwQRgK7Due5JU52QUoVHOVI3YDDAAG5C5lZoZizMMACeYCICwmISRpheADyx8RCYcIlCAHwsHDzwnIJCevnJ%2Bb4AhlDcoUgaWroEAAo4tk3c%2BBY29o561AAc6JGsJdwQADZClLMQpuXCkUA&lang=ts):
 
-![TryJS export to image demo](public/tryjs_export_image_gif.gif)
+```ts
+import { z } from "zod@4.1.0";
 
-- **Export as image** — generate code screenshots with syntax themes, Safari/minimal frames, padding options, and gradient backgrounds (download PNG or copy to clipboard)
+const Note = z.object({
+  topic: z.string(),
+  minutes: z.number().positive(),
+});
 
-### Editor & IntelliSense
+type Note = z.infer<typeof Note>;
+const note: Note = Note.parse({ topic: "Promises", minutes: 18 });
 
-- **Format code on request** — click the visible **Format** button above the editor, or press **Shift+Alt+F** (**⇧⌥F** on Mac) while editing. It formats the active JS, TS, HTML, CSS, or React tab, including with Vim enabled; one Undo restores the original code. Selection and scroll position are preserved where possible. Formatting is never automatic and does not save a named playground: it follows the usual draft and unsaved-change behavior.
-- **Local, lazy formatter** — [Prettier standalone](https://prettier.io/docs/browser) and the needed language parsers load on the first formatting request. Source code stays in the browser. Invalid syntax leaves the document unchanged with an error message; edits, selection changes, or switching documents/tabs while loading discard the pending result.
-- **Smart code completions** — 60+ snippet templates (`fn`, `cl`, `map`, `tc`, `imp`, `ust`, `uef`, `rfc`…), global API dot-access (`console.`, `Math.`, `JSON.`, `Object.`, `Array.`, `Promise.`, `document.`), and heuristic type inference for string/array/promise instance methods
-- **TypeScript Language Service** — real type-aware IntelliSense powered by `ts.createLanguageService()` with `getCompletionsAtPosition()` for semantic completions
-- **Hover type info** — hover over any identifier to see its type signature and documentation via `getQuickInfoAtPosition()`
-- **TypeScript type checking** — official ES2024 and DOM declarations replace hand-written built-ins; semantic diagnostics run in a lazy-loaded local worker so compiler work stays off the editor thread
-- **Package types** — automatic type acquisition retrieves available npm declarations and feeds both completions and hover information; package downloads are bounded, and unavailable declarations remain visible as diagnostics
-- **npm import suggestions** — type `import ... from "` to get suggestions from 50+ popular packages (lodash, zod, dayjs, axios…)
-- **React/JSX completions** — hooks (`useState`, `useEffect`…), JSX attributes (`className`, `onClick`…), and component scaffolding snippets
+console.log(note);
+```
 
-### Snippet Gallery
+The console shows `{ topic: "Promises", minutes: 18 }`. TypeScript adds type-aware completions, hover information and diagnostics in a local worker, using official JavaScript/DOM declarations and available npm package types.
 
-- **Ready-to-run examples** — organized by category: JS Fundamentals, Async Patterns, TypeScript Essentials
-- **Gallery page** — browse all snippets at `/snippets` with category filtering
-- **Detail pages** — individual snippet pages at `/snippets/:slug` with code, explanation, and related snippets
-- **Load into playground** — one-click to load any snippet directly into the editor
+## Sketch a browser interface
 
-### Share & Export
+Open **Web** for HTML/CSS/JS, or choose **React** for JSX and CSS. The preview updates as you edit; open its console drawer to inspect logs and errors.
 
-- **Share as URL** — JS, TS, Web, and React links preserve code and CSS, including empty tabs; existing share links remain compatible
-- **Download playground (.json)** — download the complete current playground for a portable TryJS file
-- **Embed code** — generate a sandboxed iframe for any mode; the dedicated `/embed` route hides site chrome and keeps editor/output visible on small screens
+In React, export your component as the default export. Imports use a shared React 19 runtime, including dependencies that use React.
 
-### My Playgrounds
+![TryJS React editor showing a counter component beside its styled, interactive preview](docs/images/react-preview.jpg)
 
-- **Optional saving** — start writing immediately; the quiet **My playgrounds** entry opens a compact panel with **Save current code…**, saved work, and file actions
-- **Open saved work** — only an open named playground adds its name, save status, **Save changes** when needed, and **Close playground**; `Cmd/Ctrl+S` names new work or updates the open record
-- **Return to your code** — closing a saved playground restores the normal editor from before it was opened, even after opening other saves or refreshing; named edits stay separate from normal language/mode drafts
-- **Explicit changes** — leaving edited saved code offers save, leave without saving, or keep editing; row actions offer rename, duplicate, download, and delete
-- **Portable files** — import playgrounds or download all saved playgrounds directly from the panel; imports add copies and never overwrite matching saved IDs
-- **Earlier code** — code replaced by a shared link or example is identified by its language and a code preview before opening it
-- **Storage safeguards** — failed saves report an error, cross-tab conflicts offer a copy, and delete has Undo inside the library and briefly after closing it; blocked draft storage falls back to memory and prompts for a JSON export
-- Saved playgrounds stay in this browser. Clearing site data removes local saves, so export a separate backup for safekeeping. The library supports up to 50 playgrounds, up to 500,000 source characters each, within a 2 MB JSON budget.
+*[Open this counter](https://tryjs.app/react#v=2&mode=react&css=FQAg3iBGD2AeC0BnAlgL2QOwOYC4rQCcATAUwPhlgG4QBfAKBiIE9x6QQBbAQwK0zwAGKuy6Z4ACxLIsEgC54AjIMEA3CSI5FkiAA4AbbszxYCyIppAHuAYxLxkckp0R47GJwUu7uRbdjwAJgAOXWpRSFsAa1NoAFcMIjwAYgAzABZUgGYSEktU6A94VO5OZH1jEERmRCdOeDjkABoq7gxEJDJkVMsbaH1CFMCANhDAxREGADobXiI2DgB3czkJPDKMAAplQQBSFvTlMIBKb19-XBAswLDLSJsYgnjElNS3u8JSAiUwqv7zEDJUjAgCsH2IZHgBF8yDirhAgUEtwicCQEl80EWQhAimGv3SSNggMCAE5ApBEYp0pN6FNDJASPpwCACkUUKgSEpCTRWXJ4ItpLIFCAAOwg4QgfQkOSeJA%2BGyYS5TRQg5w0PoDb6AkWKEXDEHcGgMCSKZm8pBoTlXG7USWYexSGTyJTKmhSmWQvS2RV4eBTQTpNVcXj8DBKdK-CUMXRmwp89lWqm3O0YB2C504qbDdX9QaA-XDEkgmxG%2BjxOS6OJyZnaPSGSqQAYPGg8PgCHGhIkS80JvB65PmgVO4UilRu%2B2SdPCiYgDV55LpQKZa6lyBVuSFBYgZZEVZcvaWWvWSqpKXhDgAKzhcm6zHgfQ8JA8eC9dgo0oFT8s3H0MgwDjqeF3E8M4-B9HEsl%2BRRO3BL4hFgyFoW0OE8BJZEOHuR5niSQEiDsEVgjyUQ5y1ZJAiyLJBGg-I4zwYYVBxCMiWqWpnAaZBejiAhEDzXRoEwED6AYNcZUKHAJGgVQyGZTDYgSHDkhsPxIGGPI6FpCQBOZVtQ3DSMQG7OMLQ5JRFGTWggA&code=JYWwDg9gTgLgBAbzgVwM4FMDKMCGN1wC%2BcAZlBCHAERTo4DGMVA3AFCvoAekscAJuhI5kAG3glkAO0bAIkuAGEIU-FAAUASkSs4cenNTwA2vpUAaOBhhKVAXTgBeFBmx50agAwa2OuLRjIUPJqvroAPCA4wPL0IjioqAByOCDoDlT0OFB8VAB8obpwYahgODFxCcmp6XEARugieQCCcAAqAJKJAJpwAEoAok0KrXD9ABoACv297QCy-YmtYQD0JWX5hYVhABYAjLkA8pIEscD0ANZweFdwMKDoAHQrexubRWC5LfrgcuiSMBYcHARMAYDARAQFJhMIDJHwbiCAG4EMC0RHAdAAdyeyw%2BBXCyhgYGQMFyCFM-0IK0JxNJ%2BKKtRJMDkcDkChBFwcCE0jlylnQ1mU-zUFPgAGo4LsNIRXm84E0%2BPDfkU1vIssAcABabbARV-dIwKDIdB5QDphCtVbKtstGWC5FbwmA9BUkik0lQdf88v0%2BKDbtsCAApTBjVlQRTQh5wTDoAiY7bXegJyQAc3QqBxeM2K0i0Ve3lYhCAA&lang=js) and change its JSX or CSS. The screenshot shows it after three clicks.*
 
-### General
+## Make the editor comfortable
 
-- **Resizable split pane** — drag the divider between editor and console; position persisted across sessions
-- **Code persistence** — normal drafts stay in localStorage per language and mode; the open saved editor keeps its pending edits and return point in this tab across refreshes
-- **Mobile support** — responsive layout with editor/console tabs on small screens
-- **SEO** — dynamic meta tags, canonical URLs, JSON-LD structured data (schema.org) with breadcrumbs for all pages
-- **Analytics** — privacy-friendly event tracking via Vercel Analytics
+- **Format when you choose.** Use **Format** above any editor, or **Shift+Alt+F** (**⇧⌥F** on Mac), for JS, TS, HTML, CSS or JSX. It formats the active tab, works with Vim enabled, and can be reversed with one Undo. Prettier and the needed parsers load on the first request; formatting runs in your browser and does not save a named playground.
+- **Use familiar keys.** Optional **Vim** keybindings are available from the status bar. Standard editing is the default; the Vim extension loads when enabled.
+- **Arrange your space.** Choose among six syntax themes and three editor fonts, and drag the divider to resize the panes. These preferences stay in this browser. Small screens use **Editor / Console** or **Editor / Preview** tabs.
 
-## Tech Stack
+## Share a working example
 
-| Layer         | Choice                          |
-| ------------- | ------------------------------- |
-| UI            | Preact + Preact Signals         |
-| Editor        | CodeMirror 6                    |
-| TS Transpiler | Sucrase                         |
-| TS Compiler   | TypeScript 5, lazy local worker, official library declarations |
-| Package Types | Microsoft Automatic Type Acquisition + virtual filesystem |
-| Build         | Vite                            |
-| Hosting       | Vercel                          |
+Open **Share** above the editor:
 
-## Development
+| Action | What it gives you |
+| --- | --- |
+| **Copy link** | A snapshot of the current JS, TS, Web or React playground, including CSS and empty tabs. Anyone with the full link can open its code. Copy a new link after making changes. |
+| **Copy embed code** | An iframe using the dedicated `/embed` view, with the editor and output visible and site navigation removed. Useful for a runnable example in a post or documentation. |
+| **Download playground (.json)** | A portable TryJS file you can import later or share as a file. |
+| **Export as image** — JS/TS | A PNG of your code or selection, with syntax themes, window frames, padding and backgrounds. Download it or copy it to the clipboard. |
 
-Requires Node.js 22.18+ in the Node 22 line (`.nvmrc`).
+## Come back to an idea
+
+Saving is optional. Normal drafts are remembered in this browser by language and mode, so you can keep trying code without naming anything.
+
+1. Open **My playgrounds → Save current code…** when you want a named save.
+2. Open it later from **My playgrounds**. Its name and save status appear above the editor; **Save changes** appears when you edit it. **Cmd/Ctrl+S** saves the open record, or asks for a name when working on a normal draft.
+3. Use **Close playground** to return to the normal code you had before opening saved work, including after a refresh or opening other saves.
+
+<p align="center">
+  <img src="docs/images/my-playgrounds.jpg" alt="My playgrounds panel with named JavaScript, TypeScript and React saves, row actions, and JSON import and export" width="435">
+</p>
+
+Pending edits to a named playground stay separate from normal drafts and survive refreshes in the same tab. Before leaving edited saved work, choose to save, leave without saving, or keep editing.
+
+The library supports rename, duplicate, delete with **Undo**, JSON import and download of all saves. Imports add copies rather than overwrite existing records; conflicting changes from another tab offer **Save a copy…**.
+
+**Saves stay in this browser and are not synced between devices.** Clearing site data removes them. Download a JSON backup for work you want to keep separately.
+
+## What to expect
+
+- **Execution and editing happen locally.** TryJS runs code in sandboxed browser iframes. TypeScript/JSX transpilation, type checking and formatting also run in the browser.
+- **Some features need the network.** npm modules load through [esm.sh](https://esm.sh/); available package declarations come from jsDelivr. Some editor tools load on demand. Imported libraries and code you run can make their own network requests.
+- **The workspace is for small browser experiments.** It provides a JS/TS snippet, an HTML/CSS/JS set, or a JSX component with CSS. There is no Node.js runtime, terminal or local multi-file project. Packages must work in a browser.
+
+## Keyboard shortcuts
+
+Use **Cmd** on macOS and **Ctrl** on Windows/Linux. Editor shortcuts apply while the editor is focused.
+
+| Shortcut | Action |
+| --- | --- |
+| **Cmd/Ctrl+Enter** | Run JavaScript or TypeScript immediately |
+| **Shift+Alt+F** / **⇧⌥F** on Mac | Format the active editor tab |
+| **Cmd/Ctrl+S** | Save the open named playground, or name the current code |
+| **Cmd/Ctrl+L** | Clear the active console |
+| **Tab** | Accept the selected completion |
+
+## Local development
+
+Use **Node.js 22.18+ within the Node 22 line** (`.nvmrc`). From a clone of this repository:
 
 ```bash
-# Install the locked dependencies
 npm ci
-
-# Start dev server
 npm run dev
+```
 
-# Regression tests, type-check & production build
+Before submitting a change:
+
+```bash
+# Regression tests, TypeScript checks and production build
 npm run check
 
-# Preview production build
+# Dependency audit used by CI
+npm audit --audit-level=high
+
+# Serve the production build locally
 npm run preview
 ```
 
-GitHub Actions runs the checks and dependency audit on pushes and pull requests. The Vercel build command also runs `npm run check`, so a failing regression test stops the deployment build.
+GitHub Actions runs the checks and audit on pushes and pull requests. Vercel also runs `npm run check` before deploying.
 
-Error navigation uses a snapshot of the code, language, and document that produced each error. Editing the code disables old locations until another run; opening another playground cannot reuse its error locations. TypeScript diagnostics use their original coordinates. Runtime errors use the nearest frame in your own code, with source maps for TypeScript and column corrections for import rewrites and result capture. Dependency-only errors, timeouts, and errors without a trustworthy source position remain text. Browsers can report the start of an expression rather than the precise failing identifier; navigation follows that reported position. If a browser omits syntax-error coordinates, a parser location is used when available.
+Built with **Preact + Signals**, **CodeMirror 6**, **Sucrase**, **TypeScript**, **Prettier** and **Vite**.
 
-## Keyboard Shortcuts
-
-| Shortcut    | Action               |
-| ----------- | -------------------- |
-| `Cmd/Ctrl+Enter` | Run JS/TS code             |
-| `Cmd/Ctrl+S` | Name a playground or update its saved record |
-| `Cmd/Ctrl+L` | Clear the active console        |
-| `Tab`       | Accept completion    |
-
-## Project Structure
-
-```
-src/
-  app.tsx                # App root, routing, keyboard bindings
-  components/
-    Editor/              # CodeMirror editor, themes, extensions
-      completions.ts     # Snippet, API, JSX, npm completion sources
-      hover.ts           # Hover-to-see-type tooltip extension
-      extensions.ts      # Editor extensions & autocompletion wiring
-      themes.ts          # Syntax themes & completion icon styling
-    Console/             # Console output display
-    WebEditor/           # Tabbed HTML/CSS/JS editor for web mode
-    WebPreview/          # Live iframe preview with console drawer
-    ReactEditor/         # JSX + CSS tabbed editor for React mode
-    ReactPreview/        # Live React component preview
-    Toolbar/             # Language toggle, web/react mode switch, links
-    StatusBar/           # Help, snippets, shortcuts, theme/font selects
-    SplitPane/           # Draggable editor/console split
-    Gallery/             # Snippet gallery modal
-    Playgrounds/         # Named local saves, sharing, JSON backups, embed links
-    Snippets/            # Snippet gallery & detail pages
-    Screenshot/          # Export-as-image modal
-    Toast/               # Toast notifications
-    Features/            # /features landing page
-  data/
-    snippets.ts          # Snippet definitions with categories
-  hooks/                 # useDebounce, useKeyboard
-  sandbox/
-    executor.ts          # Sandboxed code execution orchestrator
-    transpiler.ts        # TypeScript/JSX transpilation via Sucrase
-    type-checker.ts      # Lazy worker client for diagnostics
-    typescript-worker.ts # Official TS libraries, package types, language service
-    type-project.ts      # Virtual TypeScript filesystem and bounded type acquisition
-    ts-completions.ts    # TS Language Service for completions & hover
-  state/                 # Preact signals (editor, console, settings, UI)
-  utils/                 # Share encoding, screenshot renderer, SEO, constants
+```text
+src/components/   Editor, consoles, previews, library and page UI
+src/sandbox/      Execution, transpilation, source maps and type services
+src/state/        Editor drafts, saved playgrounds and preferences
+src/utils/        Sharing, storage, formatting and exports
+src/data/         Runnable snippet definitions
+tests/            Regression tests
 ```
 
-## Further possibilities
-
-Multi-file imports and public Gist loading remain candidates to validate against user requests and usage. Current development focuses on reliable execution, reusable local playgrounds, and sharing without adding account or project-management complexity.
-
-Have an idea? [Open an issue](https://github.com/berkinduz/try-js/issues) — we'd love to hear it.
+Bug reports and focused contributions are welcome. [Open an issue](https://github.com/berkinduz/try-js/issues) with the code, expected result and browser details; a small shared example helps reproduce it.
 
 ## License
 
-MIT
+[MIT](LICENSE)
