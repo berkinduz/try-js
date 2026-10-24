@@ -45,6 +45,6 @@
     "@types/lz-string": "^1.3.34",
     "preact-render-to-string": "6.8.1",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.4.4"
   }
 }
