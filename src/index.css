@@ -267,23 +267,27 @@ body {
 
 /* Embed mode */
 .embed-open-link {
-  position: absolute;
-  bottom: 4px;
-  right: 8px;
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+  font-size: 12px;
   font-weight: 500;
   font-family: var(--font-sans);
-  color: var(--text-muted);
-  text-decoration: none;
-  opacity: 0.5;
-  transition: opacity 0.15s, color 0.15s;
-  z-index: 20;
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .embed-open-link:hover {
-  opacity: 1;
-  color: var(--accent);
+  background: var(--bg-tertiary);
 }
+
+.embed-open-link:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
 
 /* Mobile: tab system */
 @media (max-width: 767px) {

@@ -26,7 +26,7 @@ test("generated embeds use the dedicated route and a constrained sandbox", () =>
     assert.match(embed, /src="https:\/\/tryjs\.app\/embed#v=2&code=/);
     assert.match(
       embed,
-      /sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"/,
+      /sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-popups-to-escape-sandbox"/,
     );
     assert.match(embed, /title="TryJS code playground"/);
     assert.doesNotMatch(embed, /\?embed=1/);

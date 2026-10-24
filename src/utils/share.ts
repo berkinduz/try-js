@@ -71,5 +71,5 @@ export async function shareToClipboard(state: SharedState): Promise<{ ok: boolea
 
 export function generateEmbedCode(state: SharedState, origin = "https://tryjs.app"): string {
   const url = `${origin}/embed${encodeToHash(state)}`;
-  return `<iframe src="${url}" width="100%" height="400" style="border:0;border-radius:8px;" loading="lazy" title="TryJS code playground" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+  return `<iframe src="${url}" width="100%" height="400" style="border:0;border-radius:8px;" loading="lazy" title="TryJS code playground" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe>`;
 }

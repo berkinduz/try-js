@@ -4,7 +4,7 @@ Open a tab. Write or paste some code. See the result.
 
 TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and React. Use it to check an idea, understand a language feature, or share a small working example without setting up a project first. No account or installation required.
 
-**[Open TryJS](https://tryjs.app/)** · [Browse snippets](https://tryjs.app/snippets) · [Explore features](https://tryjs.app/features)
+**[Open TryJS](https://tryjs.app/)** · [Explore examples](https://tryjs.app/snippets) · [Explore features](https://tryjs.app/features)
 
 ![TryJS running JavaScript beside a console with a table, an expanded Set and an expression result](docs/images/javascript-playground.jpg)
 
@@ -26,7 +26,7 @@ Choose the workspace that fits the question:
 | [Web](https://tryjs.app/web) | HTML, CSS and JavaScript in separate tabs, with a live page preview and a console drawer. |
 | [React](https://tryjs.app/react) | A JSX component and its CSS, with hooks, npm imports and a live React 19 preview. |
 
-For a starting point, open **Snippets** in the status bar or [browse the gallery](https://tryjs.app/snippets). Examples cover JavaScript fundamentals, async patterns and TypeScript; each has an explanation and can be loaded into the editor.
+Open **Examples** in the status bar or [explore the library](https://tryjs.app/snippets). Search by task, package or technology across JavaScript, TypeScript, React and Web examples, including Vue, Zod, CSS and Canvas. Each page has an editable playground, something to try, an expected result and readable source. Inline edits stay separate from your main drafts; **Open in TryJS** carries your current changes into the full editor. Package examples show the exact version they use.
 
 ## Follow the result
 

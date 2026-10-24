@@ -1,4 +1,6 @@
 import type { Language } from "../state/editor";
+import type { PlaygroundState } from "../utils/playground.ts";
+import { NEW_EXAMPLE_CATEGORIES } from "./example-definitions.ts";
 
 export interface SnippetSection {
   heading: string;
@@ -24,6 +26,13 @@ export interface Snippet {
   commonMistakes?: string[];
   whenToUse?: string;
   faq?: SnippetFaq[];
+  playground?: PlaygroundState;
+  tags?: string[];
+  tryThis?: string;
+  expectedResult?: string;
+  environment?: string;
+  featured?: boolean;
+  goal?: "solve" | "explore" | "build";
 }
 
 export interface SnippetCategory {
@@ -44,6 +53,7 @@ export function getAllSnippets(): Snippet[] {
 }
 
 export const SNIPPET_CATEGORIES: SnippetCategory[] = [
+  ...NEW_EXAMPLE_CATEGORIES,
   {
     name: "JS Fundamentals",
     snippets: [
@@ -1897,7 +1907,7 @@ const user: Frozen = { id: 3, name: "Carol", email: "c@x.io", role: "admin" };
           },
           {
             heading: "Narrowing happens via switch or if",
-            body: "if (result.ok) narrows to the ok: true variant, so result.value is accessible. else narrows to ok: false and result.error. A switch on the tag field gives you the same narrowing in each case.",
+            body: "if (result.ok === true) explicitly narrows to the ok: true variant, so result.value is accessible. else narrows to ok: false and result.error, including when strictNullChecks is disabled. A switch on the tag field gives you the same narrowing in each case.",
           },
           {
             heading: "Exhaustiveness with never",
@@ -1948,7 +1958,7 @@ function divide(a: number, b: number): Result<number> {
 }
 
 function display(result: Result<number>) {
-  if (result.ok) {
+  if (result.ok === true) {
     console.log("Result:", result.value);
   } else {
     console.error("Error:", result.error);

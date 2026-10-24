@@ -4,6 +4,7 @@ import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import { transform } from "sucrase";
 import * as policy from "../src/utils/analytics-policy.ts";
+import * as exampleIds from "../src/data/example-ids.ts";
 
 function analytics(hostname = "tryjs.app", pathname = "/") {
   const delivered: string[] = [];
@@ -28,6 +29,8 @@ function analytics(hostname = "tryjs.app", pathname = "/") {
   const exports: Record<string, any> = {};
   const modules: Record<string, unknown> = {
     "@vercel/analytics": { track(name: string) { vercel.push(name); } }, "./analytics-policy": policy,
+    "../data/example-ids": exampleIds,
+    "./example-context": { isExampleEmbed: () => false, hasExampleContext: () => false, hasExampleEdit: () => false, reportExampleActivity: () => null },
   };
   vm.runInNewContext(transform(readFileSync(new URL("../src/utils/analytics.ts", import.meta.url), "utf8"), { transforms: ["typescript", "imports"] }).code, {
     exports, window: browser, document: { getElementById: () => script }, require: (id: string) => modules[id],
@@ -215,4 +218,19 @@ test("an edit made while an unedited manual run is in flight cannot activate tha
   const embed = analytics("tryjs.app", "/embed"); embed.ready();
   embed.api.trackSuccessfulRun("javascript", "auto", true);
   assert.deepEqual(embed.delivered, ["successful_run"]);
+});
+
+test("example conversions are bounded and deduplicated independently of the main funnel", () => {
+  const state = analytics(); state.ready();
+  state.api.trackExampleActivity("viewed", "deduplicate-objects", "inline");
+  state.api.trackExampleActivity("viewed", "deduplicate-objects", "inline");
+  state.api.trackExampleActivity("activated", "deduplicate-objects", "inline");
+  state.api.trackExampleActivity("loaded", "react-form-actions", "gallery");
+  state.api.trackExampleActivity("viewed", "user-code-or-url", "inline");
+  state.api.trackExampleActivity("private action", "deduplicate-objects", "inline");
+  state.api.trackExampleActivity("viewed", "deduplicate-objects", "private placement");
+  state.api.trackSupportClick("example", "deduplicate-objects");
+  state.api.trackSupportClick("example", "private-data");
+  assert.deepEqual(state.delivered, ["example_viewed", "example_activated", "example_loaded", "support_clicked"]);
+  assert.equal(JSON.stringify(state.payloads[3].props), JSON.stringify({ provider: "buy_me_a_coffee", placement: "example", example: "deduplicate-objects" }));
 });

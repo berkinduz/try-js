@@ -24,8 +24,12 @@
       data-exclude-hash="true"
     ></script>
     <script>
-      if ((location.pathname.replace(/\/+$/, "") || "/") === "/embed")
+      if ((location.pathname.replace(/\/+$/, "") || "/") === "/embed") {
         document.documentElement.setAttribute("data-embed", "");
+        // The owning example page records activity; its inline editor is not another visit.
+        if (parent !== window && new URLSearchParams(location.search).has("example"))
+          document.getElementById("umami-tracker").setAttribute("data-auto-track", "false");
+      }
     </script>
   </head>
   <body>

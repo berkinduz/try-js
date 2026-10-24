@@ -48,10 +48,10 @@ const PAGES = {
     heading: "Try code. See what happens.",
   },
   "/snippets": {
-    title: "JavaScript & TypeScript Examples You Can Run | TryJS",
+    title: "JavaScript, TypeScript, React & Web Examples | TryJS",
     description:
-      "Explore runnable JavaScript and TypeScript examples with explanations: arrays, async patterns, types and more. Open any example in TryJS to edit and run it.",
-    heading: "Runnable JavaScript and TypeScript examples",
+      "Explore live JavaScript, TypeScript, React, Vue and Web examples. Try packages, solve data tasks and edit working interfaces directly in your browser.",
+    heading: "Code examples you can run.",
   },
 } as const;
 
@@ -211,7 +211,7 @@ export function getPageSeo(pathname: string): PageSeo {
       itemListElement: getAllSnippets().map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: item.seoTitle,
+        name: item.title,
         url: `${SITE_URL}/snippets/${item.slug}`,
       })),
     };

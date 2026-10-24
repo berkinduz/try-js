@@ -88,7 +88,7 @@ export function StatusBar() {
                 <strong>Share</strong> copy URL, embed, or screenshot your code
               </li>
               <li>
-                <strong>Snippets</strong> open ready-made examples
+                <strong>Examples</strong> open ready-made examples
               </li>
               <li>
                 <strong>My playgrounds</strong> optionally save your code or open saved work
@@ -144,8 +144,8 @@ export function StatusBar() {
           type="button"
           class="statusbar__snippets-btn"
           onClick={openGallery}
-          title="Browse snippets"
-          aria-label="Browse snippets"
+          title="Browse examples"
+          aria-label="Browse examples"
         >
           <svg
             width="11"
@@ -162,7 +162,7 @@ export function StatusBar() {
             <rect x="3" y="14" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
           </svg>
-          <span class="statusbar__btn-text">Snippets</span>
+          <span class="statusbar__btn-text">Examples</span>
         </button>
         <UsageFeedback />
       </div>

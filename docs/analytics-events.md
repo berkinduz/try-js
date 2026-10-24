@@ -22,7 +22,7 @@ TryJS sends custom events to the existing Vercel Analytics and Umami integration
 | `activation_completed` | The same confirmed success, after a meaningful edit existed when that run began | `surface`; `trigger`: `manual` or `auto` | First edited success per tab session, excluding embeds. A manual starter-code run cannot consume this event; existing `successful_run` behavior is preserved. |
 | `share_created` | A share URL is successfully written to the clipboard | `surface`; `scope`: `document` or `selection`; `length_warning`: boolean | Every completed share action. Failed clipboard writes are excluded. |
 | `embed_copied` | Embed markup is successfully written to the clipboard | `surface` | Every completed embed copy. Failed clipboard writes are excluded. |
-| `support_clicked` | Buy Me a Coffee link is clicked | `provider`: `buy_me_a_coffee`; `placement`: `toolbar` | Every explicit click. |
+| `support_clicked` | Buy Me a Coffee link is clicked | `provider`: `buy_me_a_coffee`; `placement`: `toolbar`, `examples`, or `example`; bounded `example` slug on detail pages | Every explicit click. A click is intent, not payment confirmation. |
 
 Local playground actions also use bounded event properties:
 
@@ -84,3 +84,25 @@ The UI-only local preference `tryjs:usage-invite:after:v2` stores the next permi
 Use `playground_library_opened → playground_opened` to assess whether people find and open named saves, and `playground_save_started → playground_saved` to assess naming completion. `saved_before_page_load` compares the saved version’s local timestamp with this page’s initialization time and sends only the boolean. It can include a reload, a second tab, or a clock change; it does not prove a distinct later visit. The existing new/returning classification is a browser-level indicator, not a D7 retention cohort or a cross-device user identity. Do not interpret repeated openings or owner smoke tests as retention growth.
 
 The common entry, edited activation and Features click events begin with the October 16, 2026 analytics update. Earlier records cannot be backfilled. Use a chart note for the release date and allow fresh traffic to accumulate before comparing conversion rates. Production verification creates a small number of owner test events; those are delivery checks, not evidence of user activation or growth.
+
+
+## Interactive examples
+
+The library keeps `/snippets` and every existing `/snippets/:slug` URL. Its catalog and the editor gallery share the same definitions, search and technology/task filters. Search text stays in memory and is never sent to analytics or put into the URL. `examples_filter_used` sends only `filter=technology|goal` and one of the visible enumerated options. The existing `snippets_index_view`, `snippet_detail_view` and `snippet_load` events remain diagnostic; `snippet_load` measures a successful gallery application, not a detail-page click.
+
+| Event | Meaning |
+| --- | --- |
+| `example_viewed` | A known example detail mounts. |
+| `example_loaded` | Its inline editor mounts, or the gallery successfully applies its state. This does not imply a completed run. |
+| `example_edited` | A real editor input changes non-whitespace content in that example. |
+| `example_activated` | A confirmed successful run follows an edit that existed when that run began. Initial auto-runs, unchanged manual runs and preview-only interactions do not activate an example. |
+| `example_opened` | The user follows Open in TryJS with the current editor snapshot, or uses the loading fallback link. |
+| `example_shared` | A detail page's canonical example link is successfully copied. This is separate from sharing an edited code snapshot. |
+
+These events contain only `example` from the catalog allowlist and `placement=inline|gallery`. They are deduplicated once per example, placement, event and tab session. Resetting the editor does not inflate conversions. The gallery starts a fresh edit context on each load; replacing a playground, changing mode or changing language clears it.
+
+Use the 60-minute funnel `example_viewed → example_loaded → example_edited → example_activated` with `placement=inline` and a single `example` filter for detail conversion. Use `example_loaded → example_edited → example_activated` with `placement=gallery` for the gallery. These are first-action diagnostics per tab, not per-load completion rates: an earlier claimed event can occur before a later visit in the same tab. Check event counts and source/device breakdowns alongside each funnel. The new events cannot be backfilled into October 17–23.
+
+The inline editor uses the existing `/embed` runtime. It suppresses its own Umami auto-pageview, Vercel injection, visitor classification and ordinary custom analytics, and never claims the main activation keys. It reports bounded activity to its owning example page using same-origin messages. The parent checks the sender window, origin, example ID and action, and requires an edit before accepting activation. No code, console output, search query, saved name or identifier is carried in these messages. The ordinary public embed behavior remains available.
+
+A quiet Support TryJS link below the live editor reports `support_clicked` with `placement=example` and the allowlisted example. The collection footer uses `placement=examples`. It opens the existing Buy Me a Coffee page. Revenue and payer counts must be verified on that provider; the site does not emit a purchase event or infer payment from a click. This instrumentation provides no D7 retention cohort.

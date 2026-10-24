@@ -30,6 +30,7 @@ import { ShareMenu } from "../Playgrounds/ShareMenu";
 import { FormatButton } from "./FormatButton";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
+import { clearGalleryExample } from "../../utils/example-context";
 import "./Editor.css";
 
 const QUICK_EXAMPLE = "const number = 2;\nconsole.log(number * 3);";
@@ -49,7 +50,7 @@ const nums = _.shuffle([1, 2, 3, 4, 5]);
 console.log("Shuffled:", nums);`,
   },
   {
-    label: "Snippets",
+    label: "Examples",
     icon: "grid",
     desc: "Browse ready-to-run examples",
     action: "gallery" as const,
@@ -215,6 +216,7 @@ export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
   }, [showPlaceholder, language.value]);
 
   const loadQuickExample = () => {
+    clearGalleryExample();
     const view = viewRef.current;
     if (!view || view.state.doc.length !== 0) return;
     const from = QUICK_EXAMPLE.indexOf("2");
@@ -242,6 +244,7 @@ export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
       return;
     }
     if ("code" in example) {
+      clearGalleryExample();
       if ("lang" in example && example.lang) {
         setLanguage(example.lang);
       }

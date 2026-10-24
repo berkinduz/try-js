@@ -3,8 +3,17 @@ import assert from "node:assert/strict";
 import ts from "typescript";
 import { createDefaultMapFromNodeModules } from "@typescript/vfs";
 import { acquirePackageTypes, createTypeProject, packageRequests } from "../src/sandbox/type-project.ts";
+import { getAllExamples } from "../src/data/examples.ts";
 
 const libraries = createDefaultMapFromNodeModules({}, ts);
+
+test("shipped TypeScript examples work with the playground's actual compiler options", () => {
+  for (const example of getAllExamples().filter(item => item.technology === "TypeScript" && !item.code.includes("import "))) {
+    const project = createTypeProject(ts, libraries);
+    try { assert.deepEqual(diagnostics(project, example.code), [], example.slug); }
+    finally { project.environment.languageService.dispose(); }
+  }
+});
 
 function diagnostics(project: ReturnType<typeof createTypeProject>, source: string) {
   const file = project.update(source);
