@@ -9,7 +9,6 @@ function analytics(hostname = "tryjs.app", pathname = "/") {
   const delivered: string[] = [];
   const payloads: { name: string; props: unknown }[] = [];
   const vercel: string[] = [];
-  const notifications: string[] = [];
   const session = new Map<string, string>();
   const listeners = new Map<string, () => void>();
   const deadlines = new Map<number, () => void>();
@@ -20,7 +19,6 @@ function analytics(hostname = "tryjs.app", pathname = "/") {
     removeEventListener(type: string) { listeners.delete(type); },
   };
   const browser = {
-    dispatchEvent(event: Event) { notifications.push(event.type); return true; },
     location: { hostname, pathname }, umami: undefined as { track: (name: string, props?: unknown) => void | Promise<unknown> } | undefined,
     setTimeout(callback: () => void) { const id = ++timeoutId; deadlines.set(id, callback); return id; },
     clearTimeout(id: number) { deadlines.delete(id); },
@@ -32,9 +30,9 @@ function analytics(hostname = "tryjs.app", pathname = "/") {
     "@vercel/analytics": { track(name: string) { vercel.push(name); } }, "./analytics-policy": policy,
   };
   vm.runInNewContext(transform(readFileSync(new URL("../src/utils/analytics.ts", import.meta.url), "utf8"), { transforms: ["typescript", "imports"] }).code, {
-    exports, window: browser, Event, document: { getElementById: () => script }, require: (id: string) => modules[id],
+    exports, window: browser, document: { getElementById: () => script }, require: (id: string) => modules[id],
   });
-  return { api: exports, delivered, payloads, vercel, browser, listeners, deadlines, notifications,
+  return { api: exports, delivered, payloads, vercel, browser, listeners, deadlines,
     ready() { browser.umami = { track(name: string, props?: unknown) { delivered.push(name); payloads.push({ name, props }); } }; listeners.get("load")?.(); } };
 }
 
@@ -116,11 +114,9 @@ test("empty-state views are deduplicated and quick example loads cannot activate
   state.api.trackQuickExampleLoaded("javascript");
   state.api.trackSuccessfulRun("javascript", "auto", state.api.isSuccessfulRunEligible("auto"));
   assert.deepEqual(state.delivered, ["editor_empty_viewed", "editor_empty_viewed", "quick_example_loaded"]);
-  assert.deepEqual(state.notifications, []);
   state.api.trackFirstMeaningfulEdit("javascript", "const number = 2;", "const number = 4;");
   state.api.trackSuccessfulRun("javascript", "auto", state.api.isSuccessfulRunEligible("auto"));
   assert.deepEqual(state.delivered.slice(3), ["first_meaningful_edit", "successful_run", "activation_completed"]);
-  assert.deepEqual(state.notifications, [policy.ACTIVATION_COMPLETED_EVENT]);
 
   for (const path of ["/embed", "/embed/"]) {
     const embed = analytics("tryjs.app", path); embed.ready();
@@ -141,7 +137,6 @@ test("feedback invitation measures its first click separately from being shown",
   state.api.trackUsageInviteDismissed("javascript");
   state.api.trackUsageInviteDismissed("web");
   assert.deepEqual(state.delivered, ["usage_invite_viewed", "usage_question_opened", "usage_invite_dismissed"]);
-  assert.deepEqual(state.notifications, []);
   const invalid = analytics(); invalid.ready();
   invalid.api.trackUsageQuestionOpened("javascript", "private URL");
   assert.deepEqual(invalid.delivered, []);
@@ -150,9 +145,20 @@ test("feedback invitation measures its first click separately from being shown",
   for (const path of ["/embed", "/embed/"]) {
     const embed = analytics("tryjs.app", path); embed.ready();
     embed.api.trackUsageInviteViewed("javascript");
+    embed.api.trackUsageInviteClicked("javascript");
     embed.api.trackUsageInviteDismissed("javascript");
     assert.deepEqual(embed.delivered, []);
   }
+});
+
+test("an invitation click remains measurable after an earlier question opening", () => {
+  const state = analytics(); state.ready();
+  state.api.trackUsageQuestionOpened("javascript", "statusbar");
+  state.api.trackUsageInviteClicked("javascript");
+  state.api.trackUsageQuestionOpened("javascript", "invite");
+  state.api.trackUsageInviteClicked("web");
+  assert.deepEqual(state.delivered, ["usage_question_opened", "usage_invite_clicked"]);
+  assert.equal(JSON.stringify(state.payloads[1].props), JSON.stringify({ surface: "javascript" }));
 });
 
 test("optional usage feedback is once per tab and accepts only the bounded intent values", () => {
@@ -194,7 +200,6 @@ test("running starter code manually does not consume a later successful edited a
   state.api.trackSuccessfulRun("react", "auto", true);
   assert.deepEqual(state.delivered, ["successful_run", "first_meaningful_edit", "activation_completed", "successful_run"]);
   assert.equal(JSON.stringify(state.payloads[2].props), JSON.stringify({ surface: "javascript", trigger: "auto" }));
-  assert.deepEqual(state.notifications, [policy.ACTIVATION_COMPLETED_EVENT]);
 });
 
 test("an edit made while an unedited manual run is in flight cannot activate that run", () => {
@@ -210,5 +215,4 @@ test("an edit made while an unedited manual run is in flight cannot activate tha
   const embed = analytics("tryjs.app", "/embed"); embed.ready();
   embed.api.trackSuccessfulRun("javascript", "auto", true);
   assert.deepEqual(embed.delivered, ["successful_run"]);
-  assert.deepEqual(embed.notifications, []);
 });

@@ -1,6 +1,5 @@
 import { track } from "@vercel/analytics";
 import {
-  ACTIVATION_COMPLETED_EVENT,
   claimSessionEvent,
   classifyVisitor,
   hasSessionEvent,
@@ -146,6 +145,12 @@ export function trackUsageInviteViewed(surface: AnalyticsSurface) {
   trackEvent("usage_invite_viewed", { surface });
 }
 
+export function trackUsageInviteClicked(surface: AnalyticsSurface) {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_invite_clicked")) return;
+  trackEvent("usage_invite_clicked", { surface });
+}
+
 export function trackUsageInviteDismissed(surface: AnalyticsSurface) {
   if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
   if (!claimSessionEvent(getStorage("sessionStorage"), "usage_invite_dismissed")) return;
@@ -205,8 +210,6 @@ export function trackSuccessfulRun(
   // An earlier manual run of starter code must not consume edited activation.
   if (editedAtStart && window.location.pathname !== "/embed" && claimSessionEvent(storage, "activation_completed")) {
     trackEvent("activation_completed", { surface, trigger });
-    try { window.dispatchEvent(new Event(ACTIVATION_COMPLETED_EVENT)); }
-    catch { /* A UI notification must never interrupt execution. */ }
   }
 }
 
