@@ -126,6 +126,35 @@ test("empty-state views are deduplicated and quick example loads cannot activate
   }
 });
 
+test("optional usage feedback is once per tab and accepts only the bounded intent values", () => {
+  const state = analytics(); state.ready();
+  for (const surface of ["javascript", "web", "react"]) {
+    state.api.trackUsageQuestionViewed(surface);
+    state.api.trackUsageQuestionOpened(surface);
+  }
+  for (const invalid of ["private source code", "https://example.com", null, { code: "secret" }]) {
+    state.api.trackUsageIntentSelected("web", invalid);
+  }
+  assert.deepEqual(state.delivered, ["usage_question_viewed", "usage_question_opened"]);
+  state.api.trackUsageIntentSelected("web", "try_web_ui");
+  state.api.trackUsageIntentSelected("react", "other");
+  assert.deepEqual(state.delivered, ["usage_question_viewed", "usage_question_opened", "usage_intent_selected"]);
+  assert.equal(JSON.stringify(state.payloads[2].props), JSON.stringify({ surface: "web", intent: "try_web_ui" }));
+
+  for (const intent of ["check_snippet", "learn_js_ts", "try_web_ui", "other"]) {
+    const answer = analytics(); answer.ready();
+    answer.api.trackUsageIntentSelected("javascript", intent);
+    assert.equal(answer.delivered.length, 1);
+  }
+  for (const path of ["/embed", "/embed/"]) {
+    const embed = analytics("tryjs.app", path); embed.ready();
+    embed.api.trackUsageQuestionViewed("javascript");
+    embed.api.trackUsageQuestionOpened("javascript");
+    embed.api.trackUsageIntentSelected("javascript", "check_snippet");
+    assert.deepEqual(embed.delivered, []);
+  }
+});
+
 test("running starter code manually does not consume a later successful edited activation", () => {
   const state = analytics(); state.ready();
   state.api.trackSuccessfulRun("javascript", "manual", true, false);

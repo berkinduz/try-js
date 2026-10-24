@@ -4,7 +4,9 @@ import {
   classifyVisitor,
   hasSessionEvent,
   isMeaningfulEdit,
+  isUsageIntent,
 } from "./analytics-policy";
+import type { UsageIntent } from "./analytics-policy";
 
 type EventProps = Record<string, string | number | boolean>;
 
@@ -120,6 +122,25 @@ export function trackEmptyEditorViewed(surface: "javascript" | "typescript") {
 export function trackQuickExampleLoaded(surface: "javascript" | "typescript") {
   if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
   trackEvent("quick_example_loaded", { surface });
+}
+
+/** Optional feedback has a separate, once-per-tab response funnel. */
+export function trackUsageQuestionViewed(surface: AnalyticsSurface) {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_question_viewed")) return;
+  trackEvent("usage_question_viewed", { surface });
+}
+
+export function trackUsageQuestionOpened(surface: AnalyticsSurface) {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_question_opened")) return;
+  trackEvent("usage_question_opened", { surface });
+}
+
+export function trackUsageIntentSelected(surface: AnalyticsSurface, intent: UsageIntent) {
+  if (!isUsageIntent(intent) || window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_intent_selected")) return;
+  trackEvent("usage_intent_selected", { surface, intent });
 }
 
 /** Measure a Features link's intent with bounded values, never its URL. */
