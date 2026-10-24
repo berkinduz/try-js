@@ -105,6 +105,27 @@ test("Features clicks send only an enumerated destination and placement", () => 
   ]));
 });
 
+test("empty-state views are deduplicated and quick example loads cannot activate an unedited tab", () => {
+  const state = analytics(); state.ready();
+  for (const surface of ["javascript", "typescript"]) {
+    state.api.trackEmptyEditorViewed(surface);
+    state.api.trackEmptyEditorViewed(surface);
+  }
+  state.api.trackQuickExampleLoaded("javascript");
+  state.api.trackSuccessfulRun("javascript", "auto", state.api.isSuccessfulRunEligible("auto"));
+  assert.deepEqual(state.delivered, ["editor_empty_viewed", "editor_empty_viewed", "quick_example_loaded"]);
+  state.api.trackFirstMeaningfulEdit("javascript", "const number = 2;", "const number = 4;");
+  state.api.trackSuccessfulRun("javascript", "auto", state.api.isSuccessfulRunEligible("auto"));
+  assert.deepEqual(state.delivered.slice(3), ["first_meaningful_edit", "successful_run", "activation_completed"]);
+
+  for (const path of ["/embed", "/embed/"]) {
+    const embed = analytics("tryjs.app", path); embed.ready();
+    embed.api.trackEmptyEditorViewed("javascript");
+    embed.api.trackQuickExampleLoaded("javascript");
+    assert.deepEqual(embed.delivered, []);
+  }
+});
+
 test("running starter code manually does not consume a later successful edited activation", () => {
   const state = analytics(); state.ready();
   state.api.trackSuccessfulRun("javascript", "manual", true, false);

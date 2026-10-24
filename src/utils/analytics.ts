@@ -109,6 +109,19 @@ export function trackPlaygroundEntered(surface: AnalyticsSurface) {
   trackEvent("playground_entered", { surface });
 }
 
+/** Measure the visible JS/TS empty state once per surface and tab session. */
+export function trackEmptyEditorViewed(surface: "javascript" | "typescript") {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), `editor_empty_viewed:${surface}`)) return;
+  trackEvent("editor_empty_viewed", { surface });
+}
+
+/** Loading the quick example is intent, not a user edit or activation. */
+export function trackQuickExampleLoaded(surface: "javascript" | "typescript") {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  trackEvent("quick_example_loaded", { surface });
+}
+
 /** Measure a Features link's intent with bounded values, never its URL. */
 export function trackFeaturesPlaygroundClick(
   href: string | undefined,

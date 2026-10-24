@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "preact/hooks";
 import { EditorView } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Transaction } from "@codemirror/state";
 import {
   createExtensions,
   languageCompartment,
@@ -21,12 +21,18 @@ import {
 import { isCurrentLocation } from "../../sandbox/source-location";
 import type { SourceLocation } from "../../sandbox/source-location";
 import { highlightSource, sourceHighlight, revealSource } from "./source-navigation";
-import { trackFirstMeaningfulEdit } from "../../utils/analytics";
+import {
+  trackEmptyEditorViewed,
+  trackFirstMeaningfulEdit,
+  trackQuickExampleLoaded,
+} from "../../utils/analytics";
 import { ShareMenu } from "../Playgrounds/ShareMenu";
 import { FormatButton } from "./FormatButton";
 import { setSelection, clearSelection } from "../../state/selection";
 import { openGallery } from "../Gallery/Gallery";
 import "./Editor.css";
+
+const QUICK_EXAMPLE = "const number = 2;\nconsole.log(number * 3);";
 
 const PLACEHOLDER_EXAMPLES = [
   {
@@ -76,6 +82,7 @@ console.log(divide(10, 0));`,
 export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const quickExampleRef = useRef<HTMLButtonElement>(null);
   const [copied, setCopied] = useState(false);
   const [editorFocused, setEditorFocused] = useState(false);
 
@@ -194,6 +201,34 @@ export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
 
   const showPlaceholder = code.value === "" && !editorFocused;
 
+  useEffect(() => {
+    const button = quickExampleRef.current;
+    if (!showPlaceholder || !button) return;
+    const surface = language.value;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      trackEmptyEditorViewed(surface);
+      observer.disconnect();
+    });
+    observer.observe(button);
+    return () => observer.disconnect();
+  }, [showPlaceholder, language.value]);
+
+  const loadQuickExample = () => {
+    const view = viewRef.current;
+    if (!view || view.state.doc.length !== 0) return;
+    const from = QUICK_EXAMPLE.indexOf("2");
+    // A programmatic load must not claim the user's first meaningful edit.
+    view.dispatch({
+      changes: { from: 0, insert: QUICK_EXAMPLE },
+      selection: { anchor: from, head: from + 1 },
+      scrollIntoView: true,
+      annotations: Transaction.addToHistory.of(false),
+    });
+    view.focus();
+    trackQuickExampleLoaded(language.value);
+  };
+
   const handleExampleClick = (
     example: (typeof PLACEHOLDER_EXAMPLES)[number],
   ) => {
@@ -217,12 +252,24 @@ export function Editor({ navigation }: { navigation?: SourceLocation | null }) {
   return (
     <div class="editor-wrapper">
       {showPlaceholder && (
-        <div class="editor-placeholder" aria-hidden="true">
+        <div class="editor-placeholder">
           <div class="editor-placeholder__inner">
             <span class="editor-placeholder__brand">TryJS</span>
             <p class="editor-placeholder__hero">Start typing to run code</p>
+            <button
+              ref={quickExampleRef}
+              type="button"
+              class="editor-placeholder__quick"
+              onClick={loadQuickExample}
+            >
+              <span class="editor-placeholder__quick-label">Try a quick example</span>
+              <code>{QUICK_EXAMPLE}</code>
+              <span class="editor-placeholder__quick-hint">
+                Change the selected number. Results update automatically.
+              </span>
+            </button>
             <div class="editor-placeholder__divider">
-              <span>or try an example</span>
+              <span>or explore more</span>
             </div>
             <div class="editor-placeholder__grid">
               {PLACEHOLDER_EXAMPLES.map((ex) => (
