@@ -1,5 +1,6 @@
 import { track } from "@vercel/analytics";
 import {
+  ACTIVATION_COMPLETED_EVENT,
   claimSessionEvent,
   classifyVisitor,
   hasSessionEvent,
@@ -12,6 +13,7 @@ type EventProps = Record<string, string | number | boolean>;
 
 export type AnalyticsSurface = "javascript" | "typescript" | "web" | "react";
 export type RunTrigger = "auto" | "manual";
+export type UsageQuestionPlacement = "statusbar" | "invite";
 
 const FIRST_MEANINGFUL_EDIT_KEY = "first_meaningful_edit";
 
@@ -131,10 +133,23 @@ export function trackUsageQuestionViewed(surface: AnalyticsSurface) {
   trackEvent("usage_question_viewed", { surface });
 }
 
-export function trackUsageQuestionOpened(surface: AnalyticsSurface) {
+export function trackUsageQuestionOpened(surface: AnalyticsSurface, placement: UsageQuestionPlacement = "statusbar") {
   if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (placement !== "statusbar" && placement !== "invite") return;
   if (!claimSessionEvent(getStorage("sessionStorage"), "usage_question_opened")) return;
-  trackEvent("usage_question_opened", { surface });
+  trackEvent("usage_question_opened", { surface, placement });
+}
+
+export function trackUsageInviteViewed(surface: AnalyticsSurface) {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_invite_viewed")) return;
+  trackEvent("usage_invite_viewed", { surface });
+}
+
+export function trackUsageInviteDismissed(surface: AnalyticsSurface) {
+  if (window.location.pathname.replace(/\/+$/, "") === "/embed") return;
+  if (!claimSessionEvent(getStorage("sessionStorage"), "usage_invite_dismissed")) return;
+  trackEvent("usage_invite_dismissed", { surface });
 }
 
 export function trackUsageIntentSelected(surface: AnalyticsSurface, intent: UsageIntent) {
@@ -190,6 +205,8 @@ export function trackSuccessfulRun(
   // An earlier manual run of starter code must not consume edited activation.
   if (editedAtStart && window.location.pathname !== "/embed" && claimSessionEvent(storage, "activation_completed")) {
     trackEvent("activation_completed", { surface, trigger });
+    try { window.dispatchEvent(new Event(ACTIVATION_COMPLETED_EVENT)); }
+    catch { /* A UI notification must never interrupt execution. */ }
   }
 }
 

@@ -1,4 +1,5 @@
 export type VisitorType = "new" | "returning";
+export const ACTIVATION_COMPLETED_EVENT = "tryjs:activation-completed";
 
 export const USAGE_INTENTS = ["check_snippet", "learn_js_ts", "try_web_ui", "other"] as const;
 export type UsageIntent = (typeof USAGE_INTENTS)[number];
