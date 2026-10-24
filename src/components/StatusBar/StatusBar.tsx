@@ -12,6 +12,7 @@ import { SYNTAX_THEMES } from "../Editor/themes";
 import type { SyntaxThemeId } from "../Editor/themes";
 import { openGallery } from "../Gallery/Gallery";
 import { formatShortcutLabel } from "../Editor/formatting";
+import { UsageFeedback } from "./UsageFeedback";
 import "./StatusBar.css";
 
 export function StatusBar() {
@@ -163,6 +164,7 @@ export function StatusBar() {
           </svg>
           <span class="statusbar__btn-text">Snippets</span>
         </button>
+        <UsageFeedback />
       </div>
 
       <div class="statusbar__right">

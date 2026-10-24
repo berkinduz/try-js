@@ -145,7 +145,8 @@
   transition: opacity 0.2s;
 }
 
-.editor-placeholder:hover {
+.editor-placeholder:hover,
+.editor-placeholder:focus-within {
   opacity: 1;
 }
 
@@ -154,7 +155,15 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  max-width: calc(100% - 24px);
+  max-height: calc(100% - 24px);
+  padding: 6px;
+  overflow: auto;
   pointer-events: auto;
+}
+
+.editor-placeholder__inner > * {
+  flex-shrink: 0;
 }
 
 .editor-placeholder__brand {
@@ -176,6 +185,49 @@
   font-weight: 500;
   color: var(--text-secondary);
   letter-spacing: -0.01em;
+}
+
+.editor-placeholder__quick {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-secondary));
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor-placeholder__quick:hover {
+  border-color: var(--accent);
+}
+
+.editor-placeholder__quick:focus-visible,
+.editor-placeholder__card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.editor-placeholder__quick-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editor-placeholder__quick code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+.editor-placeholder__quick-hint {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .editor-placeholder__divider {

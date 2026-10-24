@@ -1,5 +1,12 @@
 export type VisitorType = "new" | "returning";
 
+export const USAGE_INTENTS = ["check_snippet", "learn_js_ts", "try_web_ui", "other"] as const;
+export type UsageIntent = (typeof USAGE_INTENTS)[number];
+
+export function isUsageIntent(value: unknown): value is UsageIntent {
+  return USAGE_INTENTS.some((intent) => intent === value);
+}
+
 export type AnalyticsStorage = Pick<Storage, "getItem" | "setItem">;
 
 export const ANALYTICS_STORAGE_KEYS = {
