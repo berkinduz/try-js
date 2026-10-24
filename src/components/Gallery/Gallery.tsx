@@ -1,85 +1,153 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { signal } from "@preact/signals";
-import { SNIPPET_CATEGORIES } from "../../data/snippets";
-import type { Snippet } from "../../data/snippets";
+import type { Example } from "../../data/examples";
+import { exampleLabel } from "../../data/examples";
 import { applyPlayground } from "../../state/editor";
 import { clearConsole } from "../../state/console";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent, trackExampleActivity } from "../../utils/analytics";
+import { startGalleryExample } from "../../utils/example-context";
 import { showToast } from "../Toast/Toast";
+import { ExampleSearch, useExampleSearch } from "../Snippets/ExampleSearch";
+import "../Snippets/SnippetsPage.css";
 import "./Gallery.css";
 
 export const galleryOpen = signal(false);
-
+let opener: HTMLElement | null = null;
 export function openGallery() {
+  opener =
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
   galleryOpen.value = true;
 }
-
 function closeGallery() {
   galleryOpen.value = false;
+  opener?.focus({ preventScroll: true });
 }
 
-function loadSnippet(snippet: Snippet) {
-  trackEvent("snippet_load", { title: snippet.title, language: snippet.language });
+function loadExample(example: Example) {
+  try {
+    applyPlayground(example.state);
+  } catch (cause) {
+    showToast(
+      cause instanceof Error
+        ? cause.message
+        : "This example could not be opened.",
+      "error",
+    );
+    return;
+  }
   clearConsole();
-  try { applyPlayground({ mode: "js", language: snippet.language, code: snippet.code }); }
-  catch (cause) { showToast(cause instanceof Error ? cause.message : "This snippet could not be opened.", "error"); return; }
+  startGalleryExample(example.slug);
+  trackEvent("snippet_load", {
+    title: example.title,
+    language: example.language,
+  });
+  trackExampleActivity("loaded", example.slug, "gallery");
   closeGallery();
+  requestAnimationFrame(() => {
+    const editor = Array.from(
+      document.querySelectorAll<HTMLElement>(".cm-content"),
+    ).find((element) => element.getClientRects().length > 0);
+    editor?.focus({ preventScroll: true });
+  });
 }
 
 export function Gallery() {
   const isOpen = galleryOpen.value;
-
-  // Close on Escape
+  const search = useExampleSearch();
+  const modalRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeGallery();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeGallery();
+      }
+      if (event.key !== "Tab") return;
+      const items = Array.from(
+        modalRef.current?.querySelectorAll<HTMLElement>(
+          "button, input, select, a[href]",
+        ) ?? [],
+      ).filter((item) => item.getClientRects().length > 0);
+      const first = items[0],
+        last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [isOpen]);
-
   if (!isOpen) return null;
-
   return (
     <div class="gallery-backdrop" onClick={closeGallery}>
-      <div class="gallery-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        class="gallery-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gallery-title"
+        ref={modalRef}
+        onClick={(event) => event.stopPropagation()}
+      >
         <div class="gallery-header">
-          <h2 class="gallery-title">Snippets</h2>
+          <h2 id="gallery-title" class="gallery-title">
+            Examples
+          </h2>
           <button
             type="button"
             class="gallery-close"
             onClick={closeGallery}
-            aria-label="Close gallery"
+            aria-label="Close examples"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            ×
           </button>
         </div>
+        <div class="gallery-search">
+          <ExampleSearch search={search} compact autoFocus />
+        </div>
         <div class="gallery-body">
-          {SNIPPET_CATEGORIES.map((category) => (
-            <div key={category.name} class="gallery-category">
-              <h3 class="gallery-category-name">{category.name}</h3>
-              <div class="gallery-grid">
-                {category.snippets.map((snippet) => (
+          {search.results.length ? (
+            <div class="gallery-grid">
+              {search.results.map((example) => (
+                <div class="gallery-example" key={example.slug}>
                   <button
-                    key={snippet.title}
                     type="button"
                     class="gallery-card"
-                    onClick={() => loadSnippet(snippet)}
+                    onClick={() => loadExample(example)}
                   >
-                    <span class="gallery-card-title">{snippet.title}</span>
-                    <span class="gallery-card-desc">{snippet.description}</span>
-                    <span class={`gallery-card-lang gallery-card-lang--${snippet.language === "typescript" ? "ts" : "js"}`}>
-                      {snippet.language === "typescript" ? "TS" : "JS"}
+                    <span class="gallery-card-title">{example.title}</span>
+                    <span class="gallery-card-desc">{example.description}</span>
+                    <span class="gallery-card-lang">
+                      {exampleLabel(example)} · Load example →
                     </span>
                   </button>
-                ))}
-              </div>
+                  <a href={`/snippets/${example.slug}`} class="gallery-details">
+                    Live page & explanation ↗
+                  </a>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <p class="gallery-empty">
+              No examples found.{" "}
+              <button
+                type="button"
+                class="examples-text-button"
+                onClick={search.reset}
+              >
+                Clear filters
+              </button>
+            </p>
+          )}
+        </div>
+        <div class="gallery-footer">
+          <a href="/snippets">Explore the example library ↗</a>
         </div>
       </div>
     </div>

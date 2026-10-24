@@ -7,6 +7,9 @@ import {
   isUsageIntent,
 } from "./analytics-policy";
 import type { UsageIntent } from "./analytics-policy";
+import { isExampleId } from "../data/example-ids";
+import { hasExampleContext, hasExampleEdit, isExampleEmbed, reportExampleActivity } from "./example-context";
+import type { ExampleAction, ExamplePlacement } from "./example-context";
 
 type EventProps = Record<string, string | number | boolean>;
 
@@ -75,6 +78,7 @@ function trackUmami(name: string, props?: EventProps) {
 
 /** Send outcome events to both integrations; late Umami loading is non-blocking. */
 export function trackEvent(name: string, props?: EventProps) {
+  if (isExampleEmbed()) return;
   try {
     track(name, props);
   } catch {
@@ -98,6 +102,7 @@ function getStorage(type: "localStorage" | "sessionStorage") {
 /** Track a cookie-free new/returning segment once when the app starts. */
 export function initializeAnalytics() {
   if (typeof window === "undefined") return;
+  if (isExampleEmbed()) return;
   const visitorType = classifyVisitor(
     getStorage("localStorage"),
     getStorage("sessionStorage"),
@@ -180,6 +185,9 @@ export function trackFirstMeaningfulEdit(
   after: string,
 ) {
   if (!isMeaningfulEdit(before, after)) return;
+  const example = reportExampleActivity("edited");
+  if (example) trackExampleActivity("edited", example.slug, example.placement);
+  if (isExampleEmbed()) return;
   if (
     !claimSessionEvent(
       getStorage("sessionStorage"),
@@ -202,6 +210,11 @@ export function trackSuccessfulRun(
   eligibleAtStart: boolean,
   editedAtStart = trigger === "auto" && eligibleAtStart,
 ) {
+  if (eligibleAtStart && editedAtStart) {
+    const example = reportExampleActivity("activated");
+    if (example) trackExampleActivity("activated", example.slug, example.placement);
+  }
+  if (isExampleEmbed()) return;
   if (!eligibleAtStart) return;
   const storage = getStorage("sessionStorage");
   if (claimSessionEvent(storage, `successful_run:${surface}`)) {
@@ -215,6 +228,7 @@ export function trackSuccessfulRun(
 
 /** Snapshot activation eligibility when a run or preview generation starts. */
 export function isSuccessfulRunEligible(trigger: RunTrigger): boolean {
+  if (hasExampleContext()) return trigger === "manual" || hasExampleEdit();
   return (
     trigger === "manual" ||
     hasSessionEvent(getStorage("sessionStorage"), FIRST_MEANINGFUL_EDIT_KEY)
@@ -237,6 +251,14 @@ export function trackEmbedCopied(surface: AnalyticsSurface) {
   trackEvent("embed_copied", { surface });
 }
 
-export function trackSupportClick(placement: "toolbar") {
-  trackEvent("support_clicked", { provider: "buy_me_a_coffee", placement });
+export function trackSupportClick(placement: "toolbar" | "examples" | "example", slug?: string) {
+  if (placement === "example" && !isExampleId(slug)) return;
+  trackEvent("support_clicked", { provider: "buy_me_a_coffee", placement, ...(placement === "example" ? { example: slug! } : {}) });
+}
+
+export function trackExampleActivity(action: ExampleAction | "viewed" | "shared", slug: string, placement: ExamplePlacement) {
+  if (!isExampleId(slug) || !["inline", "gallery"].includes(placement) || !["viewed", "loaded", "edited", "activated", "opened", "shared"].includes(action)) return;
+  // An automatic iframe mount and a reset never create more unique conversions.
+  if (!claimSessionEvent(getStorage("sessionStorage"), `example:${action}:${placement}:${slug}`)) return;
+  trackEvent(`example_${action}`, { example: slug, placement });
 }

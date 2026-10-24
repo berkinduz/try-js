@@ -62,7 +62,7 @@ export function ToolbarLinks(_: { currentPath?: string }) {
                 <path d="M8 6l-6 6 6 6" />
                 <line x1="14" y1="4" x2="10" y2="20" />
               </svg>
-              Snippets
+              Examples
             </a>
             <a
               href="/features"

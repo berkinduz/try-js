@@ -1,95 +1,66 @@
 import { useEffect } from "preact/hooks";
-import { SNIPPET_CATEGORIES } from "../../data/snippets";
+import { getAllExamples } from "../../data/examples";
 import { getPageSeo } from "../../data/seo";
 import { trackEvent } from "../../utils/analytics";
+import { ExampleCard } from "./ExampleCard";
+import { ExampleSearch, useExampleSearch } from "./ExampleSearch";
+import { ExamplesLayout } from "./ExamplesLayout";
 import "./SnippetsPage.css";
 
 export function SnippetsPage() {
-  useEffect(() => { trackEvent("snippets_index_view"); }, []);
-
+  const search = useExampleSearch();
+  useEffect(() => {
+    trackEvent("snippets_index_view");
+  }, []);
   return (
-    <main class="snippets-page">
-      <div class="snippets-shell">
-        <header class="snippets-head">
-          <p class="snippets-eyebrow">tryjs.app</p>
-          <h1>{getPageSeo("/snippets").heading}</h1>
+    <ExamplesLayout>
+      <section class="examples-hero" aria-labelledby="examples-title">
+        <p class="examples-eyebrow">
+          THE EXAMPLE LIBRARY <span>•</span> {getAllExamples().length} things to
+          try
+        </p>
+        <h1 id="examples-title">{getPageSeo("/snippets").heading}</h1>
+        <p>
+          Explore a package. Understand a behavior. Build something small.
+          <br class="examples-desktop-break" /> Working JavaScript, TypeScript,
+          React and Web examples, ready to make your own.
+        </p>
+        <div class="examples-hero-note">
+          <span aria-hidden="true">+</span> Edit the code. See what changes. No
+          setup or account.
+        </div>
+      </section>
+      <section aria-label="Browse examples">
+        <ExampleSearch search={search} />
+        <noscript>
           <p>
-            Start from working JavaScript, async, and TypeScript examples, then
-            open them in the TryJS playground to edit, run, share, or extend.
+            Browse all examples below. Enable JavaScript to search, filter and
+            use the live editors.
           </p>
-          <nav class="snippets-nav">
-            <a class="snippets-btn snippets-btn--primary" href="/">
-              Open Playground
-            </a>
-            <a class="snippets-btn" href="/web">
-              Web Playground
-            </a>
-            <a class="snippets-btn" href="/react">
-              React Playground
-            </a>
-            <a class="snippets-btn" href="/features">
-              Features
-            </a>
-          </nav>
-        </header>
-
-        {SNIPPET_CATEGORIES.map((category) => (
-          <section class="snippets-category" key={category.name}>
-            <h2>{category.name}</h2>
-            <div class="snippets-grid">
-              {category.snippets.map((snippet) => (
-                <a
-                  key={snippet.slug}
-                  class="snippet-card"
-                  href={`/snippets/${snippet.slug}`}
-                >
-                  <h3>{snippet.title}</h3>
-                  <p>{snippet.description}</p>
-                  <span class="snippet-card__lang">{snippet.language}</span>
-                </a>
-              ))}
-            </div>
-          </section>
-        ))}
-
-        <footer class="snippets-footer">
-          <nav class="snippets-footer__links" aria-label="Footer navigation">
-            <a href="/">Playground</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/web">Web</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/react">React</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/features">Features</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a
-              href="https://github.com/berkinduz/try-js"
-              target="_blank"
-              rel="noopener noreferrer"
+        </noscript>
+        {search.results.length > 0 ? (
+          <div class="examples-grid">
+            {search.results.map((example) => (
+              <ExampleCard key={example.slug} example={example} />
+            ))}
+          </div>
+        ) : (
+          <div class="examples-empty">
+            <h2>No examples found</h2>
+            <p>
+              Try a task such as “group”, a package such as “Zod”, or a
+              technology such as “Vue”.
+            </p>
+            <button
+              class="examples-button"
+              type="button"
+              onClick={search.reset}
             >
-              GitHub
-            </a>
-          </nav>
-          <p class="snippets-footer__copy">
-            Built by{" "}
-            <a
-              href="https://github.com/berkinduz"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              berkinduz
-            </a>
-          </p>
-        </footer>
-      </div>
-    </main>
+              Show all examples
+            </button>
+          </div>
+        )}
+      </section>
+    </ExamplesLayout>
   );
 }

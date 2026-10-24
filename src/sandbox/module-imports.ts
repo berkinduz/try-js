@@ -1,7 +1,8 @@
 import { parser } from "@lezer/javascript";
 
 const ESM_SH_BASE = "https://esm.sh/";
-export const REACT_VERSION = "19.3.1";
+import { REACT_VERSION } from "../utils/runtime-versions.ts";
+export { REACT_VERSION };
 
 /** Matches bare npm specifiers: lodash, react, @scope/pkg, lodash/fp */
 export function parsePackageSpecifier(specifier: string): {

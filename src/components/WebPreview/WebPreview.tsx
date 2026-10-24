@@ -143,7 +143,7 @@ export function WebPreview() {
         <iframe
           ref={iframeRef}
           class="web-preview__iframe"
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-forms"
           title="Web preview"
         />
         <div class={`web-preview__console ${isOpen ? "open" : ""}`}>

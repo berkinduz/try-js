@@ -1,215 +1,170 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import {
-  findSnippetBySlug,
-  getAllSnippets,
-  type Snippet,
-} from "../../data/snippets";
-import { encodeToHash } from "../../utils/share";
-import { trackEvent } from "../../utils/analytics";
+  exampleSources,
+  findExample,
+  relatedExamples,
+} from "../../data/examples";
+import {
+  trackEvent,
+  trackExampleActivity,
+  trackSupportClick,
+} from "../../utils/analytics";
+import { ExampleCard } from "./ExampleCard";
+import { ExamplesLayout, SUPPORT_URL } from "./ExamplesLayout";
+import { LiveExample } from "./LiveExample";
+import { ExternalArrow } from "./ExternalArrow";
 import "./SnippetsPage.css";
 
-function getRelatedSnippets(current: Snippet): Snippet[] {
-  const all = getAllSnippets().filter((s) => s.slug !== current.slug);
-  const sameLang = all.filter((s) => s.language === current.language);
-  const others = all.filter((s) => s.language !== current.language);
-  return [...sameLang, ...others].slice(0, 6);
-}
-
 export function SnippetDetailPage({ slug }: { slug: string }) {
-  const result = findSnippetBySlug(slug);
-
+  const example = findExample(slug);
+  const [copyStatus, setCopyStatus] = useState("");
   useEffect(() => {
-    if (!result) return;
-    const { snippet } = result;
-
-    trackEvent("snippet_detail_view", {
-      slug: snippet.slug,
-      language: snippet.language,
-    });
-
-  }, [slug, result]);
-
-  if (!result) {
+    if (!example) return;
+    trackEvent("snippet_detail_view", { slug, language: example.language });
+    trackExampleActivity("viewed", slug, "inline");
+  }, [slug]);
+  if (!example)
     return (
-      <main class="snippets-page">
-        <div class="snippets-shell">
-          <header class="snippets-head">
-            <h1>Snippet not found</h1>
-            <p>
-              The snippet you're looking for doesn't exist.{" "}
-              <a href="/snippets">Browse all snippets</a> or{" "}
-              <a href="/">open the playground</a>.
-            </p>
-          </header>
-        </div>
-      </main>
+      <ExamplesLayout detail>
+        <section class="examples-hero">
+          <h1>Example not found</h1>
+          <p>
+            <a href="/snippets">Browse all examples</a> or{" "}
+            <a href="/">open the playground</a>.
+          </p>
+        </section>
+      </ExamplesLayout>
     );
-  }
-
-  const { snippet, category } = result;
-  const playgroundUrl = `/${encodeToHash({ code: snippet.code, language: snippet.language })}`;
-  const related = getRelatedSnippets(snippet);
-
+  const related = relatedExamples(example);
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/snippets/${example.slug}`,
+      );
+      setCopyStatus("Example link copied");
+      trackExampleActivity("shared", example.slug, "inline");
+    } catch {
+      setCopyStatus("Copy this page’s address to share the example.");
+    }
+  };
   return (
-    <main class="snippets-page">
-      <div class="snippets-shell">
-        <header class="snippets-head">
-          <p class="snippets-eyebrow">tryjs.app</p>
-          <h1>{snippet.seoTitle}</h1>
-          <p>{snippet.seoDescription}</p>
+    <ExamplesLayout detail>
+      <nav class="example-breadcrumb" aria-label="Breadcrumb">
+        <a href="/snippets">← All examples</a>
+        <span>{example.technology}</span>
+      </nav>
+      <article>
+        <header class="example-heading">
+          <div class="example-heading__meta">
+            <span>{example.environment}</span>
+            {example.tags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+          <h1>{example.seoTitle}</h1>
+          <p>{example.description}</p>
+          <div class="example-heading__actions">
+            <button
+              type="button"
+              class="examples-text-button"
+              onClick={copyLink}
+            >
+              Copy example link
+            </button>
+            <span role="status">{copyStatus}</span>
+          </div>
         </header>
-
-        <div class="snippet-detail">
-          <nav
-            class="snippet-detail__breadcrumb"
-            aria-label="Breadcrumb"
+        <aside class="example-challenge" aria-label="Something to try">
+          <strong>Try this</strong>
+          <p>{example.tryThis}</p>
+        </aside>
+        <LiveExample key={example.slug} example={example} />
+        <div class="example-after-run">
+          <p>Useful? Help keep TryJS free and independent.</p>
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackSupportClick("example", example.slug)}
           >
-            <a href="/">TryJS</a>
-            <span aria-hidden>/</span>
-            <a href="/snippets">Snippets</a>
-            <span aria-hidden>/</span>
-            <span>{snippet.title}</span>
-          </nav>
-
-          <article class="snippet-detail__card">
-            <div class="snippet-detail__header">
-              <h2>{snippet.title}</h2>
-              <p>{snippet.description}</p>
-              <div class="snippet-detail__meta">
-                <span class="snippet-card__lang">{snippet.language}</span>
-                <span class="snippet-card__lang">{category.name}</span>
+            Support TryJS <ExternalArrow />
+          </a>
+        </div>
+        <div class="example-explanation">
+          <section>
+            <h2>What to expect</h2>
+            <p>{example.expectedResult}</p>
+          </section>
+          {example.longDescription && (
+            <section>
+              <h2>About this example</h2>
+              <p>{example.longDescription}</p>
+            </section>
+          )}
+          <section>
+            <h2>How It Works</h2>
+            {example.howItWorks?.map((section) => (
+              <div key={section.heading}>
+                <h3>{section.heading}</h3>
+                <p>{section.body}</p>
               </div>
-            </div>
-
-            <div class="snippet-detail__code">
-              <pre><code>{snippet.code}</code></pre>
-            </div>
-
-            <div class="snippet-detail__actions">
-              <a class="snippets-btn snippets-btn--primary" href={playgroundUrl}>
-                Run in Playground
-              </a>
-              <a class="snippets-btn" href="/snippets">
-                All Snippets
-              </a>
-            </div>
-          </article>
-
-          {snippet.longDescription && (
-            <section class="snippet-seo" style={{ marginTop: "24px" }}>
-              <h2>Overview</h2>
-              <p>{snippet.longDescription}</p>
-            </section>
-          )}
-
-          {snippet.howItWorks && snippet.howItWorks.length > 0 && (
-            <section class="snippet-seo" style={{ marginTop: "24px" }}>
-              <h2>How It Works</h2>
-              {snippet.howItWorks.map((section, i) => (
-                <div key={i} style={{ marginBottom: i < snippet.howItWorks!.length - 1 ? "14px" : "0" }}>
-                  <h3 style={{ margin: "0 0 4px", fontSize: "14px", color: "var(--text-primary)" }}>
-                    {section.heading}
-                  </h3>
-                  <p style={{ margin: 0 }}>{section.body}</p>
-                </div>
-              ))}
-            </section>
-          )}
-
-          {snippet.commonMistakes && snippet.commonMistakes.length > 0 && (
-            <section class="snippet-seo" style={{ marginTop: "24px" }}>
-              <h2>Common Mistakes</h2>
-              <ul style={{ margin: 0, paddingLeft: "18px" }}>
-                {snippet.commonMistakes.map((m, i) => (
-                  <li key={i} style={{ marginBottom: "6px" }}>{m}</li>
+            ))}
+          </section>
+          {example.commonMistakes?.length ? (
+            <section>
+              <h2>Things to watch for</h2>
+              <ul>
+                {example.commonMistakes.map((mistake) => (
+                  <li key={mistake}>{mistake}</li>
                 ))}
               </ul>
             </section>
-          )}
-
-          {snippet.whenToUse && (
-            <section class="snippet-seo" style={{ marginTop: "24px" }}>
-              <h2>When to Use It</h2>
-              <p>{snippet.whenToUse}</p>
+          ) : null}
+          {example.whenToUse && (
+            <section>
+              <h2>When to use it</h2>
+              <p>{example.whenToUse}</p>
             </section>
           )}
-
-          {snippet.faq && snippet.faq.length > 0 && (
-            <section class="snippet-seo" style={{ marginTop: "24px" }}>
-              <h2>Frequently Asked Questions</h2>
-              {snippet.faq.map((f, i) => (
-                <div key={i} style={{ marginBottom: i < snippet.faq!.length - 1 ? "14px" : "0" }}>
-                  <h3 style={{ margin: "0 0 4px", fontSize: "14px", color: "var(--text-primary)" }}>
-                    {f.question}
-                  </h3>
-                  <p style={{ margin: 0 }}>{f.answer}</p>
-                </div>
+          <details class="example-source">
+            <summary>Read the original source</summary>
+            <p>
+              This is the starting code. Your edits stay in the live editor
+              above.
+            </p>
+            {exampleSources(example).map((source) => (
+              <div key={source.label}>
+                <h3>{source.label}</h3>
+                <pre>
+                  <code>{source.code}</code>
+                </pre>
+              </div>
+            ))}
+          </details>
+          {example.faq?.length ? (
+            <section class="example-faq">
+              <h2>Questions about this example</h2>
+              {example.faq.map((faq) => (
+                <details key={faq.question}>
+                  <summary>{faq.question}</summary>
+                  <p>{faq.answer}</p>
+                </details>
               ))}
             </section>
-          )}
-
-          {related.length > 0 && (
-            <section class="snippet-related">
-              <h2>More Snippets</h2>
-              <div class="snippets-grid">
-                {related.map((s) => (
-                  <a
-                    key={s.slug}
-                    class="snippet-card"
-                    href={`/snippets/${s.slug}`}
-                  >
-                    <h3>{s.title}</h3>
-                    <p>{s.description}</p>
-                    <span class="snippet-card__lang">{s.language}</span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
+          ) : null}
         </div>
-
-        <footer class="snippets-footer">
-          <nav class="snippets-footer__links" aria-label="Footer navigation">
-            <a href="/">Playground</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/web">Web</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/snippets">Snippets</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/react">React</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a href="/features">Features</a>
-            <span class="snippets-footer__dot" aria-hidden>
-              ·
-            </span>
-            <a
-              href="https://github.com/berkinduz/try-js"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </nav>
-          <p class="snippets-footer__copy">
-            Built by{" "}
-            <a
-              href="https://github.com/berkinduz"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              berkinduz
-            </a>
-          </p>
-        </footer>
-      </div>
-    </main>
+      </article>
+      <section class="example-related" aria-labelledby="related-title">
+        <div>
+          <h2 id="related-title">Keep exploring</h2>
+          <a href="/snippets">All examples →</a>
+        </div>
+        <div class="examples-grid">
+          {related.map((item) => (
+            <ExampleCard key={item.slug} example={item} heading={3} />
+          ))}
+        </div>
+      </section>
+    </ExamplesLayout>
   );
 }

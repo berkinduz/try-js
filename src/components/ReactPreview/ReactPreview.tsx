@@ -142,7 +142,7 @@ export function ReactPreview() {
         <iframe
           ref={iframeRef}
           class="react-preview__iframe"
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-forms"
           title="React preview"
         />
         <div class={`react-preview__console ${isOpen ? "open" : ""}`}>

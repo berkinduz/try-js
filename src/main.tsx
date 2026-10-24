@@ -3,9 +3,10 @@ import { inject } from "@vercel/analytics";
 import { getPageSeo, normalizePath } from "./data/seo";
 import { applySeo } from "./utils/seo";
 import { initializeAnalytics } from "./utils/analytics";
+import { isExampleEmbed } from "./utils/example-context";
 import "./index.css";
 
-inject();
+if (!isExampleEmbed()) inject();
 initializeAnalytics();
 
 async function mountPage() {

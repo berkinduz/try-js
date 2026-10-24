@@ -22,6 +22,7 @@ import { readLocal, writeLocal, readSession, writeSession } from "../utils/stora
 import { parsePlayground, playgroundPath, playgroundText, playgroundSurface, samePlayground } from "../utils/playground";
 import type { AppMode, Language, PlaygroundState, PlaygroundSurface } from "../utils/playground";
 import { parseSavedPlayground, readLibrary } from "../utils/library";
+import { clearGalleryExample } from "../utils/example-context";
 import type { SavedPlayground } from "../utils/library";
 
 export type { Language, AppMode } from "../utils/playground";
@@ -142,6 +143,7 @@ export const fileExtension = computed(() =>
 
 export function setLanguage(lang: Language) {
   if (lang === language.value) return;
+  clearGalleryExample();
   trackEvent("language_switch", { language: lang });
   // Save current code for current language
   saveDraft();
@@ -270,6 +272,7 @@ export function setReactCss(newCss: string) {
 }
 
 export function setMode(m: AppMode) {
+  clearGalleryExample();
   saveDraft();
   trackEvent("mode_switch", { mode: m });
   mode.value = m;
@@ -334,6 +337,7 @@ export function saveDraft(): boolean {
 
 /** Assign a validated playground inside the caller's batch, without navigation or storage writes. */
 function setPlaygroundState(next: PlaygroundState): void {
+  clearGalleryExample();
   if (next.mode === "web") {
     webHtml.value = next.html;
     webCss.value = next.css;
@@ -455,6 +459,7 @@ window.addEventListener("pagehide", saveDraft);
 window.addEventListener("popstate", () => {
   // Embedded examples follow hashchange; the /embed path does not identify their mode.
   if (isEmbed) return;
+  clearGalleryExample();
   saveDraft();
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
   mode.value = path === "/react" ? "react" : path === "/web" ? "web" : "js";

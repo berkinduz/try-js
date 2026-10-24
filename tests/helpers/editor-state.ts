@@ -31,6 +31,7 @@ export function editorState(hash = "", pathname = "/", initial: [string, string]
       },
     },
     "../utils/analytics": { trackEvent() {} },
+    "../utils/example-context": { clearGalleryExample() {} },
   };
   const history = {
     replaceState(_: unknown, __: string, path: string) { location.pathname = path; location.hash = ""; },
