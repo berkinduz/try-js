@@ -1,8 +1,16 @@
+export type FeatureIllustration = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+};
+
 export type FeatureDetail = {
   title: string;
   description: string;
   href?: string;
   linkLabel?: string;
+  image?: FeatureIllustration;
 };
 
 export type FeatureSection = {
@@ -14,6 +22,53 @@ export type FeatureSection = {
 
 /** Visible narrative and structured data share the same content and order. */
 export const FEATURES: FeatureSection[] = [
+  {
+    id: "use-cases",
+    title: "Start with a real question",
+    summary:
+      "Check an AI-generated snippet, explore a React behavior, or share a small reproducible bug. Give the code something specific to answer.",
+    details: [
+      {
+        title: "Check AI-generated code",
+        description:
+          "Paste JavaScript or TypeScript from an AI assistant. Change the inputs, inspect the output and follow errors back to the code. Use TypeScript diagnostics to help check the types behind the suggestion.",
+        href: "/",
+        linkLabel: "Check a JS / TS snippet",
+        image: {
+          src: "/images/use-cases/check-ai-code.webp",
+          width: 1536,
+          height: 1024,
+          alt: "Illustration of an assistant's code snippet moving into a browser editor and console for inspection.",
+        },
+      },
+      {
+        title: "Explore a React behavior",
+        description:
+          "Change a component's state, props or hooks and watch the live React 19 preview. Isolate one interaction, try a different approach and bring what you learn back to your app.",
+        href: "/react",
+        linkLabel: "Open the React playground",
+        image: {
+          src: "/images/use-cases/react-behavior.webp",
+          width: 1536,
+          height: 1024,
+          alt: "Illustration of a React code change updating a toggle in a live preview, with a loop connecting code and state.",
+        },
+      },
+      {
+        title: "Share a reproducible bug",
+        description:
+          "Reduce a browser issue to the smallest example that still fails. Copy a share link so someone else can run the same code and inspect what happens. Include the expected result in your bug report.",
+        href: "/web",
+        linkLabel: "Build a Web repro",
+        image: {
+          src: "/images/use-cases/share-repro.webp",
+          width: 1536,
+          height: 1024,
+          alt: "Illustration of two browser editors connected by a share link, each showing the same small example and error.",
+        },
+      },
+    ],
+  },
   {
     id: "try-code",
     title: "Try a small piece of code",
