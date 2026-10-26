@@ -8,7 +8,8 @@ import {
 } from "./analytics-policy";
 import type { UsageIntent } from "./analytics-policy";
 import { isExampleId } from "../data/example-ids";
-import { hasExampleContext, hasExampleEdit, isExampleEmbed, reportExampleActivity } from "./example-context";
+import { hasExampleContext, hasExampleEdit, reportExampleActivity } from "./example-context";
+import { isInlinePlayground } from "./feature-demo-context";
 import type { ExampleAction, ExamplePlacement } from "./example-context";
 
 type EventProps = Record<string, string | number | boolean>;
@@ -78,7 +79,7 @@ function trackUmami(name: string, props?: EventProps) {
 
 /** Send outcome events to both integrations; late Umami loading is non-blocking. */
 export function trackEvent(name: string, props?: EventProps) {
-  if (isExampleEmbed()) return;
+  if (isInlinePlayground()) return;
   try {
     track(name, props);
   } catch {
@@ -102,7 +103,7 @@ function getStorage(type: "localStorage" | "sessionStorage") {
 /** Track a cookie-free new/returning segment once when the app starts. */
 export function initializeAnalytics() {
   if (typeof window === "undefined") return;
-  if (isExampleEmbed()) return;
+  if (isInlinePlayground()) return;
   const visitorType = classifyVisitor(
     getStorage("localStorage"),
     getStorage("sessionStorage"),
@@ -187,7 +188,7 @@ export function trackFirstMeaningfulEdit(
   if (!isMeaningfulEdit(before, after)) return;
   const example = reportExampleActivity("edited");
   if (example) trackExampleActivity("edited", example.slug, example.placement);
-  if (isExampleEmbed()) return;
+  if (isInlinePlayground()) return;
   if (
     !claimSessionEvent(
       getStorage("sessionStorage"),
@@ -214,7 +215,7 @@ export function trackSuccessfulRun(
     const example = reportExampleActivity("activated");
     if (example) trackExampleActivity("activated", example.slug, example.placement);
   }
-  if (isExampleEmbed()) return;
+  if (isInlinePlayground()) return;
   if (!eligibleAtStart) return;
   const storage = getStorage("sessionStorage");
   if (claimSessionEvent(storage, `successful_run:${surface}`)) {

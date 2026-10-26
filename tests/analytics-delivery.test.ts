@@ -6,7 +6,7 @@ import { transform } from "sucrase";
 import * as policy from "../src/utils/analytics-policy.ts";
 import * as exampleIds from "../src/data/example-ids.ts";
 
-function analytics(hostname = "tryjs.app", pathname = "/") {
+function analytics(hostname = "tryjs.app", pathname = "/", inline = false) {
   const delivered: string[] = [];
   const payloads: { name: string; props: unknown }[] = [];
   const vercel: string[] = [];
@@ -31,6 +31,7 @@ function analytics(hostname = "tryjs.app", pathname = "/") {
     "@vercel/analytics": { track(name: string) { vercel.push(name); } }, "./analytics-policy": policy,
     "../data/example-ids": exampleIds,
     "./example-context": { isExampleEmbed: () => false, hasExampleContext: () => false, hasExampleEdit: () => false, reportExampleActivity: () => null },
+    "./feature-demo-context": { isInlinePlayground: () => inline },
   };
   vm.runInNewContext(transform(readFileSync(new URL("../src/utils/analytics.ts", import.meta.url), "utf8"), { transforms: ["typescript", "imports"] }).code, {
     exports, window: browser, document: { getElementById: () => script }, require: (id: string) => modules[id],
@@ -70,6 +71,18 @@ test("local and preview checks do not pollute the production Umami report", () =
   state.ready(); state.api.trackEvent("playground_saved");
   assert.equal(state.delivered.length, 0);
   assert.equal(state.deadlines.size, 0);
+});
+
+test("inline Features demos do not send ordinary events or claim main activation keys", () => {
+  const state = analytics("tryjs.app", "/embed", true);
+  state.ready();
+  state.api.initializeAnalytics();
+  state.api.trackEvent("playground_view", { language: "javascript" });
+  state.api.trackFirstMeaningfulEdit("javascript", "const n = 1;", "const n = 2;");
+  state.api.trackSuccessfulRun("javascript", "manual", true, true);
+  assert.deepEqual(state.delivered, []);
+  assert.deepEqual(state.vercel, []);
+  assert.equal(state.api.isSuccessfulRunEligible("auto"), false);
 });
 
 test("synchronous and asynchronous tracker failures never interrupt editing", async () => {

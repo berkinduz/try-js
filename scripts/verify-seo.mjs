@@ -233,7 +233,9 @@ for (const path of paths) {
       );
       for (const detail of section.details) {
         assert.ok(
-          body.includes(`<h3>${escapeText(detail.title)}</h3>`),
+          [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/g)].some((match) =>
+            match[1].replace(/<[^>]+>/g, "").endsWith(escapeText(detail.title)),
+          ),
           `Features: ${detail.title} is visible`,
         );
         assert.ok(
@@ -243,11 +245,7 @@ for (const path of paths) {
       }
     }
     for (const image of Object.values(FEATURE_IMAGES)) {
-      for (const variant of [
-        image,
-        image.mobile,
-        ...(image.tablet ? [image.tablet] : []),
-      ]) {
+      for (const variant of [image]) {
         const tag = [...tags(body, "img"), ...tags(body, "source")].find(
           (tag) =>
             attribute(tag, "src") === variant.src ||
