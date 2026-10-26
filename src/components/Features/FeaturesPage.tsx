@@ -44,7 +44,13 @@ function ProductScreenshot({
   );
 }
 
-function FeatureCopy({ detail }: { detail: FeatureDetail }) {
+function FeatureCopy({
+  detail,
+  placement = "mode",
+}: {
+  detail: FeatureDetail;
+  placement?: "mode" | "use-case";
+}) {
   return (
     <div class="features-detail">
       <h3>{detail.title}</h3>
@@ -53,7 +59,7 @@ function FeatureCopy({ detail }: { detail: FeatureDetail }) {
         <a
           class="features-text-link"
           href={detail.href}
-          onClick={() => trackFeaturesPlaygroundClick(detail.href, "mode")}
+          onClick={() => trackFeaturesPlaygroundClick(detail.href, placement)}
         >
           {detail.linkLabel}
         </a>
@@ -66,7 +72,7 @@ export function FeaturesPage() {
   useEffect(() => {
     trackEvent("features_view");
   }, []);
-  const [code, results, sharing, comforts] = FEATURES;
+  const [useCases, code, results, sharing, comforts] = FEATURES;
 
   return (
     <div class="features-page">
@@ -121,6 +127,35 @@ export function FeaturesPage() {
             <ProductScreenshot image={FEATURE_IMAGES.playground} eager />
             <figcaption>Your code and its output, in one place.</figcaption>
           </figure>
+
+          <section
+            class="features-use-cases features-section"
+            id={useCases.id}
+            aria-labelledby={`${useCases.id}-heading`}
+          >
+            <div class="features-section-heading">
+              <h2 id={`${useCases.id}-heading`}>{useCases.title}</h2>
+              <p>{useCases.summary}</p>
+            </div>
+            <div class="features-use-cases__grid">
+              {useCases.details.map((detail) => (
+                <article class="features-use-case" key={detail.title}>
+                  {detail.image && (
+                    <img
+                      class="features-use-case__image"
+                      src={detail.image.src}
+                      width={detail.image.width}
+                      height={detail.image.height}
+                      alt={detail.image.alt}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  <FeatureCopy detail={detail} placement="use-case" />
+                </article>
+              ))}
+            </div>
+          </section>
 
           <section
             class="features-code features-section"

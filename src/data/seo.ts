@@ -44,7 +44,7 @@ const PAGES = {
   "/features": {
     title: "TryJS Features — JavaScript, TypeScript, Web & React",
     description:
-      "Try JavaScript, TypeScript, Web and React in your browser. Inspect console output, follow errors, share runnable links and optionally save examples locally.",
+      "Check AI-generated JavaScript or TypeScript, experiment with React components and share reproducible bugs. Explore TryJS, a free browser playground. No signup.",
     heading: "Try code. See what happens.",
   },
   "/snippets": {

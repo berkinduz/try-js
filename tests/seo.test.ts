@@ -121,7 +121,7 @@ test("Features schema follows the visible narrative and links to each section", 
   };
   assert.deepEqual(
     FEATURES.map((section) => section.id),
-    ["try-code", "understand-results", "share-or-save", "editor-comforts"],
+    ["use-cases", "try-code", "understand-results", "share-or-save", "editor-comforts"],
   );
   assert.equal(list.numberOfItems, FEATURES.length);
   assert.equal(list.itemListElement.length, FEATURES.length);

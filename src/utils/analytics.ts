@@ -171,7 +171,7 @@ export function trackUsageIntentSelected(surface: AnalyticsSurface, intent: Usag
 /** Measure a Features link's intent with bounded values, never its URL. */
 export function trackFeaturesPlaygroundClick(
   href: string | undefined,
-  placement: "navigation" | "hero" | "mode" | "faq" | "closing" | "footer",
+  placement: "navigation" | "hero" | "use-case" | "mode" | "faq" | "closing" | "footer",
 ) {
   const target = href === "/" ? "js-ts" : href === "/web" ? "web" : href === "/react" ? "react" : null;
   if (!target) return;

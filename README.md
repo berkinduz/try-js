@@ -2,7 +2,7 @@
 
 Open a tab. Write or paste some code. See the result.
 
-TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and React. Use it to check an idea, understand a language feature, or share a small working example without setting up a project first. No account or installation required.
+TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and React. Use it to check code from an AI assistant, explore a language or React feature, or share a small reproducible bug without setting up a project first. No account or installation required.
 
 **[Open TryJS](https://tryjs.app/)** · [Explore examples](https://tryjs.app/snippets) · [Explore features](https://tryjs.app/features)
 
@@ -10,7 +10,7 @@ TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and
 
 *Filter some data, inspect it, change it. [Open this example](https://tryjs.app/#v=2&code=MYewdgzgLgBGJQKYRgXhgbQFAxgbxihAAcBLYALhgCIBBAJ3oEMBPCagGhgFtSwBXJBCoBGAExcAJuERUo9fohgBfDjnyES5KtQAK9ELwjJOPPoOSiAHFJlUAZkwA2xlWtwEiZSjQAqLYkQAZWB6UmIoU14BIVEAVlswWRhHFyVVLABdAG4sLFBIWCSADygAVWI0OARkADp7UickegAKFoJpJJUASjQAPhgAQk7EbtyCiBAnRFqoJgAjaZaS8uIxvInYaIsUdBWK2vpESX5gRBb1FqI5py54JF7UAevnGABqaqRa7aF3GAAGNTrCZTGZOEAAcxa1F8pG4SnsIHohAAFkoVoQAO4gGCkSSIJjCKLmX40aLUdb5cDQTTeXZwRCYmBBRBQZaIUoHbhMYhtTxaYA9fq08jdYHU0G1cFQmEClBEGAc4jgo4UUxecgQSkAem1MAAosViEcIBBSNSYBAUSAmVA0aRkSb%2BE0uEQQLUsPtiN8eXyRYLlI9ngLZiAADI2xD0ADChPOYuyQA&lang=js).*
 
-[Getting started](#getting-started) · [Sharing](#share-a-working-example) · [Saving](#come-back-to-an-idea) · [Shortcuts](#keyboard-shortcuts) · [Development](#local-development)
+[Getting started](#getting-started) · [Use cases](#what-can-you-use-tryjs-for) · [Sharing](#share-a-working-example) · [Saving](#come-back-to-an-idea) · [Shortcuts](#keyboard-shortcuts) · [Development](#local-development)
 
 ## Getting started
 
@@ -27,6 +27,32 @@ Choose the workspace that fits the question:
 | [React](https://tryjs.app/react) | A JSX component and its CSS, with hooks, npm imports and a live React 19 preview. |
 
 Open **Examples** in the status bar or [explore the library](https://tryjs.app/snippets). Search by task, package or technology across JavaScript, TypeScript, React and Web examples, including Vue, Zod, CSS and Canvas. Each page has an editable playground, something to try, an expected result and readable source. Inline edits stay separate from your main drafts; **Open in TryJS** carries your current changes into the full editor. Package examples show the exact version they use.
+
+## What can you use TryJS for?
+
+### Check AI-generated JavaScript or TypeScript
+
+Paste a snippet from ChatGPT, Copilot or another AI assistant into the playground. Change the inputs and compare the console output with the result you expected. Switch to TypeScript for type diagnostics, completions and hover information; follow a runtime error back to its source when a location is available.
+
+<img src="public/images/use-cases/check-ai-code.webp" alt="Illustration of an assistant's code snippet moving into a browser editor and console for inspection" width="600">
+
+[Check a JS / TS snippet](https://tryjs.app/) or [try a data-validation example with Zod](https://tryjs.app/snippets/zod-validation).
+
+### Explore a React behavior before changing your app
+
+Try a component's state, props or hooks in isolation. Edit its JSX or CSS and see the live React 19 preview update. Start with one interaction, change the behavior and bring what you learn back to your app. Browser-compatible npm imports are available when a small package helps answer the question.
+
+<img src="public/images/use-cases/react-behavior.webp" alt="Illustration of a React code change updating a toggle in a live preview, with a loop connecting code and state" width="600">
+
+[Open the React playground](https://tryjs.app/react) or [experiment with optimistic UI](https://tryjs.app/snippets/react-optimistic-ui).
+
+### Share a small reproducible bug
+
+Reduce a browser issue to the smallest JS/TS, HTML/CSS/JS or React example that still fails. Open **Share → Copy link** and include the link in an issue or conversation, together with the expected result. Someone else can open the same code and investigate it without recreating your project. The link carries a code snapshot; copy a new link after changing the example.
+
+<img src="public/images/use-cases/share-repro.webp" alt="Illustration of two browser editors connected by a share link, each showing the same small example and error" width="600">
+
+[Build a Web repro](https://tryjs.app/web) or [see the sharing options](#share-a-working-example).
 
 ## Follow the result
 

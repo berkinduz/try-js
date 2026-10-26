@@ -46,6 +46,8 @@ Also check the rendered browser: JS → Web → React → Back, embeds, a missin
 
 Features screenshots are static WebP captures of the actual playground and My playgrounds panel, with separate mobile captures so code and output stay legible. The hero image loads eagerly; the supporting images load lazily. Image sizes are checked against the actual WebP headers during build verification. The page remains readable with JavaScript disabled, including the native FAQ disclosures.
 
+The use-case section adds visible guidance for checking AI-generated code, exploring React behavior and sharing reproducible bugs. Its copy lives in `FEATURES`, so it is prerendered and included in the Features structured data in the same order. Three Imagegen illustrations in `public/images/use-cases/` are shared with the README. They illustrate workflows rather than depict the actual interface; their alt text identifies them as illustrations. The original generated PNGs are kept separately from the optimized WebP assets. New illustrations load lazily with explicit dimensions.
+
 Indexing, query performance and field Core Web Vitals should be monitored in Search Console when access is available. These cannot be established by a local build or an automated SEO score.
 
 ## References
