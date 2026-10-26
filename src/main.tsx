@@ -3,10 +3,10 @@ import { inject } from "@vercel/analytics";
 import { getPageSeo, normalizePath } from "./data/seo";
 import { applySeo } from "./utils/seo";
 import { initializeAnalytics } from "./utils/analytics";
-import { isExampleEmbed } from "./utils/example-context";
+import { isInlinePlayground } from "./utils/feature-demo-context";
 import "./index.css";
 
-if (!isExampleEmbed()) inject();
+if (!isInlinePlayground()) inject();
 initializeAnalytics();
 
 async function mountPage() {
@@ -15,7 +15,7 @@ async function mountPage() {
   applySeo(seo);
   const root = document.getElementById("app")!;
   // Informational pages keep their prerendered content while their small UI loads.
-  // They never initialize editors, code execution or the TypeScript worker.
+  // Editors run only in the separate embed frame when a live demo becomes visible.
   if (seo.status === 404) {
     const { NotFoundPage } = await import("./components/NotFoundPage");
     render(<NotFoundPage />, root);

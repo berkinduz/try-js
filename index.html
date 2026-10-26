@@ -26,8 +26,8 @@
     <script>
       if ((location.pathname.replace(/\/+$/, "") || "/") === "/embed") {
         document.documentElement.setAttribute("data-embed", "");
-        // The owning example page records activity; its inline editor is not another visit.
-        if (parent !== window && new URLSearchParams(location.search).has("example"))
+        // Inline editors are demonstrations inside a page, not another visit.
+        if (parent !== window && (new URLSearchParams(location.search).has("example") || new URLSearchParams(location.search).has("demo")))
           document.getElementById("umami-tracker").setAttribute("data-auto-track", "false");
       }
     </script>

@@ -7,6 +7,7 @@ import {
   trackFeaturesPlaygroundClick,
 } from "../../utils/analytics";
 import "./FeaturesPage.css";
+import { FeatureDemo } from "./FeatureDemo";
 
 function ProductScreenshot({
   image,
@@ -17,20 +18,6 @@ function ProductScreenshot({
 }) {
   return (
     <picture>
-      <source
-        media="(max-width: 600px)"
-        srcSet={image.mobile.src}
-        width={image.mobile.width}
-        height={image.mobile.height}
-      />
-      {image.tablet && (
-        <source
-          media="(max-width: 1000px)"
-          srcSet={image.tablet.src}
-          width={image.tablet.width}
-          height={image.tablet.height}
-        />
-      )}
       <img
         src={image.src}
         width={image.width}
@@ -44,13 +31,7 @@ function ProductScreenshot({
   );
 }
 
-function FeatureCopy({
-  detail,
-  placement = "mode",
-}: {
-  detail: FeatureDetail;
-  placement?: "mode" | "use-case";
-}) {
+function FeatureCopy({ detail }: { detail: FeatureDetail }) {
   return (
     <div class="features-detail">
       <h3>{detail.title}</h3>
@@ -59,7 +40,7 @@ function FeatureCopy({
         <a
           class="features-text-link"
           href={detail.href}
-          onClick={() => trackFeaturesPlaygroundClick(detail.href, placement)}
+          onClick={() => trackFeaturesPlaygroundClick(detail.href, "mode")}
         >
           {detail.linkLabel}
         </a>
@@ -123,39 +104,9 @@ export function FeaturesPage() {
             </div>
           </section>
 
-          <figure class="features-product">
+          <FeatureDemo section={useCases} fallback={
             <ProductScreenshot image={FEATURE_IMAGES.playground} eager />
-            <figcaption>Your code and its output, in one place.</figcaption>
-          </figure>
-
-          <section
-            class="features-use-cases features-section"
-            id={useCases.id}
-            aria-labelledby={`${useCases.id}-heading`}
-          >
-            <div class="features-section-heading">
-              <h2 id={`${useCases.id}-heading`}>{useCases.title}</h2>
-              <p>{useCases.summary}</p>
-            </div>
-            <div class="features-use-cases__grid">
-              {useCases.details.map((detail) => (
-                <article class="features-use-case" key={detail.title}>
-                  {detail.image && (
-                    <img
-                      class="features-use-case__image"
-                      src={detail.image.src}
-                      width={detail.image.width}
-                      height={detail.image.height}
-                      alt={detail.image.alt}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  <FeatureCopy detail={detail} placement="use-case" />
-                </article>
-              ))}
-            </div>
-          </section>
+          } />
 
           <section
             class="features-code features-section"

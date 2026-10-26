@@ -2,15 +2,13 @@
 
 Open a tab. Write or paste some code. See the result.
 
-TryJS is a free, open-source playground for JavaScript, TypeScript, HTML/CSS and React. Use it to check code from an AI assistant, explore a language or React feature, or share a small reproducible bug without setting up a project first. No account or installation required.
+A free, open-source playground for **JavaScript, TypeScript, HTML/CSS and React**. Paste code, change it, see the result. No signup or setup.
 
 **[Open TryJS](https://tryjs.app/)** · [Explore examples](https://tryjs.app/snippets) · [Explore features](https://tryjs.app/features)
 
-![TryJS running JavaScript beside a console with a table, an expanded Set and an expression result](docs/images/javascript-playground.jpg)
+<a href="https://tryjs.app/features#use-cases"><img src="docs/images/workflow-demo.gif" alt="Recording of the real TryJS editor: change a JavaScript input, update React state and share a small failing example" width="800"></a>
 
-*Filter some data, inspect it, change it. [Open this example](https://tryjs.app/#v=2&code=MYewdgzgLgBGJQKYRgXhgbQFAxgbxihAAcBLYALhgCIBBAJ3oEMBPCagGhgFtSwBXJBCoBGAExcAJuERUo9fohgBfDjnyES5KtQAK9ELwjJOPPoOSiAHFJlUAZkwA2xlWtwEiZSjQAqLYkQAZWB6UmIoU14BIVEAVlswWRhHFyVVLABdAG4sLFBIWCSADygAVWI0OARkADp7UickegAKFoJpJJUASjQAPhgAQk7EbtyCiBAnRFqoJgAjaZaS8uIxvInYaIsUdBWK2vpESX5gRBb1FqI5py54JF7UAevnGABqaqRa7aF3GAAGNTrCZTGZOEAAcxa1F8pG4SnsIHohAAFkoVoQAO4gGCkSSIJjCKLmX40aLUdb5cDQTTeXZwRCYmBBRBQZaIUoHbhMYhtTxaYA9fq08jdYHU0G1cFQmEClBEGAc4jgo4UUxecgQSkAem1MAAosViEcIBBSNSYBAUSAmVA0aRkSb%2BE0uEQQLUsPtiN8eXyRYLlI9ngLZiAADI2xD0ADChPOYuyQA&lang=js).*
-
-[Getting started](#getting-started) · [Use cases](#what-can-you-use-tryjs-for) · [Sharing](#share-a-working-example) · [Saving](#come-back-to-an-idea) · [Shortcuts](#keyboard-shortcuts) · [Development](#local-development)
+[Quick start](#getting-started) · [Try the live demos](https://tryjs.app/features#use-cases) · [Run locally](#local-development)
 
 ## Getting started
 
@@ -22,37 +20,22 @@ Choose the workspace that fits the question:
 
 | Workspace | What you can try |
 | --- | --- |
-| [JavaScript / TypeScript](https://tryjs.app/) | Expressions, data transformations, async code, types and npm packages, with console output beside the editor. Use **JS / TS** to switch languages. |
-| [Web](https://tryjs.app/web) | HTML, CSS and JavaScript in separate tabs, with a live page preview and a console drawer. |
-| [React](https://tryjs.app/react) | A JSX component and its CSS, with hooks, npm imports and a live React 19 preview. |
+| [JavaScript / TypeScript](https://tryjs.app/) | Run snippets, inspect the console and try browser-ready npm packages. |
+| [Web](https://tryjs.app/web) | Edit HTML, CSS and JavaScript together with a live preview. |
+| [React](https://tryjs.app/react) | Try JSX, hooks and CSS with a live React 19 preview. |
 
-Open **Examples** in the status bar or [explore the library](https://tryjs.app/snippets). Search by task, package or technology across JavaScript, TypeScript, React and Web examples, including Vue, Zod, CSS and Canvas. Each page has an editable playground, something to try, an expected result and readable source. Inline edits stay separate from your main drafts; **Open in TryJS** carries your current changes into the full editor. Package examples show the exact version they use.
+[Browse examples](https://tryjs.app/snippets) for JavaScript, TypeScript, React, Vue and Web APIs. Edit one right on the page, or open **Examples** in the editor.
 
 ## What can you use TryJS for?
 
-### Check AI-generated JavaScript or TypeScript
+- **Paste → check.** Try AI-generated code, change an input and inspect the answer.
+- **Click → tweak.** Play with React state and watch the preview respond.
+- **Break → share.** Turn a bug into a tiny example. Copy a link so someone else can try it.
 
-Paste a snippet from ChatGPT, Copilot or another AI assistant into the playground. Change the inputs and compare the console output with the result you expected. Switch to TypeScript for type diagnostics, completions and hover information; follow a runtime error back to its source when a location is available.
+[Your turn: try the live demos →](https://tryjs.app/features#use-cases)
 
-<img src="public/images/use-cases/check-ai-code.webp" alt="Illustration of an assistant's code snippet moving into a browser editor and console for inspection" width="600">
-
-[Check a JS / TS snippet](https://tryjs.app/) or [try a data-validation example with Zod](https://tryjs.app/snippets/zod-validation).
-
-### Explore a React behavior before changing your app
-
-Try a component's state, props or hooks in isolation. Edit its JSX or CSS and see the live React 19 preview update. Start with one interaction, change the behavior and bring what you learn back to your app. Browser-compatible npm imports are available when a small package helps answer the question.
-
-<img src="public/images/use-cases/react-behavior.webp" alt="Illustration of a React code change updating a toggle in a live preview, with a loop connecting code and state" width="600">
-
-[Open the React playground](https://tryjs.app/react) or [experiment with optimistic UI](https://tryjs.app/snippets/react-optimistic-ui).
-
-### Share a small reproducible bug
-
-Reduce a browser issue to the smallest JS/TS, HTML/CSS/JS or React example that still fails. Open **Share → Copy link** and include the link in an issue or conversation, together with the expected result. Someone else can open the same code and investigate it without recreating your project. The link carries a code snapshot; copy a new link after changing the example.
-
-<img src="public/images/use-cases/share-repro.webp" alt="Illustration of two browser editors connected by a share link, each showing the same small example and error" width="600">
-
-[Build a Web repro](https://tryjs.app/web) or [see the sharing options](#share-a-working-example).
+<details>
+<summary>Editor tools, sharing, saves and shortcuts</summary>
 
 ## Follow the result
 
@@ -87,10 +70,6 @@ The console shows `{ topic: "Promises", minutes: 18 }`. TypeScript adds type-awa
 Open **Web** for HTML/CSS/JS, or choose **React** for JSX and CSS. The preview updates as you edit; open its console drawer to inspect logs and errors.
 
 In React, export your component as the default export. Imports use a shared React 19 runtime, including dependencies that use React.
-
-![TryJS React editor showing a counter component beside its styled, interactive preview](docs/images/react-preview.jpg)
-
-*[Open this counter](https://tryjs.app/react#v=2&mode=react&css=FQAg3iBGD2AeC0BnAlgL2QOwOYC4rQCcATAUwPhlgG4QBfAKBiIE9x6QQBbAQwK0zwAGKuy6Z4ACxLIsEgC54AjIMEA3CSI5FkiAA4AbbszxYCyIppAHuAYxLxkckp0R47GJwUu7uRbdjwAJgAOXWpRSFsAa1NoAFcMIjwAYgAzABZUgGYSEktU6A94VO5OZH1jEERmRCdOeDjkABoq7gxEJDJkVMsbaH1CFMCANhDAxREGADobXiI2DgB3czkJPDKMAAplQQBSFvTlMIBKb19-XBAswLDLSJsYgnjElNS3u8JSAiUwqv7zEDJUjAgCsH2IZHgBF8yDirhAgUEtwicCQEl80EWQhAimGv3SSNggMCAE5ApBEYp0pN6FNDJASPpwCACkUUKgSEpCTRWXJ4ItpLIFCAAOwg4QgfQkOSeJA%2BGyYS5TRQg5w0PoDb6AkWKEXDEHcGgMCSKZm8pBoTlXG7USWYexSGTyJTKmhSmWQvS2RV4eBTQTpNVcXj8DBKdK-CUMXRmwp89lWqm3O0YB2C504qbDdX9QaA-XDEkgmxG%2BjxOS6OJyZnaPSGSqQAYPGg8PgCHGhIkS80JvB65PmgVO4UilRu%2B2SdPCiYgDV55LpQKZa6lyBVuSFBYgZZEVZcvaWWvWSqpKXhDgAKzhcm6zHgfQ8JA8eC9dgo0oFT8s3H0MgwDjqeF3E8M4-B9HEsl%2BRRO3BL4hFgyFoW0OE8BJZEOHuR5niSQEiDsEVgjyUQ5y1ZJAiyLJBGg-I4zwYYVBxCMiWqWpnAaZBejiAhEDzXRoEwED6AYNcZUKHAJGgVQyGZTDYgSHDkhsPxIGGPI6FpCQBOZVtQ3DSMQG7OMLQ5JRFGTWggA&code=JYWwDg9gTgLgBAbzgVwM4FMDKMCGN1wC%2BcAZlBCHAERTo4DGMVA3AFCvoAekscAJuhI5kAG3glkAO0bAIkuAGEIU-FAAUASkSs4cenNTwA2vpUAaOBhhKVAXTgBeFBmx50agAwa2OuLRjIUPJqvroAPCA4wPL0IjioqAByOCDoDlT0OFB8VAB8obpwYahgODFxCcmp6XEARugieQCCcAAqAJKJAJpwAEoAok0KrXD9ABoACv297QCy-YmtYQD0JWX5hYVhABYAjLkA8pIEscD0ANZweFdwMKDoAHQrexubRWC5LfrgcuiSMBYcHARMAYDARAQFJhMIDJHwbiCAG4EMC0RHAdAAdyeyw%2BBXCyhgYGQMFyCFM-0IK0JxNJ%2BKKtRJMDkcDkChBFwcCE0jlylnQ1mU-zUFPgAGo4LsNIRXm84E0%2BPDfkU1vIssAcABabbARV-dIwKDIdB5QDphCtVbKtstGWC5FbwmA9BUkik0lQdf88v0%2BKDbtsCAApTBjVlQRTQh5wTDoAiY7bXegJyQAc3QqBxeM2K0i0Ve3lYhCAA&lang=js) and change its JSX or CSS. The screenshot shows it after three clicks.*
 
 ## Make the editor comfortable
 
@@ -144,6 +123,8 @@ Use **Cmd** on macOS and **Ctrl** on Windows/Linux. Editor shortcuts apply while
 | **Cmd/Ctrl+S** | Save the open named playground, or name the current code |
 | **Cmd/Ctrl+L** | Clear the active console |
 | **Tab** | Accept the selected completion |
+
+</details>
 
 ## Local development
 
