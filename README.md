@@ -128,7 +128,7 @@ Use **Cmd** on macOS and **Ctrl** on Windows/Linux. Editor shortcuts apply while
 
 ## Local development
 
-Use **Node.js 22.18+ within the Node 22 line** (`.nvmrc`). From a clone of this repository:
+Use **Node.js 24 LTS** (`.nvmrc`). From a clone of this repository:
 
 ```bash
 npm ci
